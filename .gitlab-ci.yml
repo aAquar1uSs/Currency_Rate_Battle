@@ -26,16 +26,3 @@ build:
   tags:
     - docker-shared
 
-Exercise0:
-  stage: test
-  script:
-    - 'dotnet test ./tests/Hw8.Exercise0.Tests --no-restore --test-adapter-path:. --logger:"junit;LogFilePath=../../artifacts/{assembly}-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"'
-  tags:
-    - docker-shared
-  artifacts:
-    when: always
-    paths:
-      - ./**/*test-result.xml
-    reports:
-      junit:
-        - ./**/*test-result.xml
