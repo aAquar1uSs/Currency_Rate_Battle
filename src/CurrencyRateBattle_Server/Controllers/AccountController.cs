@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using CurrencyRateBattle_Server.Dto;
-using CurrencyRateBattle_Server.Models;
 using CurrencyRateBattle_Server.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyRateBattle_Server.Controllers
@@ -22,12 +22,12 @@ namespace CurrencyRateBattle_Server.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> LoginAsync([FromBody] UserDto userData)
         {
-            var user = new User { Email = userData.Email, Password = userData.Password };
-            var token = await _accountService.LoginAsync(user);
+            var token = await _accountService.LoginAsync(userData);
 
             if (token is null)
                 return Unauthorized();
@@ -35,14 +35,13 @@ namespace CurrencyRateBattle_Server.Controllers
             return Ok(token);
         }
 
-
         [HttpPost("registration")]
+        [AllowAnonymous]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> RegistrationAsync([FromBody] UserDto userData)
         {
-            var user = new User { Email = userData.Email, Password = userData.Password };
-            var token = await _accountService.RegistrationAsync(user);
+            var token = await _accountService.RegistrationAsync(userData);
 
             if (token is null)
                 return BadRequest();

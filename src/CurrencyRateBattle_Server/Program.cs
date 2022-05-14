@@ -4,6 +4,7 @@ using CurrencyRateBattle_Server.Managers;
 using CurrencyRateBattle_Server.Managers.Impl;
 using CurrencyRateBattle_Server.Services;
 using CurrencyRateBattle_Server.Services.Impl;
+using CurrencyRateBattle_Server.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -55,7 +56,8 @@ host.ConfigureAppConfiguration(app =>
             option.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionDb")));
 
         _ = service.AddOptions()
-            .AddSingleton<IJwtManager, JwtManger>()
+            .AddSingleton<IJwtManager, JwtManager>()
+            .AddSingleton<IEncoder, Sha256Encoder>()
             .AddSingleton<IAccountService, AccountService>();
         _ = service.AddControllers();
     });

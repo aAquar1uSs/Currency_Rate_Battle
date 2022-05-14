@@ -22,6 +22,6 @@ public class CurrencyRateBattleContext : DbContext
         modelBuilder.Entity<User>()
             .HasOne(user => user.Bill)
             .WithOne(acc => acc.User)
-            .HasForeignKey<Account>(bill => bill.AccountRef);
+            .HasForeignKey<Account>(bill => bill.UserRef);
     }
 }

@@ -6,13 +6,13 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace CurrencyRateBattle_Server.Managers.Impl;
 
-public class JwtManger : IJwtManager
+public class JwtManager : IJwtManager
 {
     private readonly ILogger<IJwtManager> _logger;
 
     private readonly IConfiguration _configuration;
 
-    public JwtManger(ILogger<IJwtManager> logger,
+    public JwtManager(ILogger<IJwtManager> logger,
         IConfiguration configuration)
     {
         _logger = logger;
