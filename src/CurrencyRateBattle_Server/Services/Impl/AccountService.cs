@@ -17,7 +17,7 @@ public class AccountService : IAccountService
 
     private readonly IEncoder _encoder;
 
-    public AccountService(ILogger<IAccountService> logger,
+    public AccountService(ILogger<AccountService> logger,
         IServiceScopeFactory scopeFactory,
         IJwtManager jwtManager,
         IEncoder encoder)
@@ -32,7 +32,7 @@ public class AccountService : IAccountService
     {
         var user = new User
         {
-            Email = userData.Email, 
+            Email = userData.Email,
             Password = _encoder.Encrypt(userData.Password)
         };
 
@@ -52,7 +52,11 @@ public class AccountService : IAccountService
 
     public async Task<Tokens?> RegistrationAsync(UserDto userData)
     {
-        var user = new User { Email = userData.Email, Password = _encoder.Encrypt(userData.Password) };
+        var user = new User
+        {
+            Email = userData.Email,
+            Password = _encoder.Encrypt(userData.Password)
+        };
 
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();

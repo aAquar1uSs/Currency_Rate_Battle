@@ -12,7 +12,7 @@ public class JwtManager : IJwtManager
 
     private readonly IConfiguration _configuration;
 
-    public JwtManager(ILogger<IJwtManager> logger,
+    public JwtManager(ILogger<JwtManager> logger,
         IConfiguration configuration)
     {
         _logger = logger;
@@ -31,7 +31,8 @@ public class JwtManager : IJwtManager
                 new(ClaimTypes.Name, user.Email)
             }),
             Expires = DateTime.UtcNow.AddMinutes(10),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey),SecurityAlgorithms.HmacSha256Signature)
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey),
+                SecurityAlgorithms.HmacSha256Signature)
         };
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return new Tokens { Token = tokenHandler.WriteToken(token) };

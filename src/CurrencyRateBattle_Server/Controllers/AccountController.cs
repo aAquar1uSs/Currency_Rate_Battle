@@ -27,6 +27,7 @@ namespace CurrencyRateBattle_Server.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         public async Task<IActionResult> LoginAsync([FromBody] UserDto userData)
         {
+            _logger.LogDebug("Authentication was triggered.");
             var token = await _accountService.LoginAsync(userData);
 
             if (token is null)

@@ -13,5 +13,4 @@ public sealed class Account
     public int UserRef { get; set; }
 
     public User User { get; set; }
-
 }
