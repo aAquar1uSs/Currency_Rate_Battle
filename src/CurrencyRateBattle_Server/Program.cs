@@ -1,3 +1,4 @@
+using CurrencyRateBattle_Server.Contexts;
 using CurrencyRateBattle_Server.Services;
 using CurrencyRateBattle_Server.Services.Impl;
 using Serilog;
@@ -22,9 +23,10 @@ host.ConfigureAppConfiguration(app =>
             .WriteTo.File("AppLog.log")
             .CreateLogger());
     })
-    .ConfigureServices(services =>
+    .ConfigureServices(service =>
     {
-        _ = services.AddOptions()
+        _ = service.AddDbContext<CurrencyRateBattleContext>();
+        _ = service.AddOptions()
             .AddSingleton<IAccountService, AccountService>();
     });
 

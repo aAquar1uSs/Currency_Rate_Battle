@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyRateBattle_Server.Contexts;
 
-public class AccountDbContext : DbContext
+public class CurrencyRateBattleContext : DbContext
 {
     private DbSet<Account> Accounts { get; }
 
-    public AccountDbContext()
+    public CurrencyRateBattleContext()
     {
         Database.EnsureCreated();
     }
@@ -15,5 +15,10 @@ public class AccountDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
     }
 }

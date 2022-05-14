@@ -4,8 +4,12 @@ public class AccountService : IAccountService
 {
     private readonly ILogger<AccountService> _logger;
 
-    public AccountService(ILogger<AccountService> logger)
+    private readonly IServiceScopeFactory _scopeFactory;
+
+    public AccountService(ILogger<AccountService> logger,
+        IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
+        _scopeFactory = scopeFactory;
     }
 }
