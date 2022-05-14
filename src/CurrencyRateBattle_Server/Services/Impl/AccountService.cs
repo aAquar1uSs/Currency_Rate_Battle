@@ -37,4 +37,21 @@ public class AccountService : IAccountService
 
         return _jwtManager.Authenticate(userData);
     }
+
+    public async Task<Tokens?> RegistrationAsync(User userData)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        if (db.Users is null)
+            return null;
+
+        if (await db.Users.AnyAsync(user => user.Email == userData.Email))
+            return null;
+
+        _ = await db.Users.AddAsync(userData);
+        _ = await db.SaveChangesAsync();
+
+        return _jwtManager.Authenticate(userData);
+    }
 }

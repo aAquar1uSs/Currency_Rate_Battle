@@ -37,9 +37,17 @@ namespace CurrencyRateBattle_Server.Controllers
 
 
         [HttpPost("registration")]
-        public async Task<IActionResult> RegistrationAsync([FromBody] User user)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> RegistrationAsync([FromBody] UserDto userData)
         {
-            return Ok();
+            var user = new User { Email = userData.Email, Password = userData.Password };
+            var token = await _accountService.RegistrationAsync(user);
+
+            if (token is null)
+                return BadRequest();
+
+            return Ok(token);
         }
     }
 }

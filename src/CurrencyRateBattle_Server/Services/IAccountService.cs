@@ -5,4 +5,7 @@ namespace CurrencyRateBattle_Server.Services;
 public interface IAccountService
 {
     public Task<Tokens?> LoginAsync(User userData);
+
+    public Task<Tokens?> RegistrationAsync(User userData);
+
 }
