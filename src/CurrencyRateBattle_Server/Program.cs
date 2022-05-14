@@ -1,3 +1,5 @@
+using CurrencyRateBattle_Server.Services;
+using CurrencyRateBattle_Server.Services.Impl;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +24,8 @@ host.ConfigureAppConfiguration(app =>
     })
     .ConfigureServices(services =>
     {
-
+        _ = services.AddOptions()
+            .AddSingleton<IAccountService, AccountService>();
     });
 
 var app = builder.Build();
