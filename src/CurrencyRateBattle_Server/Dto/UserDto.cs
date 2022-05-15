@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CurrencyRateBattle_Server.Dto;
+namespace CurrencyRateBattleServer.Dto;
 
 public class UserDto
 {

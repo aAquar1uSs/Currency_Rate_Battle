@@ -1,11 +1,12 @@
-﻿using CurrencyRateBattle_Server.Contexts;
-using CurrencyRateBattle_Server.Dto;
-using CurrencyRateBattle_Server.Managers;
-using CurrencyRateBattle_Server.Models;
-using CurrencyRateBattle_Server.Tools;
+﻿using CurrencyRateBattleServer.Contexts;
+using CurrencyRateBattleServer.Dto;
+using CurrencyRateBattleServer.Helpers;
+using CurrencyRateBattleServer.Managers;
+using CurrencyRateBattleServer.Models;
+using CurrencyRateBattleServer.Tools;
 using Microsoft.EntityFrameworkCore;
 
-namespace CurrencyRateBattle_Server.Services.Impl;
+namespace CurrencyRateBattleServer.Services.Impl;
 
 public class AccountService : IAccountService
 {
@@ -65,7 +66,8 @@ public class AccountService : IAccountService
             return null;
 
         if (await db.Users.AnyAsync(user => user.Email == userData.Email))
-            return null;
+            throw new CustomException("Email '" + user.Email + "' is already taken");
+        //return null;
 
         _ = await db.Users.AddAsync(user);
         _ = await db.SaveChangesAsync();

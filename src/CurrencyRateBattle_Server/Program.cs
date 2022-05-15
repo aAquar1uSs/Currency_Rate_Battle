@@ -1,10 +1,10 @@
-using System.Text;
-using CurrencyRateBattle_Server.Contexts;
-using CurrencyRateBattle_Server.Managers;
-using CurrencyRateBattle_Server.Managers.Impl;
-using CurrencyRateBattle_Server.Services;
-using CurrencyRateBattle_Server.Services.Impl;
-using CurrencyRateBattle_Server.Tools;
+﻿using System.Text;
+using CurrencyRateBattleServer.Contexts;
+using CurrencyRateBattleServer.Managers;
+using CurrencyRateBattleServer.Managers.Impl;
+using CurrencyRateBattleServer.Services;
+using CurrencyRateBattleServer.Services.Impl;
+using CurrencyRateBattleServer.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

@@ -7,16 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["src/CRB_Client/CRB_Client.csproj", "src/CRB_Client/"]
-RUN dotnet restore "src/CRB_Client/CRB_Client.csproj"
+COPY ["src/CRBClient/CRBClient.csproj", "src/CRBClient/"]
+RUN dotnet restore "src/CRBClient/CRBClient.csproj"
 COPY . .
-WORKDIR "/src/src/CRB_Client"
-RUN dotnet build "CRB_Client.csproj" -c Release -o /app/build
+WORKDIR "/src/src/CRBClient"
+RUN dotnet build "CRBClient.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "CRB_Client.csproj" -c Release -o /app/publish
+RUN dotnet publish "CRBClient.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "CRB_Client.dll"]
+ENTRYPOINT ["dotnet", "CRBClient.dll"]
