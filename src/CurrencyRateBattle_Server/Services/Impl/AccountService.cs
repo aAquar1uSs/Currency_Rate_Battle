@@ -17,6 +17,8 @@ public class AccountService : IAccountService
 
     private readonly IEncoder _encoder;
 
+    private const decimal AccountStartBalance = 10000;
+
     public AccountService(ILogger<AccountService> logger,
         IServiceScopeFactory scopeFactory,
         IJwtManager jwtManager,
@@ -55,7 +57,11 @@ public class AccountService : IAccountService
         var user = new User
         {
             Email = userData.Email,
-            Password = _encoder.Encrypt(userData.Password)
+            Password = _encoder.Encrypt(userData.Password),
+            Bill = new Account()
+            {
+                Amount = AccountStartBalance
+            }
         };
 
         using var scope = _scopeFactory.CreateScope();
