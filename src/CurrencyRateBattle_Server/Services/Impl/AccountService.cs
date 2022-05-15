@@ -59,7 +59,7 @@ public class AccountService : IAccountService
         {
             Email = userData.Email,
             Password = _encoder.Encrypt(userData.Password),
-            Bill = new Account()
+            Bill = new Account
             {
                 Amount = AccountStartBalance
             }
