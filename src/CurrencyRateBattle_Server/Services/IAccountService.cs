@@ -1,7 +1,7 @@
-﻿using CurrencyRateBattle_Server.Dto;
-using CurrencyRateBattle_Server.Models;
+﻿using CurrencyRateBattleServer.Dto;
+using CurrencyRateBattleServer.Models;
 
-namespace CurrencyRateBattle_Server.Services;
+namespace CurrencyRateBattleServer.Services;
 
 public interface IAccountService
 {

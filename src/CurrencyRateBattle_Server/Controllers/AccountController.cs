@@ -1,10 +1,10 @@
 ﻿using System.Net;
-using CurrencyRateBattle_Server.Dto;
-using CurrencyRateBattle_Server.Services;
+using CurrencyRateBattleServer.Dto;
+using CurrencyRateBattleServer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CurrencyRateBattle_Server.Controllers
+namespace CurrencyRateBattleServer.Controllers
 {
     [Route("api/account")]
     [ApiController]

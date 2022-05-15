@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CurrencyRateBattle_Server.Models;
+namespace CurrencyRateBattleServer.Models;
 
 public sealed class Account
 {

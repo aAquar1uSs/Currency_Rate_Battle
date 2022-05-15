@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace CurrencyRateBattle_Server.Tools;
+namespace CurrencyRateBattleServer.Tools;
 
 public class Sha256Encoder : IEncoder
 {

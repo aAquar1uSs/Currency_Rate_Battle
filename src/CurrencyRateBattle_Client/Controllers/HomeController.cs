@@ -1,8 +1,8 @@
-﻿using CRB_Client.Models;
+﻿using CRBClient.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace CRB_Client.Controllers
+namespace CRBClient.Controllers
 {
     public class HomeController : Controller
     {

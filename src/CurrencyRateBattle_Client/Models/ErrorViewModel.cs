@@ -1,4 +1,4 @@
-namespace CRB_Client.Models
+﻿namespace CRBClient.Models
 {
     public class ErrorViewModel
     {
