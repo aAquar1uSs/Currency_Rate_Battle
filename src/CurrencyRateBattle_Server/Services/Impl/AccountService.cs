@@ -73,7 +73,6 @@ public class AccountService : IAccountService
 
         if (await db.Users.AnyAsync(user => user.Email == userData.Email))
             throw new CustomException("Email '" + user.Email + "' is already taken");
-        //return null;
 
         _ = await db.Users.AddAsync(user);
         _ = await db.SaveChangesAsync();

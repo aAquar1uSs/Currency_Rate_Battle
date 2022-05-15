@@ -4,7 +4,6 @@ namespace CurrencyRateBattleServer.Models;
 
 public class Room
 {
-
     [Key]
     public int Id { get; }
 
@@ -15,6 +14,7 @@ public class Room
     /// CurrencyStateRef and IsClosed must be filled when DateTime is passed (with hosted service)
     /// </summary>
     public int? CurrencyStateId { get; set; }
+
     [ForeignKey("CurrencyStateId")]
     public virtual CurrencyState? CurrencyState { get; set; }
 

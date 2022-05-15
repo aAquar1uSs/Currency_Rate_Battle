@@ -56,6 +56,7 @@ namespace CurrencyRateBattleServer.Controllers
             }
             catch (CustomException e)
             {
+                _logger.LogDebug(e.Message);
                 return BadRequest(e.Message);
             }
         }
