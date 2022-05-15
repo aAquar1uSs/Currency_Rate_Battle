@@ -18,6 +18,11 @@ services.AddSwaggerGen();
 
 var host = builder.Host;
 
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
 host.ConfigureAppConfiguration(app =>
     {
         _ = app.AddJsonFile("appsettings.json", true, true)
@@ -25,10 +30,8 @@ host.ConfigureAppConfiguration(app =>
     })
     .ConfigureLogging(loggerBuilder =>
     {
-        _ = loggerBuilder.ClearProviders();
-        _ = loggerBuilder.AddSerilog(new LoggerConfiguration()
-            .WriteTo.File("AppLog.log")
-            .CreateLogger());
+        _ = loggerBuilder.AddSerilog(logger);
+        _ = loggerBuilder.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
     })
     .ConfigureServices(service =>
     {

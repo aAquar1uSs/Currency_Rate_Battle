@@ -42,6 +42,7 @@ namespace CurrencyRateBattle_Server.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> RegistrationAsync([FromBody] UserDto userData)
         {
+            _logger.LogDebug("Registration was triggered.");
             var token = await _accountService.RegistrationAsync(userData);
 
             if (token is null)
