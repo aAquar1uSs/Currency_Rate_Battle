@@ -1,4 +1,4 @@
-﻿namespace CurrencyRateBattle_Server.Tools;
+﻿namespace CurrencyRateBattleServer.Tools;
 
 public interface IEncoder
 {

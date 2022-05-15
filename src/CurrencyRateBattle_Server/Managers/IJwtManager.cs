@@ -1,6 +1,6 @@
-﻿using CurrencyRateBattle_Server.Models;
+﻿using CurrencyRateBattleServer.Models;
 
-namespace CurrencyRateBattle_Server.Managers;
+namespace CurrencyRateBattleServer.Managers;
 
 public interface IJwtManager
 {

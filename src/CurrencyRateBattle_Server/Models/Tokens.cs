@@ -1,4 +1,4 @@
-﻿namespace CurrencyRateBattle_Server.Models;
+﻿namespace CurrencyRateBattleServer.Models;
 
 public class Tokens
 {
