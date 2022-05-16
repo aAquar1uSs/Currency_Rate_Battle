@@ -1,0 +1,74 @@
+﻿@page
+@model CRBClient.Views.Account.Login
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/loginPage.css" type = "text/css"/>
+    <title>Login</title>
+</head>
+<body>
+<div class="main-container">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-3 col-md-6">
+
+                <div class="tab" role="tabpanel">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#Section1" aria-controls="home" role="tab" data-toggle="tab">sign in</a></li>
+                        <li role="presentation"><a href="#Section2" aria-controls="profile" role="tab" data-toggle="tab">sign up</a></li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content tabs">
+                        <div role="tabpanel" class="tab-pane fade in active" id="Section1">
+                            @using (Html.BeginForm("Login", "Account", FormMethod.Post, new {@class = "form-horizontal"}))
+                            {
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Email)
+                                    @Html.TextBoxFor(m => m.Email, "", new { @class = "form-control", @id = "exampleInputEmail1" , @placeholder = "Email" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Password)
+                                    @Html.TextBoxFor(m => m.Password, new {@type = "password", @class = "form-control", @id = "exampleInputPassword1", @placeholder = "Password" })
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-default">Sign in</button>
+                                </div>
+                            }
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="Section2">
+                            @using (Html.BeginForm("Login", "Account", FormMethod.Post, new {@class = "form-horizontal"}))
+                            {
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Email)
+                                    @Html.TextBoxFor(m=>m.Email, new {@class = "form-control", @id = "exampleInputEmail1", @placeholder = "Email"})
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Password)
+                                    @Html.TextBoxFor(m => m.Password, new {@type = "password", @class = "form-control", @id = "exampleInputPassword1", @placeholder = "Password"})
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.ConfirmPassword)
+                                    @Html.TextBoxFor(m => m.ConfirmPassword, new {@type = "password", @class = "form-control", @id = "exampleInputPassword1", @placeholder = "Repeat password"})
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-default">Sign up</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.col-md-offset-3 col-md-6 -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</div>
+</body>
+</html>
