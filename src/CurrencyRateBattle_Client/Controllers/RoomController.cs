@@ -1,40 +1,20 @@
 ﻿using CRBClient.Models;
+using CRBClient.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
 
 namespace CRBClient.Controllers;
 public class RoomsController : Controller
 {
+    private readonly IRoomService _roomService;
+    public RoomsController(IRoomService roomService)
+    {
+        _roomService = roomService;
+    }
+
     public IActionResult Index()
     {
-        IEnumerable<RoomViewModel>? rooms = null;
+        var rooms = _roomService.GetRooms().Result;
 
-        using (var client = new HttpClient())
-        {
-            client.BaseAddress = new Uri("https://gorest.co.in/public/v2/");
-            //HTTP GET
-            var responseTask = client.GetAsync("users");
-            responseTask.Wait();
-
-            var result = responseTask.Result;
-            if (result.IsSuccessStatusCode)
-            {
-                var readTask = result.Content.ReadAsStringAsync();//ReadAsAsync<IList<RoomViewModel>>();
-                readTask.Wait();
-
-                rooms = JsonSerializer.Deserialize<IEnumerable<RoomViewModel>>(readTask.Result);
-            }
-            else
-            {
-                //log response status here..
-
-                rooms = Enumerable.Empty<RoomViewModel>();
-
-                ModelState.AddModelError(string.Empty, "Server error. Please contact administrator.");
-            }
-        }
         return View(rooms);
     }
 }
