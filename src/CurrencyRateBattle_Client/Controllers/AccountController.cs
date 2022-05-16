@@ -1,7 +1,6 @@
-﻿using System.Net;
-using CRBClient.Helpers;
+﻿using CRBClient.Helpers;
 using CRBClient.Models;
-using CRBClient.Services;
+using CRBClient.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRBClient.Controllers;
@@ -30,7 +29,7 @@ public class AccountController : Controller
     {
         try
         {
-            await _userService.LoginAsync(user);
+            await _userService.LoginUserAsync(user);
         }
         catch (CustomException)
         {

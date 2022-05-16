@@ -1,6 +1,6 @@
-﻿using CRBClient.Helpers;
+﻿using System.Net;
+using CRBClient.Helpers;
 using CRBClient.Models;
-using System.Text.Json;
 using Microsoft.Extensions.Options;
 using CRBClient.Services.Interfaces;
 
@@ -28,6 +28,21 @@ public class UserService : IUserService
     public string RegisterUser()
     {
         throw new NotImplementedException();
+    }
+
+    public async Task LoginUserAsync(UserViewModel user)
+    {
+        var response = await _httpClient.PostAsync("api/account/login", user);
+
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            var token = await response.Content.ReadAsStringAsync();
+            _httpClient.SetTokenInHeader(token);
+            return;
+        }
+
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+            throw new CustomException("Unauthorized");
     }
 
     public string UpdateUserInfo()

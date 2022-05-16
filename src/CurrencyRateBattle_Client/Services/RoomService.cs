@@ -23,7 +23,7 @@ public class RoomService : IRoomService
     {
         var rooms = Enumerable.Empty<RoomViewModel>();
         //HTTP GET
-        var responseTask = _httpClient.GetAPIResults(_options.RoomsURL);
+        var responseTask = _httpClient.GetAPIResultsAsync(_options.RoomsURL);
         responseTask.Wait();
 
         var result = responseTask.Result;

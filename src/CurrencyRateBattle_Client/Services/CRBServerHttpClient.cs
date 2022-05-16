@@ -1,16 +1,16 @@
-﻿namespace CRBClient.Services;
+﻿using System.Net.Http.Formatting;
 using CRBClient.Helpers;
 using Microsoft.Extensions.Options;
-using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
+
+namespace CRBClient.Services;
 
 public class CRBServerHttpClient
 {
     private readonly WebServerOptions _options;
     private readonly HttpClient _httpClient;
     private readonly ILogger<CRBServerHttpClient> _logger;
+
     public CRBServerHttpClient(IOptions<WebServerOptions> options, HttpClient httpClient,
             ILogger<CRBServerHttpClient> logger)
     {
@@ -29,7 +29,20 @@ public class CRBServerHttpClient
         return responseMessage;
     }
 
-    public async Task<string> GetAPIResults(string subURL)
+    public async Task<HttpResponseMessage> PostAsync<T>(string requestUrl, T content)
+    {
+        _logger.LogInformation($"Sending request to {requestUrl}...");
+        var response = await _httpClient.PostAsync(requestUrl, content, new JsonMediaTypeFormatter());
+        return response;
+    }
+
+    public void SetTokenInHeader(string token)
+    {
+        _httpClient.DefaultRequestHeaders.Clear();
+        _httpClient.DefaultRequestHeaders.Add("token", token);
+    }
+
+    public async Task<string> GetAPIResultsAsync(string subURL)
     {
         _httpClient.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
@@ -43,11 +56,9 @@ public class CRBServerHttpClient
 
             return result;
         }
-        else
-        {
-            Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
-            return string.Empty;
-        }
+
+        Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
+        return string.Empty;
     }
 
 }
