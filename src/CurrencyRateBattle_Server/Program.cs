@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using CurrencyRateBattleServer.Contexts;
 using CurrencyRateBattleServer.Managers;
-using CurrencyRateBattleServer.Managers.Impl;
+using CurrencyRateBattleServer.Managers.Interfaces;
 using CurrencyRateBattleServer.Services;
-using CurrencyRateBattleServer.Services.Impl;
+using CurrencyRateBattleServer.Services.Interfaces;
 using CurrencyRateBattleServer.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;

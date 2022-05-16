@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
-using CurrencyRateBattleServer.Services;
+using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
