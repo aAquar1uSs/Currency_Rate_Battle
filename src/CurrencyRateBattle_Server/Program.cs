@@ -6,6 +6,7 @@ using CurrencyRateBattleServer.Services;
 using CurrencyRateBattleServer.Services.Interfaces;
 using CurrencyRateBattleServer.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -81,6 +82,11 @@ host.ConfigureAppConfiguration(app =>
 
         _ = service.AddDbContext<CurrencyRateBattleContext>(option =>
             option.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionDb")));
+        //Disable automatic model state validation.
+        _ = service.Configure<ApiBehaviorOptions>(options =>
+        {
+            options.SuppressModelStateInvalidFilter = true;
+        });
 
         _ = service.AddOptions()
             .AddSingleton<IJwtManager, JwtManager>()

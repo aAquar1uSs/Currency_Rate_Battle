@@ -9,12 +9,10 @@ public class UserViewModel
 {
     [BindProperty]
     [DisplayName("Email")]
-    [EmailAddress]
     public string Email { get; set; }
 
     [BindProperty]
     [DisplayName("Password")]
-    [StringLength(30, MinimumLength = 6)]
     public string Password { get; set; }
 
     [BindProperty]

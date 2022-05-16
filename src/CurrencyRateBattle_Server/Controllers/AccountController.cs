@@ -4,6 +4,7 @@ using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace CurrencyRateBattleServer.Controllers
 {
@@ -29,10 +30,13 @@ namespace CurrencyRateBattleServer.Controllers
         public async Task<IActionResult> LoginAsync([FromBody] UserDto userData)
         {
             _logger.LogDebug("Authentication was triggered.");
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data entered.");
+
             var token = await _accountService.LoginAsync(userData);
 
             if (token is null)
-                return Unauthorized();
+                return Unauthorized("This user does not exist. Please check the entered data and try again.");
 
             return Ok(token);
         }
