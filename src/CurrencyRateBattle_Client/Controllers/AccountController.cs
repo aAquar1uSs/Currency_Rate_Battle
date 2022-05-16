@@ -25,7 +25,7 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    public async Task<ActionResult> Login(UserViewModel user)
+    public async Task<ActionResult> LoginAsync(UserViewModel user)
     {
         try
         {
