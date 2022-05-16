@@ -21,7 +21,6 @@ public class JwtManager : IJwtManager
 
     public Tokens Authenticate(User user)
     {
-
         var tokenHandler = new JwtSecurityTokenHandler();
         var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
         var tokenDescriptor = new SecurityTokenDescriptor

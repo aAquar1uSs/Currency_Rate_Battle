@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using CurrencyRateBattleServer.Dto;
+using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,14 +41,23 @@ namespace CurrencyRateBattleServer.Controllers
         [AllowAnonymous]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> RegistrationAsync([FromBody] UserDto userData)
         {
-            var token = await _accountService.RegistrationAsync(userData);
+            try
+            {
+                _logger.LogDebug("Registration was triggered.");
+                var token = await _accountService.RegistrationAsync(userData);
 
-            if (token is null)
-                return BadRequest();
+                if (token is null)
+                    return NotFound();
 
-            return Ok(token);
+                return Ok(token);
+            }
+            catch (CustomException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }
