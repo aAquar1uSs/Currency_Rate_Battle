@@ -54,10 +54,11 @@ namespace CurrencyRateBattleServer.Controllers
 
                 return Ok(token);
             }
-            catch (CustomException e)
+            catch (CustomException ex)
             {
-                _logger.LogDebug(e.Message);
-                return BadRequest(e.Message);
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+
             }
         }
     }
