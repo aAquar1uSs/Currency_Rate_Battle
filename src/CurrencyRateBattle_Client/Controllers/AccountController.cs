@@ -1,10 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CRBClient.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CRBClient.Controllers;
+
 public class AccountController : Controller
 {
-    public IActionResult Index()
+    private readonly ILogger<AccountController> _logger;
+    
+    public AccountController(ILogger<AccountController> logger)
     {
-        return View();
+        _logger = logger;
+    }
+
+    [HttpGet]
+    public IActionResult Login()
+    {
+        return View("LoginView");
+    }
+
+    [HttpPost]
+    public ActionResult Login(UserViewModel user)
+    {
+        return Redirect("/Home/Index");
+    }
+
+    [HttpPost]
+    public ActionResult Registration(UserViewModel user)
+    {
+        return Redirect("/Home/Index");
     }
 }
