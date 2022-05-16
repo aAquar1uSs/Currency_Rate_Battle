@@ -8,13 +8,12 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Login()
     {
-        return View();
+        return View("LoginView");
     }
 
     [HttpPost]
-    public ActionResult Login(User user)
+    public ActionResult Login(UserViewModel user)
     {
-
-        return View();
+        return Redirect("/Home/Index");
     }
 }
