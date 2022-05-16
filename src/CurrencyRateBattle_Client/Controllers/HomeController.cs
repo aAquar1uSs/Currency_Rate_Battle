@@ -47,7 +47,7 @@ namespace CRBClient.Controllers
                     ModelState.AddModelError(string.Empty, "Server error. Please contact administrator.");
                 }
             }
-            return null;
+            return View(rooms);
         }
         public IActionResult Privacy()
         {
