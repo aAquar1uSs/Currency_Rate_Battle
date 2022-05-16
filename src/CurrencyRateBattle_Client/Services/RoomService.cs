@@ -2,17 +2,18 @@
 using CRBClient.Models;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
+using CRBClient.Services.Interfaces;
 
 namespace CRBClient.Services;
 
-public class CRBServer : ICRBServer
+public class RoomService : IRoomService
 {
     private readonly CRBServerHttpClient _httpClient;
     private readonly WebServerOptions _options;
-    private readonly ILogger<CRBServer> _logger;
+    private readonly ILogger<RoomService> _logger;
 
-    public CRBServer(CRBServerHttpClient httpClient,
-           IOptions<WebServerOptions> options, ILogger<CRBServer> logger)
+    public RoomService(CRBServerHttpClient httpClient,
+           IOptions<WebServerOptions> options, ILogger<RoomService> logger)
     {
         _httpClient = httpClient;
         _options = options.Value;

@@ -1,19 +1,19 @@
 ﻿using CRBClient.Models;
-using CRBClient.Services;
+using CRBClient.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRBClient.Controllers;
 public class RoomsController : Controller
 {
-    private readonly ICRBServer _CBRservice;
-    public RoomsController(ICRBServer CBRservice)
+    private readonly IRoomService _roomService;
+    public RoomsController(IRoomService roomService)
     {
-        _CBRservice = CBRservice;
+        _roomService = roomService;
     }
 
     public IActionResult Index()
     {
-        var rooms = _CBRservice.GetRooms().Result;
+        var rooms = _roomService.GetRooms().Result;
 
         return View(rooms);
     }

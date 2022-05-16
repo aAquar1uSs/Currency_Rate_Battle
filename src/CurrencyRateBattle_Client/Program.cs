@@ -1,5 +1,6 @@
 ﻿using CRBClient.Helpers;
 using CRBClient.Services;
+using CRBClient.Services.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.Configure<WebServerOptions>(
     builder.Configuration.GetSection(WebServerOptions.SectionName));
 builder.Services.AddHttpClient<CRBServerHttpClient>();
-builder.Services.AddScoped<ICRBServer, CRBServer>();
+builder.Services.AddScoped<IRoomService, RoomService>();
 
 var app = builder.Build();
 
