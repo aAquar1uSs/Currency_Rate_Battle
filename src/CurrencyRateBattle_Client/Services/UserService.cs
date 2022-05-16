@@ -38,11 +38,11 @@ public class UserService : IUserService
         {
             var token = await response.Content.ReadAsStringAsync();
             _httpClient.SetTokenInHeader(token);
-            return;
         }
-
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-            throw new CustomException("Unauthorized");
+        else
+        {
+            throw new CustomException("This user does not exist. Please check the entered data and try again.");
+        }
     }
 
     public string UpdateUserInfo()

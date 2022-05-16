@@ -27,12 +27,19 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<ActionResult> LoginAsync(UserViewModel user)
     {
+        if (!ModelState.IsValid)
+        {
+            ViewData["ErrorLoginMessage"] = "Invalid data. Please try again.";
+            return View("LoginView");
+        }
+
         try
         {
             await _userService.LoginUserAsync(user);
         }
-        catch (CustomException)
+        catch (CustomException ex)
         {
+            ViewData["ErrorLoginMessage"] = ex.Message;
             return View("LoginView");
         }
 
