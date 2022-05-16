@@ -16,4 +16,10 @@ public class AccountController : Controller
     {
         return Redirect("/Home/Index");
     }
+
+    [HttpPost]
+    public ActionResult Registration(UserViewModel user)
+    {
+        return Redirect("/Home/Index");
+    }
 }
