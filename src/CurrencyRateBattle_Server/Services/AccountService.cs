@@ -43,9 +43,6 @@ public class AccountService : IAccountService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        if (db.Users is null)
-            return null;
-
         if (!await db.Users.AnyAsync(x => x.Email == user.Email && x.Password == user.Password))
         {
             return null;
@@ -69,11 +66,10 @@ public class AccountService : IAccountService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        if (db.Users is null)
-            return null;
-
         if (await db.Users.AnyAsync(user => user.Email == userData.Email))
+        {
             throw new CustomException("Email '" + user.Email + "' is already taken");
+        }
 
         _ = await db.Users.AddAsync(user);
         _ = await db.SaveChangesAsync();

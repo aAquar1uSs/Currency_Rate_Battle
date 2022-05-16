@@ -31,10 +31,7 @@ namespace CurrencyRateBattleServer.Controllers
             _logger.LogDebug("Authentication was triggered.");
             var token = await _accountService.LoginAsync(userData);
 
-            if (token is null)
-                return Unauthorized();
-
-            return Ok(token);
+            return token is null ? Unauthorized() : Ok(token);
         }
 
         [HttpPost("registration")]
@@ -49,16 +46,11 @@ namespace CurrencyRateBattleServer.Controllers
                 _logger.LogDebug("Registration was triggered.");
                 var token = await _accountService.RegistrationAsync(userData);
 
-                if (token is null)
-                    return NotFound();
-
-                return Ok(token);
+                return token is null ? NotFound() : Ok(token);
             }
             catch (CustomException ex)
             {
-                // return error message if there was an exception
-                return BadRequest(new { message = ex.Message });
-
+                return BadRequest(ex.Message);
             }
         }
     }
