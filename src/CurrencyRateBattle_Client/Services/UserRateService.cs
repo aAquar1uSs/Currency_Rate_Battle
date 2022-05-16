@@ -1,36 +1,40 @@
 ﻿using CRBClient.Helpers;
 using CRBClient.Models;
-using System.Text.Json;
 using Microsoft.Extensions.Options;
 using CRBClient.Services.Interfaces;
 
 namespace CRBClient.Services;
 
-public class UserService : IUserService
+public class UserRateService : IUserRateService
 {
     private readonly CRBServerHttpClient _httpClient;
     private readonly WebServerOptions _options;
-    private readonly ILogger<UserService> _logger;
+    private readonly ILogger<UserRateService> _logger;
 
-    public UserService(CRBServerHttpClient httpClient,
-           IOptions<WebServerOptions> options, ILogger<UserService> logger)
+    public UserRateService(CRBServerHttpClient httpClient,
+           IOptions<WebServerOptions> options, ILogger<UserRateService> logger)
     {
         _httpClient = httpClient;
         _options = options.Value;
         _logger = logger;
     }
 
-    public string GetUserInfo()
+    public string DeleteUserRate()
     {
         throw new NotImplementedException();
     }
 
-    public string RegisterUser()
+    public string GetUserRates()
     {
         throw new NotImplementedException();
     }
 
-    public string UpdateUserInfo()
+    public string InsertUserRate()
+    {
+        throw new NotImplementedException();
+    }
+
+    public string UpdateUserRate()
     {
         throw new NotImplementedException();
     }
