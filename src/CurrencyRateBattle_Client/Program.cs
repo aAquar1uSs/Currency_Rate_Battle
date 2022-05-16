@@ -1,7 +1,16 @@
+﻿using CRBClient.Helpers;
+using CRBClient.Services;
+
+
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.Configure<WebServerOptions>(
+    builder.Configuration.GetSection(WebServerOptions.SectionName));
+builder.Services.AddHttpClient<CRBServerHttpClient>();
+builder.Services.AddScoped<ICRBServer, CRBServer>();
 
 var app = builder.Build();
 
