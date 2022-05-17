@@ -18,10 +18,9 @@ public class AccountController : Controller
         _userService = userService;
     }
 
-    [HttpGet]
-    public IActionResult Login()
+    public ActionResult Authorization()
     {
-        return View("LoginView");
+        return View();
     }
 
     [HttpPost]
@@ -33,16 +32,26 @@ public class AccountController : Controller
         }
         catch (CustomException ex)
         {
-            ViewData["ErrorLoginMessage"] = ex.Message;
-            return View("LoginView");
+            ViewData["ErrorMessage"] = ex.Message;
+            return View("Authorization");
         }
 
         return Redirect("/Home/Index");
     }
 
     [HttpPost]
-    public ActionResult Registration(UserViewModel user)
+    public async Task<ActionResult> RegistrationAsync(UserViewModel user)
     {
+        try
+        {
+            await _userService.RegisterUserAsync(user);
+        }
+        catch (CustomException ex)
+        {
+            ViewData["ErrorMessage"] = ex.Message;
+            return View("Authorization");
+        }
+
         return Redirect("/Home/Index");
     }
 }

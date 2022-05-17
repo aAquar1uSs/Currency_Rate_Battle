@@ -17,5 +17,5 @@ public class UserViewModel
 
     [BindProperty]
     [DisplayName("Confirm password")]
-    public string ConfirmPassword { get; set; }
+    public string? ConfirmPassword { get; set; }
 }

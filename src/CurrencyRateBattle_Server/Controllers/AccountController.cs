@@ -4,7 +4,7 @@ using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyRateBattleServer.Controllers
 {
@@ -32,22 +32,20 @@ namespace CurrencyRateBattleServer.Controllers
             _logger.LogDebug("Authentication was triggered.");
             if (!ModelState.IsValid)
                 return BadRequest("Invalid data entered.");
-
             var token = await _accountService.LoginAsync(userData);
 
-            if (token is null)
-                return Unauthorized("This user does not exist. Please check the entered data and try again.");
-
-            return Ok(token);
+            return token is null ? Unauthorized("No such user exists. Try again") : Ok(token);
         }
 
         [HttpPost("registration")]
         [AllowAnonymous]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> RegistrationAsync([FromBody] UserDto userData)
         {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data. Please try again.");
+
             try
             {
                 _logger.LogDebug("Registration was triggered.");
@@ -62,7 +60,11 @@ namespace CurrencyRateBattleServer.Controllers
             {
                 // return error message if there was an exception
                 return BadRequest(new { message = ex.Message });
-
+            }
+            catch (DbUpdateException)
+            {
+                _logger.LogDebug("An unexpected error occurred. When try update data in the database");
+                return BadRequest("An unexpected error occurred. Please try again.");
             }
         }
     }

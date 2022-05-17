@@ -25,9 +25,25 @@ public class UserService : IUserService
         throw new NotImplementedException();
     }
 
-    public string RegisterUser()
+    public async Task RegisterUserAsync(UserViewModel user)
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.PostAsync("api/account/registration", user);
+
+        if (!user.Password.Equals(user.ConfirmPassword, StringComparison.Ordinal))
+        {
+            throw new CustomException("Password is not confirmed.");
+        }
+
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            var token = await response.Content.ReadAsStringAsync();
+            _httpClient.SetTokenInHeader(token);
+        }
+        else
+        {
+            var errorText = await response.Content.ReadAsStringAsync();
+            throw new CustomException(errorText);
+        }
     }
 
     public async Task LoginUserAsync(UserViewModel user)

@@ -19,6 +19,8 @@ public class AccountService : IAccountService
 
     private readonly IEncoder _encoder;
 
+    private readonly SemaphoreSlim _semaphoreSlim = new (1, 1);
+
     private const decimal AccountStartBalance = 10000;
 
     public AccountService(ILogger<AccountService> logger,
@@ -43,13 +45,8 @@ public class AccountService : IAccountService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        if (db.Users is null)
-            return null;
-
         if (!await db.Users.AnyAsync(x => x.Email == user.Email && x.Password == user.Password))
-        {
             return null;
-        }
 
         return _jwtManager.Authenticate(user);
     }
@@ -69,14 +66,19 @@ public class AccountService : IAccountService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        if (db.Users is null)
-            return null;
-
-        if (await db.Users.AnyAsync(user => user.Email == userData.Email))
+        if (await db.Users.AnyAsync(u => u.Email == userData.Email))
             throw new CustomException("Email '" + user.Email + "' is already taken");
 
-        _ = await db.Users.AddAsync(user);
-        _ = await db.SaveChangesAsync();
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            _ = await db.Users.AddAsync(user);
+            _ = await db.SaveChangesAsync();
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
+        }
 
         return _jwtManager.Authenticate(user);
     }

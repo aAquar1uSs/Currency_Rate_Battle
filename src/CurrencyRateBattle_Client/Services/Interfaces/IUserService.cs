@@ -7,7 +7,7 @@ public interface IUserService
 
     string UpdateUserInfo();
 
-    string RegisterUser();
+    Task RegisterUserAsync(UserViewModel user);
 
     Task LoginUserAsync(UserViewModel user);
 }
