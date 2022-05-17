@@ -57,7 +57,8 @@ public class UserService : IUserService
         }
         else
         {
-            throw new CustomException("This user does not exist. Please check the entered data and try again.");
+            var errorMsg = await response.Content.ReadAsStringAsync();
+            throw new CustomException(errorMsg);
         }
     }
 
