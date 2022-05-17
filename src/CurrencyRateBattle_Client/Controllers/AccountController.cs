@@ -32,7 +32,7 @@ public class AccountController : Controller
         }
         catch (CustomException ex)
         {
-            ModelState.AddModelError(nameof(user.Email), ex.Message);
+            ViewData["ErrorMessage"] = ex.Message;
             return View("Authorization");
         }
 
@@ -48,7 +48,7 @@ public class AccountController : Controller
         }
         catch (CustomException ex)
         {
-            ModelState.AddModelError(nameof(user.Email), ex.Message);
+            ViewData["ErrorMessage"] = ex.Message;
             return View("Authorization");
         }
 
