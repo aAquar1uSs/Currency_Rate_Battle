@@ -18,10 +18,9 @@ public class AccountController : Controller
         _userService = userService;
     }
 
-    [HttpGet]
-    public IActionResult Login()
+    public ActionResult Authorization()
     {
-        return View("LoginView");
+        return View();
     }
 
     [HttpPost]
@@ -33,8 +32,8 @@ public class AccountController : Controller
         }
         catch (CustomException ex)
         {
-            ViewData["ErrorLoginMessage"] = ex.Message;
-            return View("LoginView");
+            ModelState.AddModelError(nameof(user.Email), ex.Message);
+            return View("Authorization");
         }
 
         return Redirect("/Home/Index");
@@ -49,8 +48,8 @@ public class AccountController : Controller
         }
         catch (CustomException ex)
         {
-            ViewData["ErrorRegistrationMessage"] = ex.Message;
-            return View("LoginView");
+            ModelState.AddModelError(nameof(user.Email), ex.Message);
+            return View("Authorization");
         }
 
         return Redirect("/Home/Index");

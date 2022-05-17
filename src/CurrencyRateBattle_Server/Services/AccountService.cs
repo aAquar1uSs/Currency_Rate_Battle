@@ -53,11 +53,6 @@ public class AccountService : IAccountService
         return _jwtManager.Authenticate(user);
     }
 
-    public SemaphoreSlim Get_semaphoreSlim()
-    {
-        return _semaphoreSlim;
-    }
-
     public async Task<Tokens?> RegistrationAsync(UserDto userData)
     {
         var user = new User
@@ -73,7 +68,7 @@ public class AccountService : IAccountService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        if (await db.Users.AnyAsync(user => user.Email == userData.Email))
+        if (await db.Users.AnyAsync(u => u.Email == userData.Email))
         {
             throw new CustomException("Email '" + user.Email + "' is already taken");
         }
