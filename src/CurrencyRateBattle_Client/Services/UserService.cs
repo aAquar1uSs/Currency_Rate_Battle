@@ -41,7 +41,8 @@ public class UserService : IUserService
         }
         else
         {
-            throw new CustomException("Invalid data. Please check the entered data and try again.");
+            var errorText = await response.Content.ReadAsStringAsync();
+            throw new CustomException(errorText);
         }
     }
 

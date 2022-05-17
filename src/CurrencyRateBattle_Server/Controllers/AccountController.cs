@@ -4,6 +4,7 @@ using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyRateBattleServer.Controllers
 {
@@ -29,6 +30,8 @@ namespace CurrencyRateBattleServer.Controllers
         public async Task<IActionResult> LoginAsync([FromBody] UserDto userData)
         {
             _logger.LogDebug("Authentication was triggered.");
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data entered.");
             var token = await _accountService.LoginAsync(userData);
 
             return token is null ? Unauthorized() : Ok(token);
@@ -38,19 +41,31 @@ namespace CurrencyRateBattleServer.Controllers
         [AllowAnonymous]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> RegistrationAsync([FromBody] UserDto userData)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid data. Please try again.");
+            }
             try
             {
                 _logger.LogDebug("Registration was triggered.");
-                var token = await _accountService.RegistrationAsync(userData);
+                var token = await _accountService.RegistrationAsync(userData, _accountService.Get_semaphoreSlim());
 
-                return token is null ? NotFound() : Ok(token);
+                if (token is null)
+                    return NotFound();
+
+                return Ok(token);
             }
             catch (CustomException ex)
             {
-                return BadRequest(ex.Message);
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (DbUpdateException)
+            {
+                _logger.LogDebug("An unexpected error occurred. When try update data in the database");
+                return BadRequest(new { message = "An unexpected error occurred. Please try again." });
             }
         }
     }
