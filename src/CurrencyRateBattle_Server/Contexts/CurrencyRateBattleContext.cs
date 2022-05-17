@@ -1,4 +1,5 @@
-﻿using CurrencyRateBattleServer.Models;
+﻿using CurrencyRateBattleServer.Contexts.ModelConfigurations;
+using CurrencyRateBattleServer.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyRateBattleServer.Contexts;
@@ -18,19 +19,9 @@ public class CurrencyRateBattleContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<CurrencyState>(cs => cs.HasKey(k => k.Id));
-        modelBuilder.Entity<Room>()
-            .HasKey(room => room.Id);
-        modelBuilder.Entity<Room>()
-            .Property(r => r.IsClosed)
-            .HasDefaultValue(0);
-
-
-        modelBuilder.Entity<User>(acc => acc.HasKey(k => k.Id));
-        modelBuilder.Entity<Account>(bill => bill.HasKey(b => b.Id));
-        modelBuilder.Entity<User>()
-            .HasOne(user => user.Bill)
-            .WithOne(acc => acc.User)
-            .HasForeignKey<Account>(bill => bill.UserRef);
+        modelBuilder.ApplyConfiguration(new CurrencyStateConfiguration());
+        modelBuilder.ApplyConfiguration(new RoomConfiguration());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfiguration(new AccountConfiguration());
     }
 }

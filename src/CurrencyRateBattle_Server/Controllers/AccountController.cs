@@ -34,7 +34,7 @@ namespace CurrencyRateBattleServer.Controllers
                 return BadRequest("Invalid data entered.");
             var token = await _accountService.LoginAsync(userData);
 
-            return token is null ? Unauthorized() : Ok(token);
+            return token is null ? Unauthorized("No such user exists. Try again") : Ok(token);
         }
 
         [HttpPost("registration")]
@@ -44,13 +44,12 @@ namespace CurrencyRateBattleServer.Controllers
         public async Task<IActionResult> RegistrationAsync([FromBody] UserDto userData)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest("Invalid data. Please try again.");
-            }
+
             try
             {
                 _logger.LogDebug("Registration was triggered.");
-                var token = await _accountService.RegistrationAsync(userData, _accountService.Get_semaphoreSlim());
+                var token = await _accountService.RegistrationAsync(userData);
 
                 if (token is null)
                     return NotFound();
@@ -65,7 +64,7 @@ namespace CurrencyRateBattleServer.Controllers
             catch (DbUpdateException)
             {
                 _logger.LogDebug("An unexpected error occurred. When try update data in the database");
-                return BadRequest(new { message = "An unexpected error occurred. Please try again." });
+                return BadRequest("An unexpected error occurred. Please try again.");
             }
         }
     }
