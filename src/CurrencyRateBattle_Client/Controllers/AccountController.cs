@@ -49,12 +49,6 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<ActionResult> RegistrationAsync(UserViewModel user)
     {
-        if (!ModelState.IsValid)
-        {
-            ViewData["ErrorRegistrationMessage"] = "Invalid data. Please try again.";
-            return View("LoginView");
-        }
-
         try
         {
             await _userService.RegisterUserAsync(user);

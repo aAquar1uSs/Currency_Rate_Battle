@@ -38,15 +38,19 @@ namespace CurrencyRateBattleServer.Controllers
         [AllowAnonymous]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> RegistrationAsync([FromBody] UserDto userData)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid data. Please try again.");
+            }
+
             try
             {
                 _logger.LogDebug("Registration was triggered.");
                 var token = await _accountService.RegistrationAsync(userData);
 
-                return token is null ? NotFound() : Ok(token);
+                return Ok(token);
             }
             catch (CustomException ex)
             {
