@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using CurrencyRateBattleServer.Contexts;
+using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Managers;
 using CurrencyRateBattleServer.Managers.Interfaces;
 using CurrencyRateBattleServer.Services;
@@ -82,20 +82,25 @@ host.ConfigureAppConfiguration(app =>
 
         _ = service.AddDbContext<CurrencyRateBattleContext>(option =>
             option.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionDb")));
+        _ = service.AddDatabaseDeveloperPageExceptionFilter();
         //Disable automatic model state validation.
         _ = service.Configure<ApiBehaviorOptions>(options =>
         {
             options.SuppressModelStateInvalidFilter = true;
         });
 
+
         _ = service.AddOptions()
             .AddSingleton<IJwtManager, JwtManager>()
             .AddSingleton<IEncoder, Sha256Encoder>()
             .AddSingleton<IAccountService, AccountService>();
         _ = service.AddControllers();
+        _= service.AddScoped<CurrencyRateBattleContext>();
     });
 
 var app = builder.Build();
+
+InitDatabase(app.Services);
 
 if (app.Environment.IsDevelopment())
     _ = app.UseDeveloperExceptionPage();
@@ -113,3 +118,13 @@ app.UseEndpoints(endpoints =>
 });
 
 await app.RunAsync();
+
+
+async void InitDatabase(IServiceProvider serviceProvider)
+{
+    using (var serviceScope = serviceProvider.GetService<IServiceScopeFactory>().CreateScope())
+    {
+        var context = serviceScope.ServiceProvider.GetService<CurrencyRateBattleContext>();
+        context.Database.Migrate();
+    }
+}
