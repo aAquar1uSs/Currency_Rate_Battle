@@ -89,7 +89,6 @@ host.ConfigureAppConfiguration(app =>
             options.SuppressModelStateInvalidFilter = true;
         });
 
-
         _ = service.AddOptions()
             .AddSingleton<IJwtManager, JwtManager>()
             .AddSingleton<IEncoder, Sha256Encoder>()
@@ -120,11 +119,9 @@ app.UseEndpoints(endpoints =>
 await app.RunAsync();
 
 
-async void InitDatabase(IServiceProvider serviceProvider)
+void InitDatabase(IServiceProvider serviceProvider)
 {
-    using (var serviceScope = serviceProvider.GetService<IServiceScopeFactory>().CreateScope())
-    {
-        var context = serviceScope.ServiceProvider.GetService<CurrencyRateBattleContext>();
-        context.Database.Migrate();
-    }
+    using var serviceScope = serviceProvider.GetService<IServiceScopeFactory>().CreateScope();
+    var context = serviceScope.ServiceProvider.GetService<CurrencyRateBattleContext>();
+    context.Database.Migrate();
 }

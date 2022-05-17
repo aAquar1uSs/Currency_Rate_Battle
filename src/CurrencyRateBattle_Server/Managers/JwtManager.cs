@@ -28,7 +28,7 @@ public class JwtManager : IJwtManager
         {
             Subject = new ClaimsIdentity(new Claim[]
             {
-                new(ClaimTypes.Name, user.Email)
+                new(ClaimTypes.Name, user.Id.ToString())
             }),
             Expires = DateTime.UtcNow.AddMinutes(10),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey),
