@@ -7,8 +7,10 @@ namespace CurrencyRateBattleServer.Data;
 public class CurrencyRateBattleContext : DbContext
 {
     public DbSet<User> Users { get; set; }
+
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Room> Rooms { get; set; }
+
     public DbSet<CurrencyState> CurrencyStates { get; set; }
 
     public CurrencyRateBattleContext(DbContextOptions<CurrencyRateBattleContext> options)

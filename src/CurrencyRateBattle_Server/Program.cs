@@ -94,6 +94,7 @@ host.ConfigureAppConfiguration(app =>
             .AddSingleton<IEncoder, Sha256Encoder>()
             .AddSingleton<IAccountService, AccountService>();
         _ = service.AddControllers();
+
         _= service.AddScoped<CurrencyRateBattleContext>();
     });
 

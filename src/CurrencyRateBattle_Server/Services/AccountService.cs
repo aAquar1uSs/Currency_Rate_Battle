@@ -46,9 +46,7 @@ public class AccountService : IAccountService
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         if (!await db.Users.AnyAsync(x => x.Email == user.Email && x.Password == user.Password))
-        {
             return null;
-        }
 
         return _jwtManager.Authenticate(user);
     }
@@ -69,9 +67,7 @@ public class AccountService : IAccountService
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         if (await db.Users.AnyAsync(u => u.Email == userData.Email))
-        {
             throw new CustomException("Email '" + user.Email + "' is already taken");
-        }
 
         await _semaphoreSlim.WaitAsync();
         try
