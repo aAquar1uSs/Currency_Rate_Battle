@@ -16,7 +16,7 @@ public class CurrencyRateBattleContext : DbContext
     public CurrencyRateBattleContext(DbContextOptions<CurrencyRateBattleContext> options)
     : base(options)
     {
-        Database.EnsureCreated();
+        //Database.EnsureCreated();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
