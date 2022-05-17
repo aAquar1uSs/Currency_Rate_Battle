@@ -1,4 +1,4 @@
-﻿using CurrencyRateBattleServer.Contexts;
+﻿using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Managers.Interfaces;
