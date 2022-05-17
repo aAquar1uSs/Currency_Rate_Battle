@@ -1,4 +1,6 @@
-﻿using CRBClient.Models;
+﻿using CRBClient.Helpers;
+using CRBClient.Models;
+using CRBClient.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRBClient.Controllers;
@@ -6,10 +8,14 @@ namespace CRBClient.Controllers;
 public class AccountController : Controller
 {
     private readonly ILogger<AccountController> _logger;
-    
-    public AccountController(ILogger<AccountController> logger)
+
+    private readonly IUserService _userService;
+
+    public AccountController(ILogger<AccountController> logger,
+        IUserService userService)
     {
         _logger = logger;
+        _userService = userService;
     }
 
     [HttpGet]
@@ -19,8 +25,18 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    public ActionResult Login(UserViewModel user)
+    public async Task<ActionResult> LoginAsync(UserViewModel user)
     {
+        try
+        {
+            await _userService.LoginUserAsync(user);
+        }
+        catch (CustomException ex)
+        {
+            ViewData["ErrorLoginMessage"] = ex.Message;
+            return View("LoginView");
+        }
+
         return Redirect("/Home/Index");
     }
 

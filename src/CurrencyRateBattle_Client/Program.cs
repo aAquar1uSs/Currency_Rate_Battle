@@ -12,6 +12,7 @@ builder.Services.Configure<WebServerOptions>(
     builder.Configuration.GetSection(WebServerOptions.SectionName));
 builder.Services.AddHttpClient<CRBServerHttpClient>();
 builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

@@ -3,7 +3,11 @@
 namespace CRBClient.Services.Interfaces;
 public interface IUserService
 {
-    public string GetUserInfo();
-    public string UpdateUserInfo();
-    public string RegisterUser();
+    string GetUserInfo();
+
+    string UpdateUserInfo();
+
+    string RegisterUser();
+
+    Task LoginUserAsync(UserViewModel user);
 }

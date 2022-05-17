@@ -1,10 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using CurrencyRateBattleServer.Managers.Interfaces;
 using CurrencyRateBattleServer.Models;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CurrencyRateBattleServer.Managers.Impl;
+namespace CurrencyRateBattleServer.Managers;
 
 public class JwtManager : IJwtManager
 {

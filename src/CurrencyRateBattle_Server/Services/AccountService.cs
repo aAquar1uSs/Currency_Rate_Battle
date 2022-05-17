@@ -1,12 +1,13 @@
 ﻿using CurrencyRateBattleServer.Contexts;
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
-using CurrencyRateBattleServer.Managers;
+using CurrencyRateBattleServer.Managers.Interfaces;
 using CurrencyRateBattleServer.Models;
+using CurrencyRateBattleServer.Services.Interfaces;
 using CurrencyRateBattleServer.Tools;
 using Microsoft.EntityFrameworkCore;
 
-namespace CurrencyRateBattleServer.Services.Impl;
+namespace CurrencyRateBattleServer.Services;
 
 public class AccountService : IAccountService
 {
