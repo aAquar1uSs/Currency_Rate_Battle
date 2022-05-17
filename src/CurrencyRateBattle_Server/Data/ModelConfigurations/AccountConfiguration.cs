@@ -8,6 +8,6 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
 {
     public void Configure(EntityTypeBuilder<Account> builder)
     {
-        builder.ToTable("Account").HasKey(acc => acc.Id);
+        _ = builder.ToTable("Account").HasKey(acc => acc.Id);
     }
 }
