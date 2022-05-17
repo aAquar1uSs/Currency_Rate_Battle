@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CurrencyRateBattleServer.Models;
-public class CurrencyState
+public class AccountHistory
 {
     [Key]
     public Guid Id { get; }
@@ -10,16 +10,18 @@ public class CurrencyState
     [Required]
     public DateTime Date { get; set; }
 
-    public decimal? USDValue { get; set; }
-    public decimal CurrencyExchangeRate { get; set; }
+    public decimal Amount { get; set; }
+
+    //IsCredit = true for credit transactions; dalse - for debit transactions
+    public bool IsCredit { get; set; }
 
     [ForeignKey("RoomId")]
     public Guid RoomId { get; set; }
 
     public virtual Room Room { get; set; }
 
-    [ForeignKey("CurrencyId")]
-    public Guid CurrencyId { get; set; }
+    [ForeignKey("AccountId")]
+    public Guid AccountId { get; set; }
 
-    public virtual Currency Currency { get; set; }
+    public virtual Account Account { get; set; }
 }

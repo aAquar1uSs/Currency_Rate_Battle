@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace CurrencyRateBattleServer.Contexts.ModelConfigurations;
+namespace CurrencyRateBattleServer.Data.ModelConfigurations;
 
 public class CurrencyStateConfiguration : IEntityTypeConfiguration<CurrencyState>
 {

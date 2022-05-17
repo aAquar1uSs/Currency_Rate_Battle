@@ -2,17 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace CurrencyRateBattleServer.Contexts.ModelConfigurations;
+namespace CurrencyRateBattleServer.Data.ModelConfigurations;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable("User").HasKey(user => user.Id);
-        builder.Property(user => user.Email).IsRequired();
-        builder.ToTable("User")
-            .HasOne(user => user.Bill)
+        _ = builder.ToTable("User").HasKey(user => user.Id);
+        _ = builder.Property(user => user.Email).IsRequired();
+        _ = builder.ToTable("User")
+            .HasOne(user => user.Account)
             .WithOne(acc => acc.User)
-            .HasForeignKey<Account>(bill => bill.UserRef);
+            .HasForeignKey<Account>(acc => acc.UserId);
     }
 }
