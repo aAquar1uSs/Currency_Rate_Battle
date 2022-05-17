@@ -1,4 +1,4 @@
-﻿using CurrencyRateBattleServer.Contexts.ModelConfigurations;
+﻿using CurrencyRateBattleServer.Data.ModelConfigurations;
 using CurrencyRateBattleServer.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +16,7 @@ public class CurrencyRateBattleContext : DbContext
     public CurrencyRateBattleContext(DbContextOptions<CurrencyRateBattleContext> options)
     : base(options)
     {
-        Database.EnsureCreated();
+        //Database.EnsureCreated();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,5 +25,8 @@ public class CurrencyRateBattleContext : DbContext
         modelBuilder.ApplyConfiguration(new RoomConfiguration());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new AccountConfiguration());
+        modelBuilder.ApplyConfiguration(new RateConfiguration());
+        modelBuilder.ApplyConfiguration(new AccountHistoryConfiguration());
+        modelBuilder.ApplyConfiguration(new CurrencyConfiguration());
     }
 }

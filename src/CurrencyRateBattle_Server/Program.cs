@@ -120,9 +120,10 @@ app.UseEndpoints(endpoints =>
 await app.RunAsync();
 
 
-void InitDatabase(IServiceProvider serviceProvider)
+static void InitDatabase(IServiceProvider serviceProvider)
 {
     using var serviceScope = serviceProvider.GetService<IServiceScopeFactory>().CreateScope();
     var context = serviceScope.ServiceProvider.GetService<CurrencyRateBattleContext>();
-    context.Database.Migrate();
+    if (context is not null)
+        context.Database.Migrate();
 }
