@@ -1,7 +1,7 @@
 ﻿using CurrencyRateBattleServer.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CurrencyRateBattleServer.Contexts;
+namespace CurrencyRateBattleServer.Data;
 
 public class CurrencyRateBattleContext : DbContext
 {
