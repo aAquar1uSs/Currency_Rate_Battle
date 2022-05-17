@@ -4,10 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CurrencyRateBattleServer.Data.ModelConfigurations;
 
-public class AccountConfiguration : IEntityTypeConfiguration<Account>
+public class CurrencyConfiguration : IEntityTypeConfiguration<Currency>
 {
-    public void Configure(EntityTypeBuilder<Account> builder)
+    public void Configure(EntityTypeBuilder<Currency> builder)
     {
-        _ = builder.ToTable("Account").HasKey(acc => acc.Id);
+        _ = builder.ToTable("Currency")
+            .HasKey(cur => cur.Id);
     }
 }
+
+

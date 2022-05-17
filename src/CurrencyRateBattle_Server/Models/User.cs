@@ -5,7 +5,7 @@ namespace CurrencyRateBattleServer.Models;
 public sealed class User
 {
     [Key]
-    public int Id { get; }
+    public Guid Id { get; }
 
     [Required]
     [EmailAddress]
@@ -14,5 +14,5 @@ public sealed class User
     [Required]
     public string Password { get; set; }
 
-    public Account Bill { get; set; }
+    public Account Account { get; set; }
 }
