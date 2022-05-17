@@ -19,6 +19,8 @@ public class AccountService : IAccountService
 
     private readonly IEncoder _encoder;
 
+    private readonly SemaphoreSlim _semaphoreSlim = new (1, 1);
+
     private const decimal AccountStartBalance = 10000;
 
     public AccountService(ILogger<AccountService> logger,
@@ -51,6 +53,11 @@ public class AccountService : IAccountService
         return _jwtManager.Authenticate(user);
     }
 
+    public SemaphoreSlim Get_semaphoreSlim()
+    {
+        return _semaphoreSlim;
+    }
+
     public async Task<Tokens?> RegistrationAsync(UserDto userData)
     {
         var user = new User
@@ -71,8 +78,16 @@ public class AccountService : IAccountService
             throw new CustomException("Email '" + user.Email + "' is already taken");
         }
 
-        _ = await db.Users.AddAsync(user);
-        _ = await db.SaveChangesAsync();
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            _ = await db.Users.AddAsync(user);
+            _ = await db.SaveChangesAsync();
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
+        }
 
         return _jwtManager.Authenticate(user);
     }
