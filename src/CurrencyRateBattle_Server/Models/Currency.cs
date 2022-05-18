@@ -2,10 +2,12 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CurrencyRateBattleServer.Models;
+
 public class Currency
 {
     [Key]
-    public Guid Id { get; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid Id { get; set; }
 
     [Required]
     [Column(TypeName = "varchar(3)")]
