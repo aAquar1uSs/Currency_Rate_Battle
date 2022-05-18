@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using CurrencyRateBattleServer.Data;
+using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Managers;
 using CurrencyRateBattleServer.Managers.Interfaces;
 using CurrencyRateBattleServer.Services;
@@ -18,7 +19,7 @@ var services = builder.Services;
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen(opt =>
 {
-    opt.SwaggerDoc("v1", new OpenApiInfo {Title = "MyAPI", Version = "v1"});
+    opt.SwaggerDoc("v1", new OpenApiInfo {Title = "CBRAPI", Version = "v1"});
     opt.AddSecurityDefinition("Bearer",
         new OpenApiSecurityScheme
         {
@@ -93,10 +94,13 @@ host.ConfigureAppConfiguration(app =>
             .AddSingleton<IJwtManager, JwtManager>()
             .AddSingleton<IEncoder, Sha256Encoder>()
             .AddSingleton<IAccountService, AccountService>()
-            .AddSingleton<IRoomService, RoomService>();
+            .AddSingleton<IRoomService, RoomService>()
+            .Configure<WebServerOptions>(builder.Configuration.GetSection(WebServerOptions.SectionName));
+
         _ = service.AddControllers();
 
         _= service.AddScoped<CurrencyRateBattleContext>();
+
     });
 
 var app = builder.Build();

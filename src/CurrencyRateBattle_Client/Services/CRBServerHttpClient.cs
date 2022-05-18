@@ -18,7 +18,7 @@ public class CRBServerHttpClient
         _httpClient = httpClient;
         _logger = logger;
 
-        _httpClient.BaseAddress = new Uri(this._options.BaseUrl);
+        _httpClient.BaseAddress = new Uri(_options.BaseUrl);
     }
 
     public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage)
