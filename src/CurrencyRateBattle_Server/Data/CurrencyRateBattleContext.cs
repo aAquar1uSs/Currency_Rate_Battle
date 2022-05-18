@@ -9,7 +9,14 @@ public class CurrencyRateBattleContext : DbContext
     public DbSet<User> Users { get; set; }
 
     public DbSet<Account> Accounts { get; set; }
+
+    public DbSet<AccountHistory> AccountHistory { get; set; }
+
+    public DbSet<Rate> Rates { get; set; }
+
     public DbSet<Room> Rooms { get; set; }
+
+    public DbSet<Currency> Currencies { get; set; }
 
     public DbSet<CurrencyState> CurrencyStates { get; set; }
 

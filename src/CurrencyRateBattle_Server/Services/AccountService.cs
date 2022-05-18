@@ -6,11 +6,14 @@ using CurrencyRateBattleServer.Models;
 using CurrencyRateBattleServer.Services.Interfaces;
 using CurrencyRateBattleServer.Tools;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace CurrencyRateBattleServer.Services;
 
 public class AccountService : IAccountService
 {
+    private readonly WebServerOptions _options;
+
     private readonly ILogger<IAccountService> _logger;
 
     private readonly IServiceScopeFactory _scopeFactory;
@@ -21,17 +24,20 @@ public class AccountService : IAccountService
 
     private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
-    private const decimal AccountStartBalance = 10000;
+    private readonly decimal _accountStartBalance;
 
-    public AccountService(ILogger<AccountService> logger,
+    public AccountService(IOptions<WebServerOptions> options,
+        ILogger<AccountService> logger,
         IServiceScopeFactory scopeFactory,
         IJwtManager jwtManager,
         IEncoder encoder)
     {
+        _options = options.Value;
         _logger = logger;
         _scopeFactory = scopeFactory;
         _jwtManager = jwtManager;
         _encoder = encoder;
+        _accountStartBalance = _options.RegistrationReward;
     }
 
     public async Task<Tokens?> GetUserAsync(UserDto userData)
@@ -59,7 +65,7 @@ public class AccountService : IAccountService
             Password = _encoder.Encrypt(userData.Password),
             Account = new Account
             {
-                Amount = AccountStartBalance
+                Amount = _accountStartBalance
             }
         };
 

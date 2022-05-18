@@ -1,10 +1,11 @@
-﻿namespace CRBClient.Helpers;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
+namespace CRBClient.Helpers;
 public class WebServerOptions
 {
     public const string SectionName = "WebServer";
     [Required]
-    public string BaseUrl { get; set; }
-    public string RoomsURL { get; set; }
+    [Url]
+    public string? BaseUrl { get; set; }
+    public string? RoomsURL { get; set; }
 }
