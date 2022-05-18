@@ -48,7 +48,7 @@ public class CRBServerHttpClient
             new MediaTypeWithQualityHeaderValue("application/json"));
 
         // List data response.
-        var response = _httpClient.GetAsync(subURL).Result;
+        var response = await _httpClient.GetAsync(subURL);
         if (response.IsSuccessStatusCode)
         {
             // Parse the response body.
