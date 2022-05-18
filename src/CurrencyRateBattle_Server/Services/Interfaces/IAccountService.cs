@@ -5,8 +5,8 @@ namespace CurrencyRateBattleServer.Services.Interfaces;
 
 public interface IAccountService
 {
-    public Task<Tokens?> LoginAsync(UserDto userData);
+    public Task<Tokens?> GetUserAsync(UserDto userData);
 
-    public Task<Tokens?> RegistrationAsync(UserDto userData);
+    public Task<Tokens?> СreateUserAsync(UserDto userData);
 
 }
