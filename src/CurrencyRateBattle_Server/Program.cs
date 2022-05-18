@@ -19,7 +19,7 @@ var services = builder.Services;
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen(opt =>
 {
-    opt.SwaggerDoc("v1", new OpenApiInfo {Title = "CBRAPI", Version = "v1"});
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "CBR API", Version = "v1" });
     opt.AddSecurityDefinition("Bearer",
         new OpenApiSecurityScheme
         {

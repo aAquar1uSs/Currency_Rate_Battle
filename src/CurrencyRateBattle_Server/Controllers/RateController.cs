@@ -31,8 +31,8 @@ public class RateController : ControllerBase
         return Ok(rates);
     }
 
-    // GET api/Rates/{id}
-    [HttpGet("{id}")]
+    // GET api/Rates/{accountId}
+    [HttpGet("{accountId}")]
     public async Task<List<Rate>> GetRatesByAccountIdAsync(Guid accountId)
     {
         var rates = await _rateService.GetRatesByAccountIdAsync(accountId);
