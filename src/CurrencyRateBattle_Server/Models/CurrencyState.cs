@@ -5,6 +5,7 @@ namespace CurrencyRateBattleServer.Models;
 public class CurrencyState
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; }
 
     [Required]

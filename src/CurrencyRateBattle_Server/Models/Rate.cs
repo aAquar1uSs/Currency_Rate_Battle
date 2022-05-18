@@ -5,6 +5,7 @@ namespace CurrencyRateBattleServer.Models;
 public class Rate
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; }
 
     //Date when the rate is added by user

@@ -5,6 +5,7 @@ namespace CurrencyRateBattleServer.Models;
 public class AccountHistory
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; }
 
     [Required]

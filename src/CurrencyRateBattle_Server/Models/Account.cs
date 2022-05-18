@@ -6,6 +6,7 @@ namespace CurrencyRateBattleServer.Models;
 public sealed class Account
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; }
 
     [Required]

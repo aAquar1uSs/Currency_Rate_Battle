@@ -23,6 +23,10 @@ public class CurrencyRateBattleContext : DbContext
     public CurrencyRateBattleContext(DbContextOptions<CurrencyRateBattleContext> options)
     : base(options)
     {
+        if (options == null)
+        {
+            throw new ArgumentNullException(nameof(options));
+        }
         //Database.EnsureCreated();
     }
 
@@ -35,5 +39,44 @@ public class CurrencyRateBattleContext : DbContext
         modelBuilder.ApplyConfiguration(new RateConfiguration());
         modelBuilder.ApplyConfiguration(new AccountHistoryConfiguration());
         modelBuilder.ApplyConfiguration(new CurrencyConfiguration());
+
+        //seeding
+        _ = modelBuilder.Entity<Currency>()
+            .HasData(new Currency
+            {
+                Id = Guid.NewGuid(),
+                CurrencyName = "USD",
+                CurrencySymbol = "$",
+                Description = "US Dollar"
+            },
+            new Currency
+            {
+                Id = Guid.NewGuid(),
+                CurrencyName = "EUR",
+                CurrencySymbol = "$",
+                Description = "Euro"
+            },
+            new Currency
+            {
+                Id = Guid.NewGuid(),
+                CurrencyName = "PLN",
+                CurrencySymbol = "zł",
+                Description = "Polish Zlotych"
+            },
+            new Currency
+            {
+                Id = Guid.NewGuid(),
+                CurrencyName = "GBP",
+                CurrencySymbol = "£",
+                Description = "British Pound"
+            },
+            new Currency
+            {
+                Id = Guid.NewGuid(),
+                CurrencyName = "CHF",
+                CurrencySymbol = "Fr",
+                Description = "Swiss Franc"
+            });
+
     }
 }
