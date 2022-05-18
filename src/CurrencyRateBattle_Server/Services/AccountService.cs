@@ -19,7 +19,7 @@ public class AccountService : IAccountService
 
     private readonly IEncoder _encoder;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new (1, 1);
+    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
     private const decimal AccountStartBalance = 10000;
 
@@ -34,7 +34,7 @@ public class AccountService : IAccountService
         _encoder = encoder;
     }
 
-    public async Task<Tokens?> LoginAsync(UserDto userData)
+    public async Task<Tokens?> GetUserAsync(UserDto userData)
     {
         var user = new User
         {
@@ -51,7 +51,7 @@ public class AccountService : IAccountService
         return _jwtManager.Authenticate(user);
     }
 
-    public async Task<Tokens?> RegistrationAsync(UserDto userData)
+    public async Task<Tokens?> СreateUserAsync(UserDto userData)
     {
         var user = new User
         {
