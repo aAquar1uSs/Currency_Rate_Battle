@@ -32,6 +32,7 @@ namespace CurrencyRateBattleServer.Controllers
             _logger.LogDebug("Authentication was triggered.");
             if (!ModelState.IsValid)
                 return BadRequest("Invalid data entered.");
+
             var token = await _accountService.LoginAsync(userData);
 
             return token is null ? Unauthorized("No such user exists. Try again") : Ok(token);
