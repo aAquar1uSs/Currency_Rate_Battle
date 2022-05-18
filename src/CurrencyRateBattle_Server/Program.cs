@@ -95,6 +95,7 @@ host.ConfigureAppConfiguration(app =>
             .AddSingleton<IEncoder, Sha256Encoder>()
             .AddSingleton<IAccountService, AccountService>()
             .AddSingleton<IRoomService, RoomService>()
+            .AddSingleton<IRateService, RateService>()
             .Configure<WebServerOptions>(builder.Configuration.GetSection(WebServerOptions.SectionName));
 
         _ = service.AddControllers();

@@ -1,10 +1,7 @@
 ﻿using CurrencyRateBattleServer.Data;
-using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
-using CurrencyRateBattleServer.Managers.Interfaces;
 using CurrencyRateBattleServer.Models;
 using CurrencyRateBattleServer.Services.Interfaces;
-using CurrencyRateBattleServer.Tools;
 using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyRateBattleServer.Services;
