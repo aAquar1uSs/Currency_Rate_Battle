@@ -8,7 +8,7 @@ public interface IRoomService
 
     public void UpdateRoom(Guid id, Room updatedRoom);
 
-    public Task<List<Room>> GetRoomsAsync(bool isActive);
+    public Task<List<Room>> GetRoomsAsync(bool? isActive);
 
     public Room? GetRoomById(Guid id);
 

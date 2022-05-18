@@ -40,9 +40,13 @@ public class RoomService : IRoomService
         //_DbContext.Entry(room).CurrentValues.SetValues(updatedRoom);
         _ = _DbContext.SaveChanges();
     }
-    public async Task<List<Room>> GetRoomsAsync(bool isActive)
+    public async Task<List<Room>> GetRoomsAsync(bool? isActive)
     {
-        return isActive ? _DbContext.Rooms.Where(r => !r.IsClosed).ToList() : _DbContext.Rooms.ToList();
+        if (isActive == true)
+            return _DbContext.Rooms.Where(r => !r.IsClosed).ToList();
+        if (isActive == false)
+            return _DbContext.Rooms.Where(r => r.IsClosed).ToList();
+        return _DbContext.Rooms.ToList();
     }
     public Room? GetRoomById(Guid id)
     {

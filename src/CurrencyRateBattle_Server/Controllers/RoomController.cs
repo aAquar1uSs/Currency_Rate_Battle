@@ -24,7 +24,7 @@ namespace CurrencyRateBattleServer.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Room>>> GetRoomsAsync(bool isActive = true)
+        public async Task<ActionResult<List<Room>>> GetRoomsAsync(bool? isActive)
         {
             _logger.LogDebug("List of rooms are retrieving.");
             var rooms = await _roomService.GetRoomsAsync(isActive);
