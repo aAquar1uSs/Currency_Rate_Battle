@@ -9,4 +9,6 @@ public interface IAccountService
 
     public Task<Tokens?> СreateUserAsync(UserDto userData);
 
+    public Task<AccountInfoDto?> GetAccountInfoAsync(Guid id);
+
 }

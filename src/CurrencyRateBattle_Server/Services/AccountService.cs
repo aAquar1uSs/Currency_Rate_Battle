@@ -82,4 +82,20 @@ public class AccountService : IAccountService
 
         return _jwtManager.Authenticate(user);
     }
+
+    public async Task<AccountInfoDto?> GetAccountInfoAsync(Guid id)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        var account = await db.Accounts.FirstOrDefaultAsync(a => a.UserId == id);
+
+        var resultDto = new AccountInfoDto
+        {
+            Email = account!.User.Email,
+            Amount = account.Amount
+        };
+
+        return resultDto;
+    }
 }

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Services.Interfaces;
@@ -67,6 +68,35 @@ namespace CurrencyRateBattleServer.Controllers
                 _logger.LogDebug("An unexpected error occurred. When try update data in the database");
                 return BadRequest("An unexpected error occurred. Please try again.");
             }
+        }
+
+        [HttpGet("user-profile")]
+        [Authorize]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> GetUserInfoAsync()
+        {
+            var guidId = GetGuidFromRequest();
+            if (guidId is null)
+                return BadRequest();
+
+            var result = await _accountService.GetAccountInfoAsync((Guid)guidId);
+            return Ok(result);
+        }
+
+        [NonAction]
+        private Guid? GetGuidFromRequest()
+        {
+            Guid id;
+            var user = HttpContext.User;
+
+            if (user.HasClaim(c => c.Type == "UserId"))
+            {
+                id = Guid.Parse(user.Claims.FirstOrDefault(c => c.Type == "UserId")!.Value);
+                return id;
+            }
+
+            return null!;
         }
     }
 }
