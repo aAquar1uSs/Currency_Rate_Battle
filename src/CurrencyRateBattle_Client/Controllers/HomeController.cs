@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Text.Json;
+using CRBClient.Services.Interfaces;
+using PagedList;
+using PagedListExtensions = X.PagedList.PagedListExtensions;
 
 namespace CRBClient.Controllers
 {
@@ -9,14 +12,46 @@ namespace CRBClient.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        private readonly IRoomService _roomService;
+
+        private readonly List<RoomViewModel> _list = new()
+        {
+            new RoomViewModel(),
+            new RoomViewModel(),
+            new RoomViewModel(),
+            new RoomViewModel(),
+            new RoomViewModel(),
+            new RoomViewModel(),
+            new RoomViewModel(),
+            new RoomViewModel(),
+            new RoomViewModel(),
+            new RoomViewModel(),
+            new RoomViewModel(),
+            new RoomViewModel(),
+            new RoomViewModel(),
+            new RoomViewModel()
+        };
+
+        public HomeController(ILogger<HomeController> logger,
+            IRoomService roomService)
         {
             _logger = logger;
+            _roomService = roomService;
         }
 
         public IActionResult Index()
-        {
+        { 
             return View();
+        }
+
+        public async Task<IActionResult> Main(int? page)
+        {
+            //var room = await _roomService.GetRooms();
+
+            var pageSize =  4;
+            var pageIndex = (page ?? 1);
+            var pageX = PagedListExtensions.ToPagedList(_list, pageIndex, pageSize);
+            return View(pageX);
         }
 
         public IActionResult Rooms()

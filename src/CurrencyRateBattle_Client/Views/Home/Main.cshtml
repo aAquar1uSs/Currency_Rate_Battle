@@ -1,0 +1,86 @@
+﻿@model X.PagedList.IPagedList<CRBClient.Models.RoomViewModel>
+@using X.PagedList.Mvc.Core
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/css/mainPageStyle.css" />
+
+    <title>Currency Battle Rate</title>
+  </head>
+<body>
+<div class="header">
+    <div class="logo">
+        <img src="~/css/img/logo_Rate.jpg" alt=""/>
+    </div>
+</div>
+
+<!-- Side Bar -->
+<nav role='navigation'>
+  <div id="menuToggle">
+      <input type="checkbox" />
+      <span></span>
+      
+      <span></span>
+      <span></span>
+      
+      <ul id="menu">
+          <a href="/Home/Profile"><li>Profile</li></a>
+          <a href="#"><li>Betting history</li></a>
+          <a href="#"><li>Logout</li></a>
+      </ul>
+  </div>
+</nav>
+
+<div class="container">
+    <div class="academy-logo"></div>
+    <div class="main">
+        <div class="filter">
+            <div class="valuta">
+                <div class="firs_rov_valuta">
+                    <button class="USD">
+                        <p>&dollar;</p></button>
+                    <button class="EUR">
+                        <p>&#8364;</p></button>
+                    <button class="PLN">
+                        <p>zł</p></button>
+                </div>
+                <div class="second_rov_valuta">
+                    <button class="UAH">
+                        <p>&#x20b4;</p></button>
+                    <button class="CHF">
+                        <p>&#163;</p></button>
+                    <button class="frank">
+                        <p>&#8355;</p></button>
+                </div>
+            </div>
+        </div>
+        <div class="rooms">
+            @foreach (var room in Model)
+            {
+                <div class="content_room">
+                    <div class="info_room">
+                        <p>Dollar</p>
+                    </div>
+                    <div class="info_time">
+                        <p>22.04.2022</p></div>
+                    <div class="info_valut">
+                        <button class="stavka">
+                            <p>stavka</p></button></div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="pagination-class">
+        <p>@Html.PagedListPager(Model, page => Url.Action("Main", new {page}))</p>
+        </div>
+</div>
+</body>
+</html>
