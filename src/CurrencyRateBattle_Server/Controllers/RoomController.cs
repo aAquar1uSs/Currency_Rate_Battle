@@ -33,20 +33,20 @@ namespace CurrencyRateBattleServer.Controllers
 
         // GET api/Room/{id}
         [HttpGet("{id}")]
-        public Room GetRoomById(Guid id)
+        public async Task<Room> GetRoomByIdAsync(Guid id)
         {
-            var room = _roomService.GetRoomById(id);
+            var room = await _roomService.GetRoomByIdAsync(id);
             return room;
         }
 
 
         [HttpPost]
-        public IActionResult CreateRoom([FromBody] Room roomToCreate)
+        public async Task<IActionResult> CreateRoomAsync([FromBody] Room roomToCreate)
         {
             _logger.LogDebug("New room creation is trigerred.");
             try
             {
-                var room = _roomService.CreateRoom(roomToCreate);
+                var room = await _roomService.CreateRoomAsync(roomToCreate);
                 return Ok(room);
             }
             catch (CustomException ex)
@@ -62,11 +62,11 @@ namespace CurrencyRateBattleServer.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateRoom(Guid id, [FromBody] Room updatedRoom)
+        public async Task<IActionResult> UpdateRoomAsync(Guid id, [FromBody] Room updatedRoom)
         {
             try
             {
-                _roomService.UpdateRoom(id, updatedRoom);
+                _roomService.UpdateRoomAsync(id, updatedRoom);
                 return Ok();
             }
             catch (CustomException ex)

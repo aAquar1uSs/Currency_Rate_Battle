@@ -19,7 +19,7 @@ public class AccountService : IAccountService
 
     private readonly IEncoder _encoder;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new (1, 1);
+    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
     private const decimal AccountStartBalance = 10000;
 

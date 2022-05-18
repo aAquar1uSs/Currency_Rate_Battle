@@ -13,43 +13,95 @@ public class RoomService : IRoomService
 {
     private readonly ILogger<IAccountService> _logger;
 
-    private readonly CurrencyRateBattleContext _DbContext;
+    private readonly IServiceScopeFactory _scopeFactory;
+
+    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
     public RoomService(ILogger<AccountService> logger,
-        CurrencyRateBattleContext DbContext)
+        IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
-        _DbContext = DbContext;
+        _scopeFactory = scopeFactory;
     }
 
-    public Room CreateRoom(Room room)
+    public async Task<Room> CreateRoomAsync(Room room)
     {
-        var newRoom = _DbContext.Rooms.Add(room).Entity;
-        _ = _DbContext.SaveChanges();
-        if (newRoom == null)
-            throw new CustomException($"{nameof(Room)} can not be created.");
-        return newRoom;
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+        Room newRoom;
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            newRoom = db.Rooms.Add(room).Entity;
+            _ = await db.SaveChangesAsync();
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
+        }
+
+        return newRoom ?? throw new CustomException($"{nameof(Room)} can not be created.");
     }
-    public void UpdateRoom(Guid id, Room updatedRoom)
+    public async void UpdateRoomAsync(Guid id, Room updatedRoom)
     {
-        var room = _DbContext.Rooms.FirstOrDefault(r => r.Id == id);
-        if (room == null)
-            throw new CustomException($"{nameof(Room)} with Id={id} is not found.");
-        _DbContext.Entry(room).Property(x => x.IsClosed).CurrentValue = updatedRoom.IsClosed;
-        _DbContext.Entry(room).Property(x => x.Date).CurrentValue = updatedRoom.Date;
-        //_DbContext.Entry(room).CurrentValues.SetValues(updatedRoom);
-        _ = _DbContext.SaveChanges();
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        Room room;
+
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            room = await db.Rooms.FirstOrDefaultAsync(r => r.Id == id);
+            if (room == null)
+                throw new CustomException($"{nameof(Room)} with Id={id} is not found.");
+            db.Entry(room).Property(x => x.IsClosed).CurrentValue = updatedRoom.IsClosed;
+            db.Entry(room).Property(x => x.Date).CurrentValue = updatedRoom.Date;
+            //db.Entry(room).CurrentValues.SetValues(updatedRoom);
+            _ = await db.SaveChangesAsync();
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
+        }
+
     }
     public async Task<List<Room>> GetRoomsAsync(bool? isActive)
     {
-        if (isActive == true)
-            return _DbContext.Rooms.Where(r => !r.IsClosed).ToList();
-        if (isActive == false)
-            return _DbContext.Rooms.Where(r => r.IsClosed).ToList();
-        return _DbContext.Rooms.ToList();
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        List<Room> result;
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            result = isActive == true
+                ? await db.Rooms.Where(r => !r.IsClosed).ToListAsync()
+                : isActive == false ? await db.Rooms.Where(r => r.IsClosed).ToListAsync() : await db.Rooms.ToListAsync();
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
+        }
+
+        return result;
     }
-    public Room? GetRoomById(Guid id)
+    public async Task<Room?> GetRoomByIdAsync(Guid id)
     {
-        return _DbContext.Rooms.FirstOrDefault(r => r.Id == id);
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        Room result;
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            result = await db.Rooms.FirstOrDefaultAsync(r => r.Id == id);
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
+        }
+
+        return result;
     }
 }

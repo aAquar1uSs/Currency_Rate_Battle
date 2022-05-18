@@ -92,8 +92,8 @@ host.ConfigureAppConfiguration(app =>
         _ = service.AddOptions()
             .AddSingleton<IJwtManager, JwtManager>()
             .AddSingleton<IEncoder, Sha256Encoder>()
-            .AddSingleton<IAccountService, AccountService>();
-        _ = service.AddScoped<IRoomService, RoomService>();
+            .AddSingleton<IAccountService, AccountService>()
+            .AddSingleton<IRoomService, RoomService>();
         _ = service.AddControllers();
 
         _= service.AddScoped<CurrencyRateBattleContext>();
