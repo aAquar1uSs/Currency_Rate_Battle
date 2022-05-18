@@ -36,7 +36,7 @@ public class AccountController : Controller
             return View("Authorization");
         }
 
-        return Redirect("/Home/Index");
+        return Redirect("/Home/Main");
     }
 
     [HttpPost]
@@ -52,6 +52,6 @@ public class AccountController : Controller
             return View("Authorization");
         }
 
-        return Redirect("/Home/Index");
+        return Redirect("/Home/Main");
     }
 }
