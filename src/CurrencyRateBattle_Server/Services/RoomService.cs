@@ -24,20 +24,28 @@ public class RoomService : IRoomService
 
     public Room CreateRoom(Room room)
     {
-        return _DbContext.Rooms.Add(room).Entity;
-
+        var newRoom = _DbContext.Rooms.Add(room).Entity;
+        _ = _DbContext.SaveChanges();
+        if (newRoom == null)
+            throw new CustomException($"{nameof(Room)} can not be created.");
+        return newRoom;
     }
-    public void UpdateRoom(Room room)
+    public void UpdateRoom(Guid id, Room updatedRoom)
     {
-        _DbContext.Update(room);
+        var room = _DbContext.Rooms.FirstOrDefault(r => r.Id == id);
+        if (room == null)
+            throw new CustomException($"{nameof(Room)} with Id={id} is not found.");
+        _DbContext.Entry(room).Property(x => x.IsClosed).CurrentValue = updatedRoom.IsClosed;
+        _DbContext.Entry(room).Property(x => x.Date).CurrentValue = updatedRoom.Date;
+        //_DbContext.Entry(room).CurrentValues.SetValues(updatedRoom);
+        _ = _DbContext.SaveChanges();
     }
-    public List<Room> GetRooms()
+    public async Task<List<Room>> GetRoomsAsync(bool isActive)
     {
-        return _DbContext.Rooms.ToList();
+        return isActive ? _DbContext.Rooms.Where(r => !r.IsClosed).ToList() : _DbContext.Rooms.ToList();
     }
-    public List<Room> GetActiveRooms()
+    public Room? GetRoomById(Guid id)
     {
-        return _DbContext.Rooms.Where(r => !r.IsClosed).ToList();
+        return _DbContext.Rooms.FirstOrDefault(r => r.Id == id);
     }
-
 }

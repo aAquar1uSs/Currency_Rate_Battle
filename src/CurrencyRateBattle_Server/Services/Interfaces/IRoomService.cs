@@ -1,5 +1,4 @@
-﻿using CurrencyRateBattleServer.Dto;
-using CurrencyRateBattleServer.Models;
+﻿using CurrencyRateBattleServer.Models;
 
 namespace CurrencyRateBattleServer.Services.Interfaces;
 
@@ -7,10 +6,10 @@ public interface IRoomService
 {
     public Room CreateRoom(Room room);
 
-    public void UpdateRoom(Room room);
+    public void UpdateRoom(Guid id, Room updatedRoom);
 
-    public List<Room> GetRooms();
+    public Task<List<Room>> GetRoomsAsync(bool isActive);
 
-    public List<Room> GetActiveRooms();
+    public Room? GetRoomById(Guid id);
 
 }

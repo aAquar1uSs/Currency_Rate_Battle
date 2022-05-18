@@ -1,14 +1,13 @@
-﻿using CurrencyRateBattleServer.Dto;
-using CurrencyRateBattleServer.Helpers;
+﻿using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Models;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyRateBattleServer.Controllers
 {
-    [Route("api/room")]
+    [Route("api/rooms")]
     [ApiController]
     [Authorize]
     public class RoomController : ControllerBase
@@ -24,31 +23,63 @@ namespace CurrencyRateBattleServer.Controllers
             _roomService = roomService;
         }
 
-        [HttpGet("getRooms")]
-        public async Task<ActionResult<List<Room>>> GetRooms()
+        [HttpGet]
+        public async Task<ActionResult<List<Room>>> GetRoomsAsync(bool isActive = true)
         {
-            var rooms = await GetRooms();
+            _logger.LogDebug("List of rooms are retrieving.");
+            var rooms = await _roomService.GetRoomsAsync(isActive);
             return Ok(rooms);
         }
 
-        [HttpGet("getActiveRooms")]
-        public async Task<ActionResult<List<Room>>> GetActiveRooms()
+        // GET api/Room/{id}
+        [HttpGet("{id}")]
+        public Room GetRoomById(Guid id)
         {
-            var rooms = await GetActiveRooms();
-            return Ok(rooms);
-        }
-        [HttpPut("createRoom")]
-        public async Task<IActionResult> CreateRoom(Room roomToCreate)
-        {
-            await CreateRoom(roomToCreate);
-            return Ok();
+            var room = _roomService.GetRoomById(id);
+            return room;
         }
 
-        [HttpPut("updateRoom")]
-        public async Task<IActionResult> UpdateRoom(Room roomToUpdate)
+
+        [HttpPost]
+        public IActionResult CreateRoom([FromBody] Room roomToCreate)
         {
-            await UpdateRoom(roomToUpdate);
-            return Ok();
+            _logger.LogDebug("New room creation is trigerred.");
+            try
+            {
+                var room = _roomService.CreateRoom(roomToCreate);
+                return Ok(room);
+            }
+            catch (CustomException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (DbUpdateException)
+            {
+                _logger.LogDebug("An unexpected error occurred during the attempt to create a room in the DB.");
+                return BadRequest("An unexpected error occurred. Please try again.");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateRoom(Guid id, [FromBody] Room updatedRoom)
+        {
+            try
+            {
+                _roomService.UpdateRoom(id, updatedRoom);
+                return Ok();
+            }
+            catch (CustomException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (DbUpdateException)
+            {
+                _logger.LogDebug("An unexpected error occurred during the attempt to update the room in the DB.");
+                return BadRequest("An unexpected error occurred. Please try again.");
+            }
+
         }
     }
 }
