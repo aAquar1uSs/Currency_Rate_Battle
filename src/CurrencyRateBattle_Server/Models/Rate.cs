@@ -6,7 +6,7 @@ public class Rate
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Id { get; }
+    public Guid Id { get; set;  }
 
     //Date when the rate is added by user
     [Required]

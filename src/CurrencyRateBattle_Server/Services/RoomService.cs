@@ -44,17 +44,14 @@ public class RoomService : IRoomService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        Room room;
-
         await _semaphoreSlim.WaitAsync();
         try
         {
-            room = await db.Rooms.FirstOrDefaultAsync(r => r.Id == id);
-            if (room == null)
+            var roomExists = await db.Rooms.AnyAsync(r => r.Id == id);
+            if (!roomExists)
                 throw new CustomException($"{nameof(Room)} with Id={id} is not found.");
-            db.Entry(room).Property(x => x.IsClosed).CurrentValue = updatedRoom.IsClosed;
-            db.Entry(room).Property(x => x.Date).CurrentValue = updatedRoom.Date;
-            //db.Entry(room).CurrentValues.SetValues(updatedRoom);
+
+            _ = db.Rooms.Update(updatedRoom);
             _ = await db.SaveChangesAsync();
         }
         finally

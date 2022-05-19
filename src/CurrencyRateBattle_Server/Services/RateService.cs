@@ -44,17 +44,14 @@ public class RateService : IRateService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        Rate rate;
-
         await _semaphoreSlim.WaitAsync();
         try
         {
-            rate = await db.Rates.FirstOrDefaultAsync(r => r.Id == id);
-            if (rate == null)
+            var rateExists = await db.Rooms.AnyAsync(r => r.Id == id);
+            if (!rateExists)
                 throw new CustomException($"{nameof(Rate)} with Id={id} is not found.");
-            db.Entry(rate).Property(x => x.IsClosed).CurrentValue = updatedRate.IsClosed;
-            db.Entry(rate).Property(x => x.IsWon).CurrentValue = updatedRate.IsWon;
-            db.Entry(rate).Property(x => x.Amount).CurrentValue = updatedRate.Amount;
+
+            _ = db.Rates.Update(updatedRate);
             _ = await db.SaveChangesAsync();
         }
         finally
