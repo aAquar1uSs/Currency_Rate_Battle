@@ -11,14 +11,16 @@ public class UserService : IUserService
     private readonly CRBServerHttpClient _httpClient;
     private readonly WebServerOptions _options;
     private readonly ILogger<UserService> _logger;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private ISession Session => _httpContextAccessor.HttpContext.Session;
 
-
-    public UserService(CRBServerHttpClient httpClient,
+    public UserService(CRBServerHttpClient httpClient, IHttpContextAccessor httpContextAccessor,
            IOptions<WebServerOptions> options, ILogger<UserService> logger)
     {
         _httpClient = httpClient;
         _options = options.Value;
         _logger = logger;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public string GetUserInfo()
@@ -55,6 +57,8 @@ public class UserService : IUserService
         {
             var token = await response.Content.ReadAsStringAsync();
             _httpClient.SetTokenInHeader(token);
+            Session.SetString("token", token);
+            Session.SetString("userEmail", user.Email);
         }
         else
         {

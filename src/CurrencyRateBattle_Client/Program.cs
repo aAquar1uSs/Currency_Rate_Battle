@@ -20,11 +20,14 @@ builder.Logging.AddSerilog(logger)
 builder.Services.AddControllersWithViews();
 builder.Services.Configure<WebServerOptions>(
     builder.Configuration.GetSection(WebServerOptions.SectionName));
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
 //builder.Services.AddHttpClient<CRBServerHttpClient>();
 builder.Services.AddSingleton<CRBServerHttpClient>();
 builder.Services.AddSingleton<IRoomService, RoomService>();
 builder.Services.AddSingleton<IUserService, UserService>();
-
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -35,12 +38,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseSession();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthorization();
+//app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

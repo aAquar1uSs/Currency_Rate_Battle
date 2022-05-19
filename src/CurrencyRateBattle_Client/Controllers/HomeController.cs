@@ -1,5 +1,6 @@
 ﻿using CRBClient.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
 using System.Text.Json;
 using CRBClient.Services.Interfaces;
@@ -52,7 +53,7 @@ namespace CRBClient.Controllers
         public async Task<IActionResult> Main(int? page)
         {
             //var room = await _roomService.GetRooms();
-
+            var token = HttpContext.Session.GetString("token");
             var pageSize =  4;
             var pageIndex = (page ?? 1);
             var pageX = PagedListExtensions.ToPagedList(_list, pageIndex, pageSize);
@@ -76,6 +77,7 @@ namespace CRBClient.Controllers
         public IActionResult Logout()
         {
             _userService.Logout();
+            HttpContext.Session.Clear();
             return Redirect("/Account/Authorization");
         }
 
