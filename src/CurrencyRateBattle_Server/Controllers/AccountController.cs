@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Net;
+﻿using System.Net;
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Services.Interfaces;
@@ -61,7 +60,7 @@ public class AccountController : ControllerBase
         catch (CustomException ex)
         {
             // return error message if there was an exception
-            return BadRequest(new { message = ex.Message });
+            return BadRequest(new {message = ex.Message});
         }
         catch (DbUpdateException)
         {
@@ -76,26 +75,11 @@ public class AccountController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> GetUserInfoAsync()
     {
-        var guidId = GetGuidFromRequest();
+        var guidId = _accountService.GetGuidFromRequest(HttpContext);
         if (guidId is null)
             return BadRequest();
 
         var result = await _accountService.GetAccountInfoAsync((Guid)guidId);
         return Ok(result);
-    }
-
-    [NonAction]
-    private Guid? GetGuidFromRequest()
-    {
-        Guid id;
-        var user = HttpContext.User;
-
-        if (user.HasClaim(c => c.Type == "UserId"))
-        {
-            id = Guid.Parse(user.Claims.FirstOrDefault(c => c.Type == "UserId")!.Value);
-            return id;
-        }
-
-        return null!;
     }
 }

@@ -11,4 +11,8 @@ public interface IAccountService
 
     public Task<AccountInfoDto?> GetAccountInfoAsync(Guid id);
 
+    public Task<Account?> GetAccountByUserIdAsync(Guid? userId);
+
+    public Guid? GetGuidFromRequest(HttpContext context);
+
 }

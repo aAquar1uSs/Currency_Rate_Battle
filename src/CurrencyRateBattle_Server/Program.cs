@@ -96,6 +96,7 @@ host.ConfigureAppConfiguration(app =>
             .AddSingleton<IAccountService, AccountService>()
             .AddSingleton<IRoomService, RoomService>()
             .AddSingleton<IRateService, RateService>()
+            .AddSingleton<IAccountHistoryService, AccountHistoryService>()
             .Configure<WebServerOptions>(builder.Configuration.GetSection(WebServerOptions.SectionName));
 
         _ = service.AddControllers();
