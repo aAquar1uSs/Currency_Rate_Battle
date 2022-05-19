@@ -1,4 +1,5 @@
-﻿@{
+﻿@model CRBClient.Models.AccountInfoViewModel
+@{
     Layout = null;
 }
 
@@ -19,8 +20,8 @@
             <img src="~/img/profile-image.png" alt="Profile Image" class="profile-img">
         </div>
         <div class="card-body">
-            <a class="mail">yourname@amail.com</a>
-            <p class="balance">10 000 UAH</p>
+            <a class="mail">@Html.DisplayFor(model => model.Email)</a>
+            <p class="balance">@Html.DisplayFor(model => model.Amount) UAH</p>
         </div>
 
         <div class="social-links">

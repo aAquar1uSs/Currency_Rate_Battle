@@ -12,6 +12,7 @@ public class UserService : IUserService
     private readonly WebServerOptions _options;
     private readonly ILogger<UserService> _logger;
 
+
     public UserService(CRBServerHttpClient httpClient,
            IOptions<WebServerOptions> options, ILogger<UserService> logger)
     {
@@ -65,5 +66,20 @@ public class UserService : IUserService
     public string UpdateUserInfo()
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<AccountInfoViewModel> GetAccountInfoAsync()
+    {
+        var response = await _httpClient.GetAsync("api/account/user-profile");
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            return await response.Content.ReadAsAsync<AccountInfoViewModel>();
+        }
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            throw new CustomException();
+        }
+        // ToDo BadRequest handler
+        return null!;
     }
 }

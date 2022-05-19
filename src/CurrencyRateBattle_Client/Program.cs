@@ -20,9 +20,10 @@ builder.Logging.AddSerilog(logger)
 builder.Services.AddControllersWithViews();
 builder.Services.Configure<WebServerOptions>(
     builder.Configuration.GetSection(WebServerOptions.SectionName));
-builder.Services.AddHttpClient<CRBServerHttpClient>();
-builder.Services.AddScoped<IRoomService, RoomService>();
-builder.Services.AddScoped<IUserService, UserService>();
+//builder.Services.AddHttpClient<CRBServerHttpClient>();
+builder.Services.AddSingleton<CRBServerHttpClient>();
+builder.Services.AddSingleton<IRoomService, RoomService>();
+builder.Services.AddSingleton<IUserService, UserService>();
 
 var app = builder.Build();
 

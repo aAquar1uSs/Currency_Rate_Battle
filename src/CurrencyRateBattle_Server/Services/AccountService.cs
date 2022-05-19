@@ -42,19 +42,13 @@ public class AccountService : IAccountService
 
     public async Task<Tokens?> GetUserAsync(UserDto userData)
     {
-        var user = new User
-        {
-            Email = userData.Email,
-            Password = _encoder.Encrypt(userData.Password)
-        };
-
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        if (!await db.Users.AnyAsync(x => x.Email == user.Email && x.Password == user.Password))
-            return null;
+        var user = await db.Users
+            .FirstOrDefaultAsync(x => x.Email == userData.Email && x.Password == _encoder.Encrypt(userData.Password));
 
-        return _jwtManager.Authenticate(user);
+        return user is null ? null! : _jwtManager.Authenticate(user);
     }
 
     public async Task<Tokens?> СreateUserAsync(UserDto userData)
@@ -96,9 +90,14 @@ public class AccountService : IAccountService
 
         var account = await db.Accounts.FirstOrDefaultAsync(a => a.UserId == id);
 
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user is null || account is null)
+            return null;
+
         var resultDto = new AccountInfoDto
         {
-            Email = account!.User.Email,
+            Email = user.Email,
             Amount = account.Amount
         };
 
