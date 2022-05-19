@@ -31,7 +31,7 @@ public class AccountHistoryController : ControllerBase
         _accountService = accountService;
     }
 
-    [HttpGet("get")]
+    [HttpGet]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> GetAccountHistoryAsync()
@@ -45,7 +45,7 @@ public class AccountHistoryController : ControllerBase
         return Ok(history);
     }
 
-    [HttpPost("create-new")]
+    [HttpPost]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> CreateNewAccountHistory([FromBody] AccountHistoryDto historyDto)
