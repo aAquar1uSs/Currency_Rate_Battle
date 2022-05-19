@@ -2,6 +2,8 @@
 using CRBClient.Helpers;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
+using System.Text.Json;
+using CRBClient.Models;
 
 namespace CRBClient.Services;
 
@@ -11,14 +13,16 @@ public class CRBServerHttpClient
     private readonly HttpClient _httpClient;
     private readonly ILogger<CRBServerHttpClient> _logger;
 
-    public CRBServerHttpClient(IOptions<WebServerOptions> options, HttpClient httpClient,
+    public CRBServerHttpClient(IOptions<WebServerOptions> options,
             ILogger<CRBServerHttpClient> logger)
     {
         _options = options.Value;
-        _httpClient = httpClient;
+       // _httpClient = httpClient;
         _logger = logger;
-
-        _httpClient.BaseAddress = new Uri(_options.BaseUrl);
+        _httpClient = new HttpClient
+        {
+            BaseAddress = new Uri(_options.BaseUrl)
+        };
     }
 
     public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage)
@@ -39,7 +43,9 @@ public class CRBServerHttpClient
     public void SetTokenInHeader(string token)
     {
         _httpClient.DefaultRequestHeaders.Clear();
-        _httpClient.DefaultRequestHeaders.Add("token", token);
+
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
     }
 
     public async Task<string> GetAPIResultsAsync(string subURL)
@@ -59,6 +65,13 @@ public class CRBServerHttpClient
 
         Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
         return string.Empty;
+    }
+
+    public async Task<HttpResponseMessage> GetAsync(string requestUrl)
+    {
+        _logger.LogInformation($"Sending request to {requestUrl}...");
+        var response = await _httpClient.GetAsync(requestUrl);
+        return response;
     }
 
 }

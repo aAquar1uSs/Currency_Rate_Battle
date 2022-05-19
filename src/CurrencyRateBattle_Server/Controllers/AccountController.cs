@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Services.Interfaces;
@@ -33,9 +34,9 @@ public class AccountController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest("Invalid data entered.");
 
-        var token = await _accountService.GetUserAsync(userData);
+        var tokens = await _accountService.GetUserAsync(userData);
 
-        return token is null ? Unauthorized("No such user exists. Try again") : Ok(token);
+        return tokens is null ? Unauthorized("No such user exists. Try again") : Ok(tokens.Token);
     }
 
     [HttpPost("registration")]
@@ -50,12 +51,12 @@ public class AccountController : ControllerBase
         try
         {
             _logger.LogDebug("Registration was triggered.");
-            var token = await _accountService.СreateUserAsync(userData);
+            var tokens = await _accountService.СreateUserAsync(userData);
 
-            if (token is null)
+            if (tokens is null)
                 return NotFound();
 
-            return Ok(token);
+            return Ok(tokens.Token);
         }
         catch (CustomException ex)
         {
@@ -67,5 +68,34 @@ public class AccountController : ControllerBase
             _logger.LogDebug("An unexpected error occurred. When try update data in the database");
             return BadRequest("An unexpected error occurred. Please try again.");
         }
+    }
+
+    [HttpGet("user-profile")]
+    [Authorize]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    public async Task<IActionResult> GetUserInfoAsync()
+    {
+        var guidId = GetGuidFromRequest();
+        if (guidId is null)
+            return BadRequest();
+
+        var result = await _accountService.GetAccountInfoAsync((Guid)guidId);
+        return Ok(result);
+    }
+
+    [NonAction]
+    private Guid? GetGuidFromRequest()
+    {
+        Guid id;
+        var user = HttpContext.User;
+
+        if (user.HasClaim(c => c.Type == "UserId"))
+        {
+            id = Guid.Parse(user.Claims.FirstOrDefault(c => c.Type == "UserId")!.Value);
+            return id;
+        }
+
+        return null!;
     }
 }

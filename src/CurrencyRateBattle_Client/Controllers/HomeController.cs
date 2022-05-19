@@ -5,6 +5,7 @@ using System.Text.Json;
 using CRBClient.Services.Interfaces;
 using PagedList;
 using PagedListExtensions = X.PagedList.PagedListExtensions;
+using CRBClient.Helpers;
 
 namespace CRBClient.Controllers
 {
@@ -13,6 +14,9 @@ namespace CRBClient.Controllers
         private readonly ILogger<HomeController> _logger;
 
         private readonly IRoomService _roomService;
+
+        private readonly IUserService _userService;
+
 
         private readonly List<RoomViewModel> _list = new()
         {
@@ -33,14 +37,15 @@ namespace CRBClient.Controllers
         };
 
         public HomeController(ILogger<HomeController> logger,
-            IRoomService roomService)
+            IRoomService roomService, IUserService userService)
         {
             _logger = logger;
             _roomService = roomService;
+            _userService = userService;
         }
 
         public IActionResult Index()
-        { 
+        {
             return View();
         }
 
@@ -52,6 +57,20 @@ namespace CRBClient.Controllers
             var pageIndex = (page ?? 1);
             var pageX = PagedListExtensions.ToPagedList(_list, pageIndex, pageSize);
             return View(pageX);
+        }
+
+        public async Task<IActionResult> Profile()
+        {
+            AccountInfoViewModel accountInfo;
+            try
+            {
+                accountInfo = await _userService.GetAccountInfoAsync();
+            }
+            catch (CustomException)
+            {
+                return Redirect("/Account/Authorization");
+            }
+            return View(accountInfo);
         }
 
         public IActionResult Rooms()
