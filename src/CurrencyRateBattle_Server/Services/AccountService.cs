@@ -103,4 +103,38 @@ public class AccountService : IAccountService
 
         return resultDto;
     }
+
+    public async Task<Account?> GetAccountByUserIdAsync(Guid? userId)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        Account? account;
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            account = await db.Accounts
+                .FirstOrDefaultAsync(acc => acc.UserId == userId);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+
+        return account;
+    }
+
+    public Guid? GetGuidFromRequest(HttpContext context)
+    {
+        Guid id;
+        var user = context.User;
+
+        if (user.HasClaim(c => c.Type == "UserId"))
+        {
+            id = Guid.Parse(user.Claims.FirstOrDefault(c => c.Type == "UserId")!.Value);
+            return id;
+        }
+
+        return null!;
+    }
 }
