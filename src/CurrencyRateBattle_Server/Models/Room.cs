@@ -6,7 +6,7 @@ public class Room
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Id { get; }
+    public Guid Id { get; set; }
 
     [Required]
     public DateTime Date { get; set; }
