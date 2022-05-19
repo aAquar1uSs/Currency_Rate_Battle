@@ -82,4 +82,9 @@ public class UserService : IUserService
         // ToDo BadRequest handler
         return null!;
     }
+
+    public void Logout()
+    {
+        _httpClient.ClearHeader();
+    }
 }

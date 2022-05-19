@@ -73,6 +73,12 @@ namespace CRBClient.Controllers
             return View(accountInfo);
         }
 
+        public IActionResult Logout()
+        {
+            _userService.Logout();
+            return Redirect("/Account/Authorization");
+        }
+
         public IActionResult Rooms()
         {
             IEnumerable<RoomViewModel>? rooms = null;

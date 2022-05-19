@@ -40,12 +40,24 @@ public class CRBServerHttpClient
         return response;
     }
 
+    public async Task<HttpResponseMessage> GetAsync(string requestUrl)
+    {
+        _logger.LogInformation($"Sending request to {requestUrl}...");
+        var response = await _httpClient.GetAsync(requestUrl);
+        return response;
+    }
+
     public void SetTokenInHeader(string token)
     {
-        _httpClient.DefaultRequestHeaders.Clear();
+        ClearHeader();
 
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
+    }
+
+    public void ClearHeader()
+    {
+        _httpClient.DefaultRequestHeaders.Clear();
     }
 
     public async Task<string> GetAPIResultsAsync(string subURL)
@@ -65,13 +77,6 @@ public class CRBServerHttpClient
 
         Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
         return string.Empty;
-    }
-
-    public async Task<HttpResponseMessage> GetAsync(string requestUrl)
-    {
-        _logger.LogInformation($"Sending request to {requestUrl}...");
-        var response = await _httpClient.GetAsync(requestUrl);
-        return response;
     }
 
 }

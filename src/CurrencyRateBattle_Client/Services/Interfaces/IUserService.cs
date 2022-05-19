@@ -10,4 +10,6 @@ public interface IUserService
     Task LoginUserAsync(UserViewModel user);
 
     Task<AccountInfoViewModel> GetAccountInfoAsync();
+
+    public void Logout();
 }
