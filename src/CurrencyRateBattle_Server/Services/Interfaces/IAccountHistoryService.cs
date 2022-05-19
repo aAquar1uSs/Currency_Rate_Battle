@@ -7,5 +7,5 @@ public interface IAccountHistoryService
 {
     Task<List<AccountHistory>> GetAccountHistoryByAccountId(Guid? id);
 
-    Task CreateHistoryAsync(Room room, Account account, AccountHistoryDto history);
+    Task CreateHistoryAsync(Room room, Account account, AccountHistoryDto historyDto);
 }
