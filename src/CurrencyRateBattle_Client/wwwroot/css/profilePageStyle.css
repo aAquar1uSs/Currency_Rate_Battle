@@ -11,11 +11,35 @@ body {
     color: #fdfdfd;
 }
 
+.header {
+    height: 170px;
+    max-width: 100%;
+    background-color: rgb(0, 0, 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo img {
+    max-width: 100%;
+    max-height: 170px;
+    margin: 25px 0 25px 0;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    background-image: url("../css/img/backgound_image.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
 .card {
+    height: 290px;
     max-width: 250px;
-    margin: 150px auto 0;
-    background-color: #42515a;
-    box-shadow: 0 20px 90px #00000024;
+    margin: 150px auto 300px;
+    background-color: rgb(32, 32, 32);
+    box-shadow: 0px 0px 21px 8px #000000;
     text-align: center;
     font-size: 20px;
     border-radius: 25px;
@@ -34,10 +58,9 @@ body {
     position: absolute;
     left: 50%;
     transform: translate(-50%, -50%);
-    border: 8px solid #e0f10e;
-    box-shadow: 0 0 30px #00000033;
+    border: 8px solid yellow;
+    box-shadow: 0 0 30px yellow;
 }
-
 
 .card .card-body {
     padding: 10px 40px;
@@ -80,15 +103,14 @@ body {
 }
 
 .card .social-links .social-icon:hover {
-    background-color: #d885af;
+    background-color: yellow;
     height: 50px;
     width: 50px;
-    text-decoration: none;
 }
 
 
 .card .card-footer {
-    background-color: #e0f10e;
+    background-color: yellow;
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
     padding: 20px 0 20px 0;
@@ -96,7 +118,14 @@ body {
 
 .card .card-footer .company-name {
     font-size: 20px;
+    text-decoration: none;
 }
+
+.card .card-footer .company-name span {
+    text-decoration: none;
+    color: black;
+}
+
 
 
 @media screen and (max-width: 575px) {
