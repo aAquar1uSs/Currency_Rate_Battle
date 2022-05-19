@@ -15,24 +15,31 @@
     <title>Profile Card</title>
 </head>
 <body>
-    <div class="card">
-        <div class="card-header">
-            <img src="~/img/profile-image.png" alt="Profile Image" class="profile-img">
-        </div>
-        <div class="card-body">
-            <a class="mail">@Html.DisplayFor(model => model.Email)</a>
-            <p class="balance">@Html.DisplayFor(model => model.Amount) UAH</p>
-        </div>
-
-        <div class="social-links">
-            <a href="https://t.me/+e1_dOqBNiUdhOWE6" class="fab fa-telegram social-icon"></a>
-            <a href="https://git.java-academy.xyz/Oleksandr_Panchenko/currency-rate-battle" class="fab fa-gitlab social-icon"></a>
-        </div>
-
-        <div class="card-footer">
-            <p class="company-name"><span>Currency Rate Battle</span></p>
-        </div>
+<div class="header">
+    <div class="logo">
+        <a href="/Home/Main"><img src="~/css/img/logo_Rate.jpg" alt=""/></a>
     </div>
+</div>
+<div class="container">
+<div class="card">
+    <div class="card-header">
+        <img src="~/img/profile-image.png" alt="Profile Image" class="profile-img">
+    </div>
+    <div class="card-body">
+        <a class="mail">@Html.DisplayFor(model => model.Email)</a>
+        <p class="balance">@Html.DisplayFor(model => model.Amount) UAH</p>
+    </div>
+
+    <div class="social-links">
+        <a href="https://t.me/+e1_dOqBNiUdhOWE6" class="fab fa-telegram social-icon"></a>
+        <a href="https://git.java-academy.xyz/Oleksandr_Panchenko/currency-rate-battle" class="fab fa-gitlab social-icon"></a>
+    </div>
+
+    <div class="card-footer">
+        <p class="company-name"><a href="/Home/Main"><span>Currency Rate Battle</span></a></p>
+    </div>
+</div>
+</div>
 </body>
 </html>
 
