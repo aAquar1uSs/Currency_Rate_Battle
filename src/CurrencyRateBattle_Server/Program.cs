@@ -4,6 +4,7 @@ using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Managers;
 using CurrencyRateBattleServer.Managers.Interfaces;
 using CurrencyRateBattleServer.Services;
+using CurrencyRateBattleServer.Services.HostedServices;
 using CurrencyRateBattleServer.Services.Interfaces;
 using CurrencyRateBattleServer.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -84,11 +85,16 @@ host.ConfigureAppConfiguration(app =>
         _ = service.AddDbContext<CurrencyRateBattleContext>(option =>
             option.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionDb")));
         _ = service.AddDatabaseDeveloperPageExceptionFilter();
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
         //Disable automatic model state validation.
         _ = service.Configure<ApiBehaviorOptions>(options =>
         {
             options.SuppressModelStateInvalidFilter = true;
         });
+
+        _ = service.AddHostedService<CurrencyHostedService>()
+            .AddHostedService<RoomHostedService>();
 
         _ = service.AddOptions()
             .AddSingleton<IJwtManager, JwtManager>()
@@ -96,6 +102,7 @@ host.ConfigureAppConfiguration(app =>
             .AddSingleton<IAccountService, AccountService>()
             .AddSingleton<IRoomService, RoomService>()
             .AddSingleton<IRateService, RateService>()
+            .AddSingleton<ICurrencyStateService, CurrencyStateService>()
             .AddSingleton<IAccountHistoryService, AccountHistoryService>()
             .Configure<WebServerOptions>(builder.Configuration.GetSection(WebServerOptions.SectionName));
 

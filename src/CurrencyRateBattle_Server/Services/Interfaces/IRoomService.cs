@@ -11,5 +11,4 @@ public interface IRoomService
     public Task<List<Room>> GetRoomsAsync(bool? isActive);
 
     public Task<Room?> GetRoomByIdAsync(Guid id);
-
 }
