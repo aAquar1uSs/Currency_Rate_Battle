@@ -2,45 +2,9 @@
 @using X.PagedList.Mvc.Core
 
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_BlackLayout.cshtml";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="~/css/mainPageStyle.css" />
-
-    <title>Currency Battle Rate</title>
-  </head>
-<body>
-<div class="header">
-    <div class="logo">
-        <img src="~/css/img/logo_Rate.jpg" alt=""/>
-    </div>
-</div>
-
-<!-- Side Bar -->
-<nav role='navigation'>
-  <div id="menuToggle">
-      <input type="checkbox" />
-      <span></span>
-      
-      <span></span>
-      <span></span>
-      
-      <ul id="menu">
-          <a href="/Home/Profile"><li>Profile</li></a>
-          <a href="#"><li>Betting history</li></a>
-          <a href="/Home/Logout"><li>Logout</li></a>
-      </ul>
-  </div>
-</nav>
-
-<div class="container">
-    <div class="academy-logo"></div>
     <div class="main">
         <div class="filter">
             <div class="valuta">
@@ -81,6 +45,7 @@
     <div class="pagination-class">
         <p>@Html.PagedListPager(Model, page => Url.Action("Main", new {page}))</p>
         </div>
-</div>
-</body>
-</html>
+@section Scripts
+{
+  <link href="~/css/mainPageStyle.css" rel="stylesheet" />
+}

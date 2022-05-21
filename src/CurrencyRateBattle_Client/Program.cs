@@ -26,6 +26,7 @@ builder.Services.AddSession();
 builder.Services.AddSingleton<CRBServerHttpClient>();
 builder.Services.AddSingleton<IRoomService, RoomService>();
 builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddSingleton<ICommonService, CommonService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
@@ -38,7 +39,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseSession();
+app.UseSession(new SessionOptions()
+{
+    Cookie = new CookieBuilder()
+    {
+        Name = ".AspNetCore.Session.CBR"
+    }
+});
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

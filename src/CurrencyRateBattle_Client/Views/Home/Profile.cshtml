@@ -1,26 +1,8 @@
 ﻿@model CRBClient.Models.AccountInfoViewModel
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_BlackLayout.cshtml";
 }
 
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
-    <link rel="stylesheet" href="~/css/profilePageStyle.css">
-    <title>Profile Card</title>
-</head>
-<body>
-<div class="header">
-    <div class="logo">
-        <a href="/Home/Main"><img src="~/css/img/logo_Rate.jpg" alt=""/></a>
-    </div>
-</div>
-<div class="container">
 <div class="card">
     <div class="card-header">
         <img src="~/img/profile-image.png" alt="Profile Image" class="profile-img">
@@ -39,7 +21,7 @@
         <p class="company-name"><a href="/Home/Main"><span>Currency Rate Battle</span></a></p>
     </div>
 </div>
-</div>
-</body>
-</html>
-
+@section Scripts
+{
+  <link href="~/css/profilePageStyle.css" rel="stylesheet" />
+}

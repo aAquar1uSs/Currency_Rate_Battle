@@ -1,6 +1,5 @@
 ﻿using CRBClient.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
 using System.Text.Json;
 using CRBClient.Services.Interfaces;
@@ -17,6 +16,9 @@ namespace CRBClient.Controllers
         private readonly IRoomService _roomService;
 
         private readonly IUserService _userService;
+
+        private readonly ICommonService _commonService;
+
 
 
         private readonly List<RoomViewModel> _list = new()
@@ -38,20 +40,24 @@ namespace CRBClient.Controllers
         };
 
         public HomeController(ILogger<HomeController> logger,
-            IRoomService roomService, IUserService userService)
+            IRoomService roomService, IUserService userService, ICommonService commonService)
         {
             _logger = logger;
             _roomService = roomService;
             _userService = userService;
+            _commonService = commonService;
         }
 
         public IActionResult Index()
         {
+            ViewBag.Balance = _commonService.GetUserBalanceAsync();
             return View();
         }
 
         public async Task<IActionResult> Main(int? page)
         {
+            ViewBag.Balance = await _commonService.GetUserBalanceAsync();
+            ViewBag.Title = "Main Page";
             //var room = await _roomService.GetRooms();
             var token = HttpContext.Session.GetString("token");
             var pageSize =  4;
@@ -62,6 +68,8 @@ namespace CRBClient.Controllers
 
         public async Task<IActionResult> Profile()
         {
+            ViewBag.Balance = await _commonService.GetUserBalanceAsync();
+            ViewBag.Title = "User Profile";
             AccountInfoViewModel accountInfo;
             try
             {

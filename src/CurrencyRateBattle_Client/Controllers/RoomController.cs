@@ -1,5 +1,4 @@
-﻿using CRBClient.Models;
-using CRBClient.Services.Interfaces;
+﻿using CRBClient.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRBClient.Controllers;
@@ -13,6 +12,7 @@ public class RoomsController : Controller
 
     public IActionResult Index()
     {
+        ViewBag.Title = "Rooms";
         var rooms = _roomService.GetRooms().Result;
 
         return View(rooms);
