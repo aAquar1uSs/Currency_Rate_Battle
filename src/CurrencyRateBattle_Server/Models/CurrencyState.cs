@@ -11,8 +11,6 @@ public class CurrencyState
     [Required]
     public DateTime Date { get; set; }
 
-    public decimal? USDValue { get; set; }
-
     public decimal CurrencyExchangeRate { get; set; }
 
     [ForeignKey("RoomId")]
