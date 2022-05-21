@@ -10,6 +10,7 @@ namespace CurrencyRateBattleServer.Controllers;
 
 [Route("api/account")]
 [ApiController]
+[Authorize]
 public class AccountController : ControllerBase
 {
     private readonly ILogger<AccountController> _logger;
@@ -69,8 +70,20 @@ public class AccountController : ControllerBase
         }
     }
 
+    [HttpGet("get-balance")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    public async Task<IActionResult> GetUserBalanceAsync()
+    {
+        var userId = _accountService.GetGuidFromRequest(HttpContext);
+        if (userId is null)
+            return BadRequest();
+
+        var account = await _accountService.GetAccountByUserIdAsync(userId);
+        return account is not null ? Ok(account.Amount) : Ok(0);
+    }
+
     [HttpGet("user-profile")]
-    [Authorize]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> GetUserInfoAsync()
