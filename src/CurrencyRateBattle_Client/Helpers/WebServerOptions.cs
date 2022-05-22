@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace CRBClient.Helpers;
 public class WebServerOptions
@@ -8,4 +9,8 @@ public class WebServerOptions
     [Url]
     public string? BaseUrl { get; set; }
     public string? RoomsURL { get; set; }
+
+    [Required]
+    [DefaultValue("get-balance")]
+    public string? GetBalanceURL { get; set; }
 }

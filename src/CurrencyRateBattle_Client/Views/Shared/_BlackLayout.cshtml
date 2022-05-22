@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Currency Rate Battle</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+</head>
+<body>
+    <div class="header">
+    <div class="cust-balance"><span>@ViewBag.Balance</span></div>
+        <div class="logo">
+            <a href="/Home/Main"><img src="~/css/img/logo_Rate.jpg" alt=""/></a>
+        </div>
+        <nav role="navigation" class="burger-m">
+          <div id="menuToggle">
+              <input type="checkbox" />
+              <span></span>
+              
+              <span></span>
+              <span></span>
+              
+              <ul id="menu">
+                  <a href="/Home/Profile"><li>Profile</li></a>
+                  <a href="#"><li>Betting History</li></a>
+                  <a href="/Home/Logout"><li>Logout</li></a>
+              </ul>
+          </div>
+        </nav>
+    </div>
+
+<div class="container">
+    <div class="academy-logo"></div>
+        <!--main role="main" class="pb-3"-->
+            @RenderBody()
+        <!--/main-->
+         <div class="cust-footer"><footer>
+           &copy; 2022 - Currency Rate Battle
+        </footer>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>
