@@ -17,9 +17,9 @@ public class AccountHistory
     public bool IsCredit { get; set; }
 
     [ForeignKey("RoomId")]
-    public Guid RoomId { get; set; }
+    public Guid? RoomId { get; set; }
 
-    public virtual Room Room { get; set; }
+    public virtual Room? Room { get; set; }
 
     [ForeignKey("AccountId")]
     public Guid AccountId { get; set; }

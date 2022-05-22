@@ -87,6 +87,21 @@ public class UserService : IUserService
         return null!;
     }
 
+    public async Task<List<AccountHistoryViewModel>> GetAccountHistoryAsync()
+    {
+        var response = await _httpClient.GetAsync("api/history");
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            return await response.Content.ReadAsAsync<List<AccountHistoryViewModel>>();
+        }
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            throw new CustomException();
+        }
+        // ToDo BadRequest handler
+        return null!;
+    }
+
     public void Logout()
     {
         _httpClient.ClearHeader();

@@ -60,7 +60,7 @@ namespace CRBClient.Controllers
             ViewBag.Title = "Main Page";
             //var room = await _roomService.GetRooms();
             var token = HttpContext.Session.GetString("token");
-            var pageSize =  4;
+            var pageSize = 4;
             var pageIndex = (page ?? 1);
             var pageX = PagedListExtensions.ToPagedList(_list, pageIndex, pageSize);
             return View(pageX);
@@ -81,6 +81,7 @@ namespace CRBClient.Controllers
             }
             return View(accountInfo);
         }
+
 
         public IActionResult Logout()
         {
