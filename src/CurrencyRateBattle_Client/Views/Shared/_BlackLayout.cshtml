@@ -10,26 +10,25 @@
 <body>
     <div class="header">
     <div class="cust-balance"><span>@ViewBag.Balance</span></div>
-    <div class="logo">
-        <a href="/Home/Main"><img src="~/css/img/logo_Rate.jpg" alt=""/></a>
+        <div class="logo">
+            <a href="/Home/Main"><img src="~/css/img/logo_Rate.jpg" alt=""/></a>
+        </div>
+        <nav role="navigation" class="burger-m">
+          <div id="menuToggle">
+              <input type="checkbox" />
+              <span></span>
+              
+              <span></span>
+              <span></span>
+              
+              <ul id="menu">
+                  <a href="/Home/Profile"><li>Profile</li></a>
+                  <a href="#"><li>Betting History</li></a>
+                  <a href="/Home/Logout"><li>Logout</li></a>
+              </ul>
+          </div>
+        </nav>
     </div>
-    </div>
-    <!-- Side Bar -->
-<nav role='navigation'>
-  <div id="menuToggle">
-      <input type="checkbox" />
-      <span></span>
-      
-      <span></span>
-      <span></span>
-      
-      <ul id="menu">
-          <a href="/Home/Profile"><li>Profile</li></a>
-          <a href="#"><li>Betting History</li></a>
-          <a href="/Home/Logout"><li>Logout</li></a>
-      </ul>
-  </div>
-</nav>
 
 <div class="container">
     <div class="academy-logo"></div>
@@ -44,6 +43,5 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
