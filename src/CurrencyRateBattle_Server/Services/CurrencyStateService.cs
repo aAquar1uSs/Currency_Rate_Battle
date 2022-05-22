@@ -61,6 +61,9 @@ public class CurrencyStateService : ICurrencyStateService
         var currencyDto = _rateStorage.FirstOrDefault(curr => curr.Currency.Equals(currencyName,
             StringComparison.Ordinal));
 
+        var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00"),
+            "MM.dd.yyyy HH:mm:ss", null);
+
         await _semaphoreSlim.WaitAsync();
         try
         {
@@ -69,6 +72,7 @@ public class CurrencyStateService : ICurrencyStateService
 
             foreach (var curr in currencyStates)
             {
+                curr.Date = currentDate;
                 curr.CurrencyExchangeRate = currencyDto.Rate;
             }
 

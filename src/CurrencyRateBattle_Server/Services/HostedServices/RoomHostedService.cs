@@ -32,7 +32,7 @@ public class RoomHostedService : IHostedService, IDisposable
 
     private async void Callback(object? state)
     {
-        var currentDate = ParseExact(Now.ToString("MM.dd.yyyy HH:00:00"),
+        var currentDate = ParseExact(UtcNow.ToString("MM.dd.yyyy HH:00:00"),
             "MM.dd.yyyy HH:mm:ss", null);
 
         using var scope = _scopeFactory.CreateScope();

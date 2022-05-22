@@ -2,8 +2,6 @@
 using CRBClient.Helpers;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
-using System.Text.Json;
-using CRBClient.Models;
 
 namespace CRBClient.Services;
 
@@ -14,15 +12,12 @@ public class CRBServerHttpClient
     private readonly ILogger<CRBServerHttpClient> _logger;
 
     public CRBServerHttpClient(IOptions<WebServerOptions> options,
-            ILogger<CRBServerHttpClient> logger)
+        ILogger<CRBServerHttpClient> logger)
     {
         _options = options.Value;
-       // _httpClient = httpClient;
+        // _httpClient = httpClient;
         _logger = logger;
-        _httpClient = new HttpClient
-        {
-            BaseAddress = new Uri(_options.BaseUrl)
-        };
+        _httpClient = new HttpClient {BaseAddress = new Uri(_options.BaseUrl)};
     }
 
     public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage)
@@ -59,24 +54,4 @@ public class CRBServerHttpClient
     {
         _httpClient.DefaultRequestHeaders.Clear();
     }
-
-    public async Task<string> GetAPIResultsAsync(string subURL)
-    {
-        _httpClient.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json"));
-
-        // List data response.
-        var response = await _httpClient.GetAsync(subURL);
-        if (response.IsSuccessStatusCode)
-        {
-            // Parse the response body.
-            var result = await response.Content.ReadAsStringAsync();
-
-            return result;
-        }
-
-        Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
-        return string.Empty;
-    }
-
 }

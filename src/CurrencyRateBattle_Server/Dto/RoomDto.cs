@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace CRBClient.Models;
+namespace CurrencyRateBattleServer.Dto;
 
-public class RoomViewModel
+public class RoomDto
 {
     [JsonPropertyName("id")]
     public Guid Id { get; set; }

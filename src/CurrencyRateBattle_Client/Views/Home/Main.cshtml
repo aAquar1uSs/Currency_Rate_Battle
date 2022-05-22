@@ -1,5 +1,6 @@
 ﻿@model X.PagedList.IPagedList<CRBClient.Models.RoomViewModel>
 @using X.PagedList.Mvc.Core
+@using System.Globalization
 
 @{
     Layout = "~/Views/Shared/_BlackLayout.cshtml";
@@ -31,10 +32,14 @@
             {
                 <div class="content_room">
                     <div class="info_room">
-                        <p>Dollar</p>
+                        <p>@Html.Label(room.СurrencyName + " ("
+                                       + room.CurrencyExchangeRate
+                                       + " "
+                                       + room.UpdateRateTime.ToString("MMMM-dd HH:mm", CultureInfo.InvariantCulture) +
+                                       ")")</p>
                     </div>
                     <div class="info_time">
-                        <p>22.04.2022</p></div>
+                        <p>@Html.Label(room.Date.ToString("MM/dd/yyyy HH:mm", CultureInfo.InvariantCulture))</p></div>
                     <div class="info_valut">
                         <button class="stavka">
                             <p>stavka</p></button></div>
@@ -45,4 +50,4 @@
     <div class="pagination-class">
         <p>@Html.PagedListPager(Model, page => Url.Action("Main", new {page}))</p>
         </div>
-
+        

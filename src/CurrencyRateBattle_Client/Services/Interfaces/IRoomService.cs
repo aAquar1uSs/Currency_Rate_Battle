@@ -1,7 +1,8 @@
 ﻿using CRBClient.Models;
 
 namespace CRBClient.Services.Interfaces;
+
 public interface IRoomService
 {
-    public Task<IEnumerable<RoomViewModel>> GetRooms();
+    public Task<List<RoomViewModel>> GetRooms(bool isClosed);
 }

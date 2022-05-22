@@ -23,11 +23,11 @@ public class RoomController : ControllerBase
         _roomService = roomService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Room>>> GetRoomsAsync(bool? isActive)
+    [HttpGet("get-rooms/{isClosed}")]
+    public async Task<ActionResult<IEnumerable<Room>>> GetRoomsAsync([FromRoute] bool isClosed)
     {
         _logger.LogDebug("List of rooms are retrieving.");
-        var rooms = await _roomService.GetRoomsAsync(isActive);
+        var rooms = await _roomService.GetRoomsAsync(isClosed);
         return Ok(rooms);
     }
 
@@ -40,7 +40,7 @@ public class RoomController : ControllerBase
     }
 
 
-    [HttpPost]
+    /*[HttpPost]
     public async Task<IActionResult> CreateRoomAsync([FromBody] Room roomToCreate)
     {
         _logger.LogDebug("New room creation is trigerred.");
@@ -60,7 +60,7 @@ public class RoomController : ControllerBase
             _logger.LogDebug("An unexpected error occurred during the attempt to create a room in the DB.");
             return BadRequest("An unexpected error occurred. Please try again.");
         }
-    }
+    }*/
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateRoomAsync(Guid id, [FromBody] Room updatedRoom)
@@ -74,13 +74,12 @@ public class RoomController : ControllerBase
         catch (CustomException ex)
         {
             // return error message if there was an exception
-            return BadRequest(new { message = ex.Message });
+            return BadRequest(new {message = ex.Message});
         }
         catch (DbUpdateException)
         {
             _logger.LogDebug("An unexpected error occurred during the attempt to update the room in the DB.");
             return BadRequest("An unexpected error occurred. Please try again.");
         }
-
     }
 }
