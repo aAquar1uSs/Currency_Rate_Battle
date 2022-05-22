@@ -11,5 +11,7 @@ public interface IUserService
 
     Task<AccountInfoViewModel> GetAccountInfoAsync();
 
+    Task<List<AccountHistoryViewModel>> GetAccountHistoryAsync();
+
     public void Logout();
 }
