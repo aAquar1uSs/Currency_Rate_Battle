@@ -22,6 +22,8 @@ public class AccountService : IAccountService
 
     private readonly IEncoder _encoder;
 
+    private readonly IAccountHistoryService _accountHistoryService;
+
     private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
     private readonly decimal _accountStartBalance;
@@ -30,13 +32,15 @@ public class AccountService : IAccountService
         ILogger<AccountService> logger,
         IServiceScopeFactory scopeFactory,
         IJwtManager jwtManager,
-        IEncoder encoder)
+        IEncoder encoder,
+        IAccountHistoryService accountHistoryService)
     {
         _options = options.Value;
         _logger = logger;
         _scopeFactory = scopeFactory;
         _jwtManager = jwtManager;
         _encoder = encoder;
+        _accountHistoryService = accountHistoryService;
         _accountStartBalance = _options.RegistrationReward;
     }
 
@@ -62,7 +66,7 @@ public class AccountService : IAccountService
                 Amount = _accountStartBalance
             }
         };
-
+        
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -73,6 +77,17 @@ public class AccountService : IAccountService
         try
         {
             _ = await db.Users.AddAsync(user);
+            _ = await db.SaveChangesAsync();
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
+        }
+
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            _ = _accountHistoryService.CreateHistoryByValuesAsync(null, user.Account.Id, DateTime.UtcNow, _accountStartBalance, true);
             _ = await db.SaveChangesAsync();
         }
         finally
@@ -137,4 +152,5 @@ public class AccountService : IAccountService
 
         return null!;
     }
+
 }

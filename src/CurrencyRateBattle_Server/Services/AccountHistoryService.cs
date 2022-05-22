@@ -42,7 +42,7 @@ public class AccountHistoryService : IAccountHistoryService
         return histories;
     }
 
-    public async Task CreateHistoryAsync(Room room, Account account,
+    public async Task CreateHistoryAsync(Room? room, Account account,
         AccountHistoryDto accountHistoryDto)
     {
         var history = new AccountHistory()
@@ -50,10 +50,39 @@ public class AccountHistoryService : IAccountHistoryService
             Date = accountHistoryDto.Date,
             Amount = accountHistoryDto.Amount,
             IsCredit = accountHistoryDto.IsCredit,
-            RoomId = room.Id,
-            Room = room,
             AccountId = account.Id,
             Account = account
+        };
+        if (room is not null)
+        {
+            history.Room = room;
+            history.RoomId = room.Id;
+        }
+
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            await dbContext.AccountHistory.AddAsync(history);
+            await dbContext.SaveChangesAsync();
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    public async Task CreateHistoryByValuesAsync(Guid? roomId, Guid accountId, DateTime date, decimal amount, bool isCredit)
+    {
+        var history = new AccountHistory()
+        {
+            Date = date,
+            Amount = amount,
+            IsCredit = isCredit,
+            RoomId = roomId,
+            AccountId = accountId
         };
 
         using var scope = _scopeFactory.CreateScope();

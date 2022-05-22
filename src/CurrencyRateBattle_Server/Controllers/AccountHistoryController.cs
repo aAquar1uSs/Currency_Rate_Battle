@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using CurrencyRateBattleServer.Dto;
+using CurrencyRateBattleServer.Models;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +41,11 @@ public class AccountHistoryController : ControllerBase
         if (userId is null)
             return BadRequest();
 
-        var history = await _historyService.GetAccountHistoryByAccountId(userId);
+        var account = await _accountService.GetAccountByUserIdAsync(userId);
+        if (account is null)
+            return BadRequest();
+
+        var history = await _historyService.GetAccountHistoryByAccountId(account.Id);
 
         return Ok(history);
     }
@@ -55,9 +60,10 @@ public class AccountHistoryController : ControllerBase
             var userId = _accountService.GetGuidFromRequest(HttpContext);
             if (userId is null)
                 return BadRequest();
-
+            Room? room = null;
             var account = await _accountService.GetAccountByUserIdAsync(userId);
-            var room = await _roomService.GetRoomByIdAsync(historyDto.RoomId);
+            if (historyDto.RoomId is not null)
+                room = await _roomService.GetRoomByIdAsync((Guid)historyDto.RoomId);
 
             await _historyService.CreateHistoryAsync(room, account, historyDto);
         }
