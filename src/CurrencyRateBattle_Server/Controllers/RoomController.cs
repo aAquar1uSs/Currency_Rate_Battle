@@ -82,4 +82,14 @@ public class RoomController : ControllerBase
             return BadRequest("An unexpected error occurred. Please try again.");
         }
     }
+
+    [HttpGet("filter/{currencyName}")]
+    public async Task<ActionResult<List<Room>>> GetRoomsAsync([FromRoute] string currencyName)
+    {
+        _logger.LogDebug("Filtered by currency room list.");
+
+        var rooms = await _roomService.GetActiveRoomsWithFilterAsync(currencyName);
+
+        return rooms is null ? BadRequest() : Ok(rooms);
+    }
 }

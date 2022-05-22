@@ -12,4 +12,6 @@ public interface IRoomService
     public Task<List<RoomDto>> GetRoomsAsync(bool? isActive);
 
     public Task<Room?> GetRoomByIdAsync(Guid id);
+
+    public Task<List<RoomDto>?> GetActiveRoomsWithFilterAsync(string currencyName);
 }

@@ -122,4 +122,64 @@ public class RoomService : IRoomService
 
         return result;
     }
+
+    public async Task<List<RoomDto>?> GetActiveRoomsWithFilterAsync(string currencyName)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        var result = new List<RoomDto>();
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            var curr = await db.Currencies
+                .FirstOrDefaultAsync(curr => curr.CurrencyName == currencyName);
+
+            if (curr is null)
+                return null;
+
+            result = GetActiveRoomsWithFilterByCurrencyId(db, curr.Id, currencyName);
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
+        }
+
+        return result;
+    }
+
+    private List<RoomDto> GetActiveRoomsWithFilterByCurrencyId(
+        CurrencyRateBattleContext db,
+        Guid currId,
+        string currName)
+    {
+        var result = new List<RoomDto>();
+
+        var rooms =
+                from currencyState in db.CurrencyStates
+                join room in db.Rooms
+                on currencyState.RoomId equals room.Id
+                select new
+                {
+                    room.Date,
+                    currencyState.CurrencyExchangeRate,
+                    currencyState.CurrencyId,
+                    room.IsClosed
+                };
+
+        var filteredRooms = rooms.Where(r => r.CurrencyId == currId && r.IsClosed == false);
+
+        foreach (var room in filteredRooms)
+        {
+            result.Add(
+                new RoomDto()
+                {
+                    CurrencyName = currName,
+                    CurrencyRate = room.CurrencyExchangeRate,
+                    Time = room.Date
+                });
+        }
+
+        return result;
+    }
 }
