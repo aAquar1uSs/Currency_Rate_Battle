@@ -13,5 +13,7 @@ public interface IUserService
 
     Task<List<AccountHistoryViewModel>> GetAccountHistoryAsync();
 
+    Task<string> GetUserBalanceAsync();
+
     public void Logout();
 }

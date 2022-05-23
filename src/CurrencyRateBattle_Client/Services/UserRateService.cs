@@ -7,11 +7,11 @@ namespace CRBClient.Services;
 
 public class UserRateService : IUserRateService
 {
-    private readonly CRBServerHttpClient _httpClient;
+    private readonly ICRBServerHttpClient _httpClient;
     private readonly WebServerOptions _options;
     private readonly ILogger<UserRateService> _logger;
 
-    public UserRateService(CRBServerHttpClient httpClient,
+    public UserRateService(ICRBServerHttpClient httpClient,
         IOptions<WebServerOptions> options, ILogger<UserRateService> logger)
     {
         _httpClient = httpClient;

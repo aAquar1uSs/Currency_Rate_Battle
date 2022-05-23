@@ -9,11 +9,11 @@ namespace CRBClient.Services;
 
 public class RoomService : IRoomService
 {
-    private readonly CRBServerHttpClient _httpClient;
+    private readonly ICRBServerHttpClient _httpClient;
     private readonly WebServerOptions _options;
     private readonly ILogger<RoomService> _logger;
 
-    public RoomService(CRBServerHttpClient httpClient,
+    public RoomService(ICRBServerHttpClient httpClient,
         IOptions<WebServerOptions> options, ILogger<RoomService> logger)
     {
         _httpClient = httpClient;
