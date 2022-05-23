@@ -16,4 +16,12 @@ public class WebServerOptions
     public string? GetBalanceURL { get; set; }
 
     public string? FilterURL { get; set; }
+
+    public string? RegistrationAccURL { get; set; }
+
+    public string? LoginAccURL { get; set; }
+
+    public string? UserProfileURL { get; set; }
+
+    public string? AccountHistoryURL { get; set; }
 }

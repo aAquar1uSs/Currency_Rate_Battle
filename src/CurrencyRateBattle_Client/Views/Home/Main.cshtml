@@ -12,17 +12,13 @@
         <br/>
         <div class="valuta">
             <div class="firs_rov_valuta">
-
-                @{
-                    var currentFiler = ViewBag.CurrentFiler as string;
-                }
-                @(Html.ActionLink("USD", "CurrencyFilter", "Home", new {currentFilter = "USD"}))
-                @(Html.ActionLink("EUR", "CurrencyFilter", "Home", new {currentFilter = "EUR"}))
-                @(Html.ActionLink("PLN", "CurrencyFilter", "Home", new {currentFilter = "PLN"}))
+                @(Html.ActionLink("USD", "", "Home", new {currentFilter = "USD"}))
+                @(Html.ActionLink("EUR", "", "Home", new {currentFilter = "EUR"}))
+                @(Html.ActionLink("PLN", "", "Home", new {currentFilter = "PLN"}))
             </div>
             <div class="second_rov_valuta">
-                @(Html.ActionLink("CHF", "CurrencyFilter", "Home", new {currentFilter = "CHF"}))
-                @(Html.ActionLink("GBP", "CurrencyFilter", "Home", new {currentFilter = "GBP"}))
+                @(Html.ActionLink("CHF", "", "Home", new {currentFilter = "CHF"}))
+                @(Html.ActionLink("GBP", "", "Home", new {currentFilter = "GBP"}))
             </div>
         </div>
     </div>
@@ -52,5 +48,5 @@
     </div>
 </div>
 <div class="pagination-class">
-    <p>@Html.PagedListPager(Model, page => Url.Action("Main"))</p>
+    <p>@Html.PagedListPager(Model, page => Url.Action("Main", new {page}))</p>
 </div>

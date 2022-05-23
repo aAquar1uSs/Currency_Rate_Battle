@@ -6,8 +6,6 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 //Configure logger
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -20,15 +18,17 @@ builder.Logging.AddSerilog(logger)
 builder.Services.AddControllersWithViews();
 builder.Services.Configure<WebServerOptions>(
     builder.Configuration.GetSection(WebServerOptions.SectionName));
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
-//builder.Services.AddHttpClient<CRBServerHttpClient>();
-builder.Services.AddSingleton<CRBServerHttpClient>();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSingleton<ICRBServerHttpClient, CRBServerHttpClient>();
+
 builder.Services.AddSingleton<IRoomService, RoomService>();
 builder.Services.AddSingleton<IUserService, UserService>();
-builder.Services.AddSingleton<ICommonService, CommonService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddHttpContextAccessor();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -39,20 +39,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseSession(new SessionOptions()
-{
-    Cookie = new CookieBuilder()
-    {
-        Name = ".AspNetCore.Session.CBR"
-    }
-});
+app.UseSession(new SessionOptions() {Cookie = new CookieBuilder() {Name = ".AspNetCore.Session.CBR"}});
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.UseAuthorization();
-//app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

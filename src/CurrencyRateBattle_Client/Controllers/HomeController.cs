@@ -15,22 +15,19 @@ namespace CRBClient.Controllers
 
         private readonly IUserService _userService;
 
-        private readonly ICommonService _commonService;
-
         private List<RoomViewModel> _roomStorage = new();
 
         public HomeController(ILogger<HomeController> logger,
-            IRoomService roomService, IUserService userService, ICommonService commonService)
+            IRoomService roomService, IUserService userService)
         {
             _logger = logger;
             _roomService = roomService;
             _userService = userService;
-            _commonService = commonService;
         }
 
         public IActionResult Index()
         {
-            ViewBag.Balance = _commonService.GetUserBalanceAsync();
+            ViewBag.Balance = _userService.GetUserBalanceAsync();
             return View();
         }
 
@@ -39,7 +36,7 @@ namespace CRBClient.Controllers
             X.PagedList.IPagedList<RoomViewModel> pageX;
             try
             {
-                ViewBag.Balance = await _commonService.GetUserBalanceAsync();
+                ViewBag.Balance = await _userService.GetUserBalanceAsync();
                 ViewBag.Title = "Main Page";
 
                 _roomStorage = await _roomService.GetRoomsAsync(false);
@@ -56,35 +53,12 @@ namespace CRBClient.Controllers
             return View(pageX);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> CurrencyFilter(string currencyName, int? page)
-        {
-            X.PagedList.IPagedList<RoomViewModel> pageX;
-            try
-            {
-                ViewBag.Balance = await _commonService.GetUserBalanceAsync();
-                ViewBag.Title = "Main Page";
-
-                _roomStorage = await _roomService.GetFilteredCurrencyAsync(currencyName);
-                var pageSize = 4;
-                var pageIndex = (page ?? 1);
-                pageX = PagedListExtensions.ToPagedList(_roomStorage, pageIndex, pageSize);
-            }
-            catch (CustomException)
-            {
-                _logger.LogDebug("User unauthorized");
-                return Redirect("/Account/Authorization");
-            }
-
-            return View("Main", pageX);
-        }
-
         public async Task<IActionResult> Profile()
         {
             AccountInfoViewModel accountInfo;
             try
             {
-                ViewBag.Balance = await _commonService.GetUserBalanceAsync();
+                ViewBag.Balance = await _userService.GetUserBalanceAsync();
                 ViewBag.Title = "User Profile";
 
                 accountInfo = await _userService.GetAccountInfoAsync();

@@ -15,33 +15,29 @@ namespace CRBClient.Controllers
 
         private readonly IUserService _userService;
 
-        private readonly ICommonService _commonService;
-
-
         public AccountHistoryController(ILogger<HomeController> logger,
-            IUserService userService, ICommonService commonService)
+            IUserService userService)
         {
             _logger = logger;
             _userService = userService;
-            _commonService = commonService;
         }
 
         public async Task<IActionResult> Index(int? page)
         {
             var pageSize = 10;
             var pageIndex = page.HasValue ? Convert.ToInt32(page) : 1;
-            ViewBag.Balance = await _commonService.GetUserBalanceAsync();
+            ViewBag.Balance = await _userService.GetUserBalanceAsync();
             ViewBag.Title = "Account History";
-            List<AccountHistoryViewModel> accountHistoryInfo;
             try
             {
-                accountHistoryInfo = await _userService.GetAccountHistoryAsync();
+                var accountHistoryInfo = await _userService.GetAccountHistoryAsync();
                 //accountHistories = accountHistoryInfo.ToPagedList(pageIndex, pageSize);
                 var accountHistories = PagedListExtensions.ToPagedList(accountHistoryInfo, pageIndex, pageSize);
                 return View(accountHistories);
             }
             catch (CustomException)
             {
+                _logger.LogDebug("User unauthorized");
                 return Redirect("/Account/Authorization");
             }
         }
