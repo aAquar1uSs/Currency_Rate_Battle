@@ -56,29 +56,6 @@ namespace CRBClient.Controllers
             return View(pageX);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> CurrencyFilter(string currencyName, int? page)
-        {
-            X.PagedList.IPagedList<RoomViewModel> pageX;
-            try
-            {
-                ViewBag.Balance = await _commonService.GetUserBalanceAsync();
-                ViewBag.Title = "Main Page";
-
-                _roomStorage = await _roomService.GetFilteredCurrencyAsync(currencyName);
-                var pageSize = 4;
-                var pageIndex = (page ?? 1);
-                pageX = PagedListExtensions.ToPagedList(_roomStorage, pageIndex, pageSize);
-            }
-            catch (CustomException)
-            {
-                _logger.LogDebug("User unauthorized");
-                return Redirect("/Account/Authorization");
-            }
-
-            return View("Main", pageX);
-        }
-
         public async Task<IActionResult> Profile()
         {
             AccountInfoViewModel accountInfo;
