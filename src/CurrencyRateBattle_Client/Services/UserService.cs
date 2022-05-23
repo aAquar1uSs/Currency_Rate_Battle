@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using CRBClient.Helpers;
 using CRBClient.Models;
 using Microsoft.Extensions.Options;
@@ -8,13 +9,13 @@ namespace CRBClient.Services;
 
 public class UserService : IUserService
 {
-    private readonly CRBServerHttpClient _httpClient;
+    private readonly ICRBServerHttpClient _httpClient;
     private readonly WebServerOptions _options;
     private readonly ILogger<UserService> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private ISession Session => _httpContextAccessor.HttpContext.Session;
 
-    public UserService(CRBServerHttpClient httpClient,
+    public UserService(ICRBServerHttpClient httpClient,
         IHttpContextAccessor httpContextAccessor,
         IOptions<WebServerOptions> options,
         ILogger<UserService> logger)
@@ -86,8 +87,7 @@ public class UserService : IUserService
             throw new CustomException();
         }
 
-        // ToDo BadRequest handler
-        return null!;
+        return new AccountInfoViewModel();
     }
 
     public async Task<List<AccountHistoryViewModel>> GetAccountHistoryAsync()
@@ -103,8 +103,22 @@ public class UserService : IUserService
             throw new CustomException();
         }
 
-        // ToDo BadRequest handler
-        return null!;
+        return new List<AccountHistoryViewModel>();
+    }
+
+    public async Task<string> GetUserBalanceAsync()
+    {
+        var balance = string.Empty;
+        var response = await _httpClient.GetAsync(_options.GetBalanceURL);
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            if (decimal.TryParse(response.Content.ReadAsStringAsync().Result, out var bal))
+            {
+                balance = "BALANCE: " + bal.ToString("C", new CultureInfo("uk-UA"));
+            }
+        }
+
+        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : balance;
     }
 
     public void Logout()

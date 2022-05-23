@@ -38,6 +38,7 @@ namespace CRBClient.Controllers
             string searchString,
             int? page)
         {
+            X.PagedList.IPagedList<RoomViewModel> pageX;
             try
             {
 

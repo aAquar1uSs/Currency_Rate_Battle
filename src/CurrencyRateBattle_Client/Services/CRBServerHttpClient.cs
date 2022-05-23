@@ -2,16 +2,17 @@
 using CRBClient.Helpers;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
+using CRBClient.Services.Interfaces;
 
 namespace CRBClient.Services;
 
-public class CRBServerHttpClient
+public class CRBServerHttpClient : ICRBServerHttpClient
 {
     private readonly WebServerOptions _options;
     private readonly HttpClient _httpClient;
     private readonly ILogger<CRBServerHttpClient> _logger;
-
     private readonly IHttpContextAccessor _httpContextAccessor;
+
     private ISession Session => _httpContextAccessor.HttpContext.Session;
 
     public CRBServerHttpClient(IOptions<WebServerOptions> options,
