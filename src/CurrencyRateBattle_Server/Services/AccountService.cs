@@ -61,12 +61,9 @@ public class AccountService : IAccountService
         {
             Email = userData.Email,
             Password = _encoder.Encrypt(userData.Password),
-            Account = new Account
-            {
-                Amount = _accountStartBalance
-            }
+            Account = new Account {Amount = _accountStartBalance}
         };
-        
+
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -77,17 +74,10 @@ public class AccountService : IAccountService
         try
         {
             _ = await db.Users.AddAsync(user);
-            _ = await db.SaveChangesAsync();
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
-        }
 
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            _ = _accountHistoryService.CreateHistoryByValuesAsync(null, user.Account.Id, DateTime.UtcNow, _accountStartBalance, true);
+            _ = _accountHistoryService.CreateHistoryByValuesAsync(null, user.Account.Id, DateTime.UtcNow,
+                _accountStartBalance, true);
+
             _ = await db.SaveChangesAsync();
         }
         finally
@@ -110,11 +100,7 @@ public class AccountService : IAccountService
         if (user is null || account is null)
             return null;
 
-        var resultDto = new AccountInfoDto
-        {
-            Email = user.Email,
-            Amount = account.Amount
-        };
+        var resultDto = new AccountInfoDto {Email = user.Email, Amount = account.Amount};
 
         return resultDto;
     }
@@ -141,16 +127,14 @@ public class AccountService : IAccountService
 
     public Guid? GetGuidFromRequest(HttpContext context)
     {
-        Guid id;
         var user = context.User;
 
         if (user.HasClaim(c => c.Type == "UserId"))
         {
-            id = Guid.Parse(user.Claims.FirstOrDefault(c => c.Type == "UserId")!.Value);
+            var id = Guid.Parse(user.Claims.FirstOrDefault(c => c.Type == "UserId")!.Value);
             return id;
         }
 
         return null!;
     }
-
 }

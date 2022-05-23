@@ -22,23 +22,29 @@ public class RoomService : IRoomService
         _scopeFactory = scopeFactory;
     }
 
-    public async Task<Room> CreateRoomAsync(Room room)
+    public async Task CreateRoomAsync(CurrencyRateBattleContext db, Currency curr)
     {
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-        Room newRoom;
+        var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00"),
+            "MM.dd.yyyy HH:mm:ss", null);
+
+        var currState = new CurrencyState
+        {
+            Date = currentDate,
+            CurrencyExchangeRate = 0,
+            Currency = curr,
+            CurrencyId = curr.Id,
+            Room = new Room {Date = currentDate.AddDays(1), IsClosed = false}
+        };
+
         await _semaphoreSlim.WaitAsync();
         try
         {
-            newRoom = db.Rooms.Add(room).Entity;
-            _ = await db.SaveChangesAsync();
+            await db.CurrencyStates.AddAsync(currState);
         }
         finally
         {
-            _ = _semaphoreSlim.Release();
+            _semaphoreSlim.Release();
         }
-
-        return newRoom ?? throw new CustomException($"{nameof(Room)} can not be created.");
     }
 
     public async void UpdateRoomAsync(Guid id, Room updatedRoom)
@@ -123,7 +129,7 @@ public class RoomService : IRoomService
         return result;
     }
 
-    public async Task<List<RoomDto>?> GetActiveRoomsWithFilterAsync(string currencyName)
+    public async Task<List<RoomDto>?> GetActiveRoomsWithFilterByCurrencyNameAsync(string currencyName)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -132,52 +138,36 @@ public class RoomService : IRoomService
         await _semaphoreSlim.WaitAsync();
         try
         {
-            var curr = await db.Currencies
-                .FirstOrDefaultAsync(curr => curr.CurrencyName == currencyName);
-
-            if (curr is null)
-                return null;
-
-            result = GetActiveRoomsWithFilterByCurrencyId(db, curr.Id, currencyName);
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
-        }
-
-        return result;
-    }
-
-    private List<RoomDto> GetActiveRoomsWithFilterByCurrencyId(
-        CurrencyRateBattleContext db,
-        Guid currId,
-        string currName)
-    {
-        var result = new List<RoomDto>();
-
-        var rooms =
+            var filteredRooms =
                 from currencyState in db.CurrencyStates
-                join room in db.Rooms
-                on currencyState.RoomId equals room.Id
+                join room in db.Rooms on currencyState.RoomId equals room.Id
+                join curr in db.Currencies on currencyState.CurrencyId equals curr.Id
+                where (curr.CurrencyName == currencyName && room.IsClosed == false)
                 select new
                 {
                     room.Date,
                     currencyState.CurrencyExchangeRate,
                     currencyState.CurrencyId,
-                    room.IsClosed
+                    room.IsClosed,
+                    RateUpdateDate = currencyState.Date
                 };
 
-        var filteredRooms = rooms.Where(r => r.CurrencyId == currId && r.IsClosed == false);
-
-        foreach (var room in filteredRooms)
+            foreach (var room in filteredRooms)
+            {
+                result.Add(
+                    new RoomDto
+                    {
+                        CurrencyExchangeRate = room.CurrencyExchangeRate,
+                        Date = room.Date,
+                        СurrencyName = currencyName,
+                        UpdateRateTime = room.RateUpdateDate,
+                        IsClosed = room.IsClosed
+                    });
+            }
+        }
+        finally
         {
-            result.Add(
-                new RoomDto()
-                {
-                    CurrencyName = currName,
-                    CurrencyRate = room.CurrencyExchangeRate,
-                    Time = room.Date
-                });
+            _ = _semaphoreSlim.Release();
         }
 
         return result;

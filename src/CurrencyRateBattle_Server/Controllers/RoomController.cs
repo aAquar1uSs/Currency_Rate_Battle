@@ -39,29 +39,6 @@ public class RoomController : ControllerBase
         return room;
     }
 
-
-    /*[HttpPost]
-    public async Task<IActionResult> CreateRoomAsync([FromBody] Room roomToCreate)
-    {
-        _logger.LogDebug("New room creation is trigerred.");
-        try
-        {
-            var room = await _roomService.CreateRoomAsync(roomToCreate);
-            _logger.LogInformation($"Room has been created successfully ({room.Id})");
-            return Ok(room);
-        }
-        catch (CustomException ex)
-        {
-            // return error message if there was an exception
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (DbUpdateException)
-        {
-            _logger.LogDebug("An unexpected error occurred during the attempt to create a room in the DB.");
-            return BadRequest("An unexpected error occurred. Please try again.");
-        }
-    }*/
-
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateRoomAsync(Guid id, [FromBody] Room updatedRoom)
     {
@@ -84,11 +61,11 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet("filter/{currencyName}")]
-    public async Task<ActionResult<List<Room>>> GetRoomsAsync([FromRoute] string currencyName)
+    public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromRoute] string currencyName)
     {
         _logger.LogDebug("Filtered by currency room list.");
 
-        var rooms = await _roomService.GetActiveRoomsWithFilterAsync(currencyName);
+        var rooms = await _roomService.GetActiveRoomsWithFilterByCurrencyNameAsync(currencyName);
 
         return rooms is null ? BadRequest() : Ok(rooms);
     }
