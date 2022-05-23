@@ -12,7 +12,7 @@ public class UserRateService : IUserRateService
     private readonly ILogger<UserRateService> _logger;
 
     public UserRateService(CRBServerHttpClient httpClient,
-           IOptions<WebServerOptions> options, ILogger<UserRateService> logger)
+        IOptions<WebServerOptions> options, ILogger<UserRateService> logger)
     {
         _httpClient = httpClient;
         _options = options.Value;
