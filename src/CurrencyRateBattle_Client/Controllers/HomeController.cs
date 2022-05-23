@@ -1,9 +1,7 @@
 ﻿using CRBClient.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Text.Json;
 using CRBClient.Services.Interfaces;
-using PagedList;
 using PagedListExtensions = X.PagedList.PagedListExtensions;
 using CRBClient.Helpers;
 
@@ -19,25 +17,7 @@ namespace CRBClient.Controllers
 
         private readonly ICommonService _commonService;
 
-
-
-        private readonly List<RoomViewModel> _list = new()
-        {
-            new RoomViewModel(),
-            new RoomViewModel(),
-            new RoomViewModel(),
-            new RoomViewModel(),
-            new RoomViewModel(),
-            new RoomViewModel(),
-            new RoomViewModel(),
-            new RoomViewModel(),
-            new RoomViewModel(),
-            new RoomViewModel(),
-            new RoomViewModel(),
-            new RoomViewModel(),
-            new RoomViewModel(),
-            new RoomViewModel()
-        };
+        private List<RoomViewModel> _roomStorage = new();
 
         public HomeController(ILogger<HomeController> logger,
             IRoomService roomService, IUserService userService, ICommonService commonService)
@@ -56,32 +36,67 @@ namespace CRBClient.Controllers
 
         public async Task<IActionResult> Main(int? page)
         {
-            ViewBag.Balance = await _commonService.GetUserBalanceAsync();
-            ViewBag.Title = "Main Page";
-            //var room = await _roomService.GetRooms();
-            var token = HttpContext.Session.GetString("token");
-            var pageSize = 4;
-            var pageIndex = (page ?? 1);
-            var pageX = PagedListExtensions.ToPagedList(_list, pageIndex, pageSize);
+            X.PagedList.IPagedList<RoomViewModel> pageX;
+            try
+            {
+                ViewBag.Balance = await _commonService.GetUserBalanceAsync();
+                ViewBag.Title = "Main Page";
+
+                _roomStorage = await _roomService.GetRoomsAsync(false);
+                var pageSize = 4;
+                var pageIndex = (page ?? 1);
+                pageX = PagedListExtensions.ToPagedList(_roomStorage, pageIndex, pageSize);
+            }
+            catch (CustomException)
+            {
+                _logger.LogDebug("User unauthorized");
+                return Redirect("/Account/Authorization");
+            }
+
             return View(pageX);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CurrencyFilter(string currencyName, int? page)
+        {
+            X.PagedList.IPagedList<RoomViewModel> pageX;
+            try
+            {
+                ViewBag.Balance = await _commonService.GetUserBalanceAsync();
+                ViewBag.Title = "Main Page";
+
+                _roomStorage = await _roomService.GetFilteredCurrencyAsync(currencyName);
+                var pageSize = 4;
+                var pageIndex = (page ?? 1);
+                pageX = PagedListExtensions.ToPagedList(_roomStorage, pageIndex, pageSize);
+            }
+            catch (CustomException)
+            {
+                _logger.LogDebug("User unauthorized");
+                return Redirect("/Account/Authorization");
+            }
+
+            return View("Main", pageX);
         }
 
         public async Task<IActionResult> Profile()
         {
-            ViewBag.Balance = await _commonService.GetUserBalanceAsync();
-            ViewBag.Title = "User Profile";
             AccountInfoViewModel accountInfo;
             try
             {
+                ViewBag.Balance = await _commonService.GetUserBalanceAsync();
+                ViewBag.Title = "User Profile";
+
                 accountInfo = await _userService.GetAccountInfoAsync();
             }
             catch (CustomException)
             {
+                _logger.LogDebug("User unauthorized");
                 return Redirect("/Account/Authorization");
             }
+
             return View(accountInfo);
         }
-
 
         public IActionResult Logout()
         {
@@ -90,36 +105,6 @@ namespace CRBClient.Controllers
             return Redirect("/Account/Authorization");
         }
 
-        public IActionResult Rooms()
-        {
-            IEnumerable<RoomViewModel>? rooms = null;
-
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri("https://gorest.co.in/public/v2/");
-                //HTTP GET
-                var responseTask = client.GetAsync("users");
-                responseTask.Wait();
-
-                var result = responseTask.Result;
-                if (result.IsSuccessStatusCode)
-                {
-                    var readTask = result.Content.ReadAsStringAsync();//ReadAsAsync<IList<RoomViewModel>>();
-                    readTask.Wait();
-
-                    rooms = JsonSerializer.Deserialize<IEnumerable<RoomViewModel>>(readTask.Result);
-                }
-                else
-                {
-                    //log response status here..
-
-                    rooms = Enumerable.Empty<RoomViewModel>();
-
-                    ModelState.AddModelError(string.Empty, "Server error. Please contact administrator.");
-                }
-            }
-            return View(rooms);
-        }
         public IActionResult Privacy()
         {
             return View();
@@ -128,7 +113,7 @@ namespace CRBClient.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
     }
 }

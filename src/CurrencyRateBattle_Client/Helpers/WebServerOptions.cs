@@ -8,9 +8,12 @@ public class WebServerOptions
     [Required]
     [Url]
     public string? BaseUrl { get; set; }
+
     public string? RoomsURL { get; set; }
 
     [Required]
     [DefaultValue("get-balance")]
     public string? GetBalanceURL { get; set; }
+
+    public string? FilterURL { get; set; }
 }

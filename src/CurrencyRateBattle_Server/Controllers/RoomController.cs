@@ -23,11 +23,11 @@ public class RoomController : ControllerBase
         _roomService = roomService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Room>>> GetRoomsAsync(bool? isActive)
+    [HttpGet("get-rooms/{isClosed}")]
+    public async Task<ActionResult<IEnumerable<Room>>> GetRoomsAsync([FromRoute] bool isClosed)
     {
         _logger.LogDebug("List of rooms are retrieving.");
-        var rooms = await _roomService.GetRoomsAsync(isActive);
+        var rooms = await _roomService.GetRoomsAsync(isClosed);
         return Ok(rooms);
     }
 
@@ -37,29 +37,6 @@ public class RoomController : ControllerBase
     {
         var room = await _roomService.GetRoomByIdAsync(id);
         return room;
-    }
-
-
-    [HttpPost]
-    public async Task<IActionResult> CreateRoomAsync([FromBody] Room roomToCreate)
-    {
-        _logger.LogDebug("New room creation is trigerred.");
-        try
-        {
-            var room = await _roomService.CreateRoomAsync(roomToCreate);
-            _logger.LogInformation($"Room has been created successfully ({room.Id})");
-            return Ok(room);
-        }
-        catch (CustomException ex)
-        {
-            // return error message if there was an exception
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (DbUpdateException)
-        {
-            _logger.LogDebug("An unexpected error occurred during the attempt to create a room in the DB.");
-            return BadRequest("An unexpected error occurred. Please try again.");
-        }
     }
 
     [HttpPut("{id}")]
@@ -74,13 +51,22 @@ public class RoomController : ControllerBase
         catch (CustomException ex)
         {
             // return error message if there was an exception
-            return BadRequest(new { message = ex.Message });
+            return BadRequest(new {message = ex.Message});
         }
         catch (DbUpdateException)
         {
             _logger.LogDebug("An unexpected error occurred during the attempt to update the room in the DB.");
             return BadRequest("An unexpected error occurred. Please try again.");
         }
+    }
 
+    [HttpGet("filter/{currencyName}")]
+    public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromRoute] string currencyName)
+    {
+        _logger.LogDebug("Filtered by currency room list.");
+
+        var rooms = await _roomService.GetActiveRoomsWithFilterByCurrencyNameAsync(currencyName);
+
+        return rooms is null ? BadRequest() : Ok(rooms);
     }
 }

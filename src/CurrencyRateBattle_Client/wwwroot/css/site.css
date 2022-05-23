@@ -65,11 +65,12 @@
     padding-top: 4rem;
 }
 
-a {
+.valuta a {
     text-decoration: none;
-    color: #232323;
+    color: yellow;
     transition: color 0.3s ease;
 }
+
 .burger-m{
     margin-right: 240px;
 }
@@ -96,7 +97,6 @@ a {
 {
     color: tomato;
 }
-
 
 #menuToggle input
 {
@@ -223,13 +223,6 @@ a {
     display: flex;
 }
 
-
-a {
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-
 .filter {
     padding: 15px;
     height: 600px;
@@ -237,6 +230,11 @@ a {
     opacity: 0.96;
     background-color: rgb(32, 32, 32);
     box-shadow: 0px 0px 21px 8px #000000;
+}
+
+.filter h2{
+    color: yellow;
+    text-align: center;
 }
 
 .rooms {
@@ -262,7 +260,7 @@ a {
     justify-content: space-between;
 }
 
-.valuta {
+/*.valuta {
     max-width: 100%;
 }
 
@@ -274,7 +272,7 @@ a {
 .valuta button p {
     color: rgb(228, 228, 139);
     font-size: 30px;
-}
+}*/
 
 .valuta button:hover {
     border: 2px solid rgb(236, 236, 13);
@@ -351,10 +349,12 @@ a {
 
 .pagination-class {
     margin-top: 3%;
-    margin-left: 45%;
+    margin-left: 33%;
     opacity: 0.96;
     background-color: rgb(32, 32, 32);
     text-align: center;
+    height: 40px;
+    margin-right: 30%;
 }
 
 .ul.pagination {
@@ -418,11 +418,10 @@ tr:hover {
     background-color: rgb(32, 32, 32, 0.5);
 }
 
-
 .pagination {
     position: relative;
     margin-top: 3%;
-    margin-left: 45%;
+    margin-left: 35%;
     opacity: 0.96;
     text-align: center;
     color: white;

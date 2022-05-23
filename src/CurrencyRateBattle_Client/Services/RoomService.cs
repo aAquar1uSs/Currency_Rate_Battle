@@ -1,4 +1,5 @@
-﻿using CRBClient.Helpers;
+﻿using System.Net;
+using CRBClient.Helpers;
 using CRBClient.Models;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
@@ -13,26 +14,48 @@ public class RoomService : IRoomService
     private readonly ILogger<RoomService> _logger;
 
     public RoomService(CRBServerHttpClient httpClient,
-           IOptions<WebServerOptions> options, ILogger<RoomService> logger)
+        IOptions<WebServerOptions> options, ILogger<RoomService> logger)
     {
         _httpClient = httpClient;
         _options = options.Value;
         _logger = logger;
     }
-    public async Task<IEnumerable<RoomViewModel>> GetRooms()
+
+    public async Task<List<RoomViewModel>> GetRoomsAsync(bool isClosed)
     {
-        var rooms = Enumerable.Empty<RoomViewModel>();
-        //HTTP GET
-        var responseTask = _httpClient.GetAPIResultsAsync(_options.RoomsURL);
-        responseTask.Wait();
+        var responseTask = await _httpClient.GetAsync(_options.RoomsURL + $"/{isClosed}");
 
-        var result = responseTask.Result;
-        rooms = JsonSerializer.Deserialize<IEnumerable<RoomViewModel>>(result);
+        if (responseTask.StatusCode == HttpStatusCode.OK)
+        {
+            var result = await responseTask.Content.ReadAsStringAsync();
+            var rooms = JsonSerializer.Deserialize<IEnumerable<RoomViewModel>>(result);
 
-        // rooms = Enumerable.Empty<RoomViewModel>();
+            _logger.LogInformation("Rooms are loaded successfully.");
+            return rooms.ToList();
+        }
 
-        //_logger.LogInformation("Rooms are not loaded. Something bad has happened :(");
-        _logger.LogInformation("Rooms are loaded successfully.");
-        return rooms;
+        if (responseTask.StatusCode == HttpStatusCode.Unauthorized)
+            throw new CustomException("User unauthorized");
+
+        return new List<RoomViewModel>();
+    }
+
+    public async Task<List<RoomViewModel>> GetFilteredCurrencyAsync(string currencyName)
+    {
+        var responseTask = await _httpClient.GetAsync(_options.FilterURL + $"/{currencyName}");
+
+        if (responseTask.StatusCode == HttpStatusCode.OK)
+        {
+            var result = await responseTask.Content.ReadAsStringAsync();
+            var rooms = JsonSerializer.Deserialize<IEnumerable<RoomViewModel>>(result);
+
+            _logger.LogInformation("Rooms are loaded successfully.");
+            return rooms.ToList();
+        }
+
+        if (responseTask.StatusCode == HttpStatusCode.Unauthorized)
+            throw new CustomException("User unauthorized");
+
+        return new List<RoomViewModel>();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CurrencyRateBattleServer.Data;
+using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Models;
 using CurrencyRateBattleServer.Services.Interfaces;
@@ -21,24 +22,31 @@ public class RoomService : IRoomService
         _scopeFactory = scopeFactory;
     }
 
-    public async Task<Room> CreateRoomAsync(Room room)
+    public async Task CreateRoomAsync(CurrencyRateBattleContext db, Currency curr)
     {
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-        Room newRoom;
+        var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00"),
+            "MM.dd.yyyy HH:mm:ss", null);
+
+        var currState = new CurrencyState
+        {
+            Date = currentDate,
+            CurrencyExchangeRate = 0,
+            Currency = curr,
+            CurrencyId = curr.Id,
+            Room = new Room {Date = currentDate.AddDays(1), IsClosed = false}
+        };
+
         await _semaphoreSlim.WaitAsync();
         try
         {
-            newRoom = db.Rooms.Add(room).Entity;
-            _ = await db.SaveChangesAsync();
+            await db.CurrencyStates.AddAsync(currState);
         }
         finally
         {
-            _ = _semaphoreSlim.Release();
+            _semaphoreSlim.Release();
         }
-
-        return newRoom ?? throw new CustomException($"{nameof(Room)} can not be created.");
     }
+
     public async void UpdateRoomAsync(Guid id, Room updatedRoom)
     {
         using var scope = _scopeFactory.CreateScope();
@@ -58,28 +66,50 @@ public class RoomService : IRoomService
         {
             _ = _semaphoreSlim.Release();
         }
-
     }
-    public async Task<List<Room>> GetRoomsAsync(bool? isActive)
+
+    public async Task<List<RoomDto>> GetRoomsAsync(bool? isActive)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        List<Room> result;
+        List<RoomDto> roomDtoStorage = new();
         await _semaphoreSlim.WaitAsync();
         try
         {
-            result = isActive == true
-                ? await db.Rooms.Where(r => !r.IsClosed).ToListAsync()
-                : isActive == false ? await db.Rooms.Where(r => r.IsClosed).ToListAsync() : await db.Rooms.ToListAsync();
+            var result = from curr in db.Currencies
+                join currState in db.CurrencyStates on curr.Id equals currState.CurrencyId
+                join room in db.Rooms on currState.RoomId equals room.Id
+                where room.IsClosed == isActive
+                select new
+                {
+                    curr.CurrencyName,
+                    room.Date,
+                    room.IsClosed,
+                    currState.CurrencyExchangeRate,
+                    RateDate = currState.Date
+                };
+
+            foreach (var data in result)
+            {
+                roomDtoStorage.Add(new RoomDto
+                {
+                    CurrencyExchangeRate = Math.Round(data.CurrencyExchangeRate, 2),
+                    СurrencyName = data.CurrencyName,
+                    Date = data.Date,
+                    IsClosed = data.IsClosed,
+                    UpdateRateTime = data.RateDate
+                });
+            }
         }
         finally
         {
             _ = _semaphoreSlim.Release();
         }
 
-        return result;
+        return roomDtoStorage;
     }
+
     public async Task<Room?> GetRoomByIdAsync(Guid id)
     {
         using var scope = _scopeFactory.CreateScope();
@@ -90,6 +120,50 @@ public class RoomService : IRoomService
         try
         {
             result = await db.Rooms.FirstOrDefaultAsync(r => r.Id == id);
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
+        }
+
+        return result;
+    }
+
+    public async Task<List<RoomDto>?> GetActiveRoomsWithFilterByCurrencyNameAsync(string currencyName)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        var result = new List<RoomDto>();
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            var filteredRooms =
+                from currencyState in db.CurrencyStates
+                join room in db.Rooms on currencyState.RoomId equals room.Id
+                join curr in db.Currencies on currencyState.CurrencyId equals curr.Id
+                where (curr.CurrencyName == currencyName && room.IsClosed == false)
+                select new
+                {
+                    room.Date,
+                    currencyState.CurrencyExchangeRate,
+                    currencyState.CurrencyId,
+                    room.IsClosed,
+                    RateUpdateDate = currencyState.Date
+                };
+
+            foreach (var room in filteredRooms)
+            {
+                result.Add(
+                    new RoomDto
+                    {
+                        CurrencyExchangeRate = room.CurrencyExchangeRate,
+                        Date = room.Date,
+                        СurrencyName = currencyName,
+                        UpdateRateTime = room.RateUpdateDate,
+                        IsClosed = room.IsClosed
+                    });
+            }
         }
         finally
         {
