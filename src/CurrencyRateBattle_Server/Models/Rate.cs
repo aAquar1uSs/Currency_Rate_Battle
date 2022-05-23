@@ -6,13 +6,18 @@ public class Rate
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Id { get; set;  }
+    public Guid Id { get; set; }
 
     //Date when the rate is added by user
     [Required]
     public DateTime SetDate { get; set; }
 
     public decimal Amount { get; set; }
+
+    //Date when the rate is settled
+    public DateTime? SettleDate { get; set; }
+
+    public decimal? Payout { get; set; }
 
     /// <summary>
     /// IsClosed must be filled when DateTime is passed (with hosted service)
