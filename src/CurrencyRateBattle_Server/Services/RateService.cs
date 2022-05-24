@@ -40,7 +40,7 @@ public class RateService : IRateService
 
         return newRate ?? throw new CustomException($"{nameof(Rate)} can not be created.");
     }
-    public async void UpdateRateAsync(Guid id, Rate updatedRate)
+    public async Task UpdateRateAsync(Guid id, Rate updatedRate)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -179,7 +179,7 @@ public class RateService : IRateService
         return betDtoStorage;
     }
 
-    public async void DeleteRateAsync(Guid id)
+    public async Task DeleteRateAsync(Guid id)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();

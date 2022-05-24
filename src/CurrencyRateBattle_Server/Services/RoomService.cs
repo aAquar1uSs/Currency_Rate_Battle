@@ -47,7 +47,7 @@ public class RoomService : IRoomService
         }
     }
 
-    public async void UpdateRoomAsync(Guid id, Room updatedRoom)
+    public async Task UpdateRoomAsync(Guid id, Room updatedRoom)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
