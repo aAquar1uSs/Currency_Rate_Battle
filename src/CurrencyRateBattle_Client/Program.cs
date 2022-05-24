@@ -27,6 +27,7 @@ builder.Services.AddSingleton<ICRBServerHttpClient, CRBServerHttpClient>();
 
 builder.Services.AddSingleton<IRoomService, RoomService>();
 builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddSingleton<IUserRateService, UserRateService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 var app = builder.Build();
