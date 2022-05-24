@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using CRBClient.Services.Interfaces;
-using PagedListExtensions = X.PagedList.PagedListExtensions;
 using CRBClient.Helpers;
 
 namespace CRBClient.Controllers
@@ -31,18 +30,28 @@ namespace CRBClient.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Main(int? page)
+        public async Task<IActionResult> Main(string currentFilter,
+            string searchString,
+            int? page)
         {
-            X.PagedList.IPagedList<RoomViewModel> pageX;
             try
             {
                 ViewBag.Balance = await _userService.GetUserBalanceAsync();
                 ViewBag.Title = "Main Page";
 
-                _roomStorage = await _roomService.GetRoomsAsync(false);
-                var pageSize = 4;
-                var pageIndex = (page ?? 1);
-                pageX = PagedListExtensions.ToPagedList(_roomStorage, pageIndex, pageSize);
+                if (searchString != null)
+                    page = 1;
+                else
+                {
+                    searchString = currentFilter;
+                }
+
+                ViewData["CurrentFilter"] = searchString;
+
+                if (!string.IsNullOrEmpty(searchString))
+                    _roomStorage = await _roomService.GetFilteredCurrencyAsync(searchString.ToUpperInvariant());
+                else
+                    _roomStorage = await _roomService.GetRoomsAsync(false);
             }
             catch (CustomException)
             {
@@ -50,7 +59,8 @@ namespace CRBClient.Controllers
                 return Redirect("/Account/Authorization");
             }
 
-            return View(pageX);
+            var pageSize = 4;
+            return View(await PaginationList<RoomViewModel>.CreateAsync(_roomStorage, page ?? 1, pageSize));
         }
 
         public async Task<IActionResult> Profile()

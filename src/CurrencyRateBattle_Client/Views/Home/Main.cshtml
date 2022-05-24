@@ -1,5 +1,4 @@
-﻿@model X.PagedList.IPagedList<CRBClient.Models.RoomViewModel>
-@using X.PagedList.Mvc.Core
+﻿@model PaginationList<CRBClient.Models.RoomViewModel>
 @using System.Globalization
 
 @{
@@ -11,15 +10,15 @@
         <h2>Filters</h2>
         <br/>
         <div class="valuta">
-            <div class="firs_rov_valuta">
-                @(Html.ActionLink("USD", "", "Home", new {currentFilter = "USD"}))
-                @(Html.ActionLink("EUR", "", "Home", new {currentFilter = "EUR"}))
-                @(Html.ActionLink("PLN", "", "Home", new {currentFilter = "PLN"}))
-            </div>
-            <div class="second_rov_valuta">
-                @(Html.ActionLink("CHF", "", "Home", new {currentFilter = "CHF"}))
-                @(Html.ActionLink("GBP", "", "Home", new {currentFilter = "GBP"}))
-            </div>
+            @using (Html.BeginForm("Main","Home", FormMethod.Get))
+            {
+                <p>
+                    Find by currency name: <input type="text" name="searchString" value="@ViewData["CurrentFilter"]"/>
+                    <input type="submit" value="Search" class="btn btn-success"/>
+                    <br/>
+                    <a asp-action="Main">Back to full list</a>
+                </p>
+            }
         </div>
     </div>
     <div class="rooms">
@@ -48,5 +47,22 @@
     </div>
 </div>
 <div class="pagination-class">
-    <p>@Html.PagedListPager(Model, page => Url.Action("Main", new {page}))</p>
+    @{
+        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "active";
+        var nexDisabled = !Model.HasNextPage ? "disabled" : "active";
+    }
+    
+    <a asp-action="Main"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       asp-route-page="@(Model.PageIndex-1)"
+       class="@prevDisabled">
+        Previous
+    </a>
+    
+    <a asp-action="Main"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       asp-route-page="@(Model.PageIndex+1)"
+           class="@nexDisabled">
+            Next
+        </a>
 </div>
