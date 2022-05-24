@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using CurrencyRateBattleServer.Helpers;
+﻿using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Services.HostedServices.Handlers;
 using CurrencyRateBattleServer.Services.Interfaces;
 
@@ -17,7 +16,7 @@ public class RateCalculationService : IRateCalculationService
 
     private readonly WinnerHandler _winnerHandler;
 
-    private readonly PayoutHandler _payoutHandler;
+    private readonly CalculationHandler _calculationHandler;
 
     public RateCalculationService(ILogger<RateCalculationService> logger,
         IServiceScopeFactory scopeFactory,
@@ -28,10 +27,12 @@ public class RateCalculationService : IRateCalculationService
         _scopeFactory = scopeFactory;
         _rateService = rateService;
         _paymentService = paymentService;
-        _winnerHandler = new WinnerHandler(_scopeFactory);
-        _payoutHandler = new PayoutHandler();
 
-        _winnerHandler.SetNext(_payoutHandler);
+        //Chain of responsibility
+        _winnerHandler = new WinnerHandler(_scopeFactory);
+        _calculationHandler = new CalculationHandler();
+
+        _winnerHandler.SetNext(_calculationHandler);
     }
 
     public async Task StartRateCalculationByRoomIdAsync(Guid roomId)
@@ -43,18 +44,18 @@ public class RateCalculationService : IRateCalculationService
 
         try
         {
+            //Invoke chain
             var updatedRate = await _winnerHandler.Handle(rates);
 
             foreach (var rate in updatedRate)
             {
-                await _paymentService.ApportionCashByRateAsync(rate.Id, rate.Payout);
+                await _paymentService.ApportionCashByRateAsync(rate.AccountId, rate.Payout);
                 await _rateService.UpdateRateByRoomIdAsync(roomId, rate);
             }
         }
-        catch (CustomException)
+        catch (CustomException ex)
         {
-            _logger.LogDebug("There was 1 bet in the room. Cashback...");
-            await _paymentService.ApportionCashByRateAsync(rates.First().AccountId, rates.First().Amount);
+            _logger.LogDebug(ex.Message);
         }
     }
 }

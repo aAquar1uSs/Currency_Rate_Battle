@@ -1,5 +1,4 @@
 ﻿using CurrencyRateBattleServer.Data;
-using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,11 +15,22 @@ public class WinnerHandler : AbstractHandler
 
     public override async Task<List<Rate>> Handle(List<Rate> rates)
     {
+        switch (rates.Count)
+        {
+            case 0:
+                return rates;
+
+            case 1:
+            {
+                var rate = rates.First();
+                rate.IsClosed = true;
+                rate.Payout = rate.Amount;
+                return rates;
+            }
+        }
+
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
-        if (rates.Count <= 1)
-            throw new CustomException();
 
         var currState = await db.CurrencyStates
             .FirstOrDefaultAsync(currState => currState.CurrencyId == rates.First().CurrencyId);

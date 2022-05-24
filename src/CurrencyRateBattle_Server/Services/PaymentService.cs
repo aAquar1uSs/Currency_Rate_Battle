@@ -1,5 +1,4 @@
 ﻿using CurrencyRateBattleServer.Data;
-using CurrencyRateBattleServer.Models;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,19 +11,18 @@ public class PaymentService : IPaymentService
     private readonly IServiceScopeFactory _scopeFactory;
 
     public PaymentService(ILogger<PaymentService> logger,
-        IAccountService accountService,
         IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
         _scopeFactory = scopeFactory;
     }
 
-    public async Task ApportionCashByRateAsync(Guid accId, decimal amount)
+    public async Task ApportionCashByRateAsync(Guid accountId, decimal amount)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        var account = await db.Accounts.FirstOrDefaultAsync(acc => acc.Id == accId);
+        var account = await db.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId);
 
         if (account is null)
             return;

@@ -75,7 +75,7 @@ public class AccountService : IAccountService
         {
             _ = await db.Users.AddAsync(user);
 
-            _ = _accountHistoryService.CreateHistoryByValuesAsync(null, user.Account.Id, DateTime.UtcNow,
+            _ = _accountHistoryService.CreateHistoryByValuesAsync(null, user.Account.Id, DateTime.Now,
                 _accountStartBalance, true);
 
             _ = await db.SaveChangesAsync();

@@ -30,7 +30,7 @@ public class JwtManager : IJwtManager
             {
                 new("UserId", user.Id.ToString())
             }),
-            Expires = DateTime.UtcNow.AddMinutes(10),
+            Expires = DateTime.Now.AddMinutes(10),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey),
                 SecurityAlgorithms.HmacSha256Signature)
         };

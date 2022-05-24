@@ -2,7 +2,6 @@
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Models;
-using CurrencyRateBattleServer.Services.HostedServices.Handlers;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,7 +41,7 @@ public class RoomService : IRoomService
 
     public async Task CreateRoomAsync(CurrencyRateBattleContext db, Currency curr)
     {
-        var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00"),
+        var currentDate = DateTime.ParseExact(DateTime.Now.ToString("MM.dd.yyyy HH:00:00"),
             "MM.dd.yyyy HH:mm:ss", null);
 
         var currState = new CurrencyState
@@ -70,20 +69,12 @@ public class RoomService : IRoomService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            var roomExists = await db.Rooms.AnyAsync(r => r.Id == id);
-            if (!roomExists)
-                throw new CustomException($"{nameof(Room)} with Id={id} is not found.");
+        var roomExists = await db.Rooms.AnyAsync(r => r.Id == id);
+        if (!roomExists)
+            throw new CustomException($"{nameof(Room)} with Id={id} is not found.");
 
-            _ = db.Rooms.Update(updatedRoom);
-            _ = await db.SaveChangesAsync();
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
-        }
+        _ = db.Rooms.Update(updatedRoom);
+        _ = await db.SaveChangesAsync();
     }
 
     public async Task CheckRoomsStateAsync()
@@ -97,18 +88,19 @@ public class RoomService : IRoomService
             foreach (var r in db.Rooms)
             {
                 if ((r.Date.Date == DateTime.Today
-                     && r.Date.Hour == DateTime.UtcNow.AddHours(1).Hour)
+                     && r.Date.Hour == DateTime.Now.AddHours(1).Hour)
                     || (r.Date.Date == DateTime.Today.AddDays(1))
-                    && (r.Date.Hour == DateTime.UtcNow.AddHours(1).Hour))
+                    && (r.Date.Hour == 0 && DateTime.Now.Hour == 23))
                 {
                     r.IsClosed = true;
                     await UpdateRoomAsync(r.Id, r);
                 }
                 else if (r.Date.Date == DateTime.Today
-                         && r.Date.Hour == DateTime.UtcNow.Hour)
+                         && r.Date.Hour == DateTime.Now.Hour
+                         && r.IsClosed)
                 {
-                   await _rateCalculationService.StartRateCalculationByRoomIdAsync(r.Id);
-                   await UpdateRoomAsync(r.Id, r);
+                    await _rateCalculationService.StartRateCalculationByRoomIdAsync(r.Id);
+                    await UpdateRoomAsync(r.Id, r);
                 }
             }
         }
@@ -116,8 +108,6 @@ public class RoomService : IRoomService
         {
             _ = _semaphoreSlim.Release();
         }
-
-        await db.SaveChangesAsync();
     }
 
     public async Task<List<RoomDto>> GetRoomsAsync(bool? isActive)

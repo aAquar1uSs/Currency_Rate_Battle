@@ -73,7 +73,7 @@ public class CurrencyStateService : ICurrencyStateService
         var currencyDto = _rateStorage.FirstOrDefault(curr => curr.Currency.Equals(currencyName,
             StringComparison.Ordinal));
 
-        var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00"),
+        var currentDate = DateTime.ParseExact(DateTime.Now.ToString("MM.dd.yyyy HH:00:00"),
             "MM.dd.yyyy HH:mm:ss", null);
 
         await _semaphoreSlim.WaitAsync();

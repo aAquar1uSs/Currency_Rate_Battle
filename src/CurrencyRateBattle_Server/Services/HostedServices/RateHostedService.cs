@@ -19,7 +19,7 @@ public class RateHostedService :  IHostedService, IDisposable
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Room Hosted Service running.");
+        _logger.LogInformation("Rate Hosted Service running.");
 
         _timer = new Timer(Callback, null, TimeSpan.Zero,
             TimeSpan.FromHours(1));
@@ -29,7 +29,7 @@ public class RateHostedService :  IHostedService, IDisposable
 
     private async void Callback(object? state)
     {
-        await _roomService.CheckRoomsStateAsync();
+       await _roomService.CheckRoomsStateAsync();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
