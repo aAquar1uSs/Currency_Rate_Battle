@@ -58,4 +58,4 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Authorization}");
 
-app.Run();
+await app.RunAsync();
