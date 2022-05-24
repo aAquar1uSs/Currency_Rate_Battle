@@ -96,8 +96,6 @@ public class RoomService : IRoomService
         {
             foreach (var r in db.Rooms)
             {
-                await _rateCalculationService.StartRateCalculationByRoomIdAsync(r.Id);
-
                 if ((r.Date.Date == DateTime.Today
                      && r.Date.Hour == DateTime.UtcNow.AddHours(1).Hour)
                     || (r.Date.Date == DateTime.Today.AddDays(1))
