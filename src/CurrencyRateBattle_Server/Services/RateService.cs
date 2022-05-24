@@ -87,9 +87,8 @@ public class RateService : IRateService
             try
             {
                 var currency = await db.Currencies.FirstOrDefaultAsync(c => c.CurrencyName == currencyCode);
-                currencyId = currency is not null
-                    ? currency.Id
-                    : throw new CustomException($"Rates can not be retrieved: currency is invalid.");
+                currencyId = currency?.Id ??
+                             throw new CustomException($"Rates can not be retrieved: currency is invalid.");
             }
             finally
             {
@@ -103,11 +102,13 @@ public class RateService : IRateService
         {
             if (currencyId != Guid.Empty)
                 result = await db.Rates.Where(r => r.CurrencyId == currencyId).ToListAsync();
-            result = isActive == true
-                ? await db.Rates.Where(r => !r.IsClosed).ToListAsync()
-                : isActive == false
-                    ? await db.Rates.Where(r => r.IsClosed).ToListAsync()
-                    : await db.Rates.ToListAsync();
+
+            result = isActive switch
+            {
+                null => await db.Rates.ToListAsync(),
+                true => await db.Rates.Where(r => !r.IsClosed).ToListAsync(),
+                _ => await db.Rates.Where(r => r.IsClosed).ToListAsync()
+            };
         }
         finally
         {
@@ -129,6 +130,7 @@ public class RateService : IRateService
             var result = from rate in db.Rates
                 join curr in db.Currencies on rate.CurrencyId equals curr.Id
                 join room in db.Rooms on rate.RoomId equals room.Id
+                join currState in db.CurrencyStates on rate.CurrencyId equals currState.CurrencyId
                 where rate.AccountId == accountId
                 select new
                 {
@@ -144,34 +146,11 @@ public class RateService : IRateService
                     room.Date,
                     rate.RoomId,
                     curr.CurrencyName,
-                    rate.CurrencyId
+                    rate.CurrencyId,
+                    currState.CurrencyExchangeRate
                 };
 
-            var query = from res in result
-                join currState in db.CurrencyStates
-                    on new {res.RoomId, res.CurrencyId} equals new {currState.RoomId, currState.CurrencyId}
-                    into gj
-                from subCurr in gj.DefaultIfEmpty()
-                select new
-                {
-                    res.Id,
-                    res.Amount,
-                    res.SettleDate,
-                    res.SetDate,
-                    res.IsWon,
-                    res.IsClosed,
-                    res.AccountId,
-                    res.RateCurrencyExchange,
-                    res.Payout,
-                    res.Date,
-                    res.RoomId,
-                    res.CurrencyName,
-                    res.CurrencyId,
-                    CurrencyExchangeRate = subCurr == null ? 0 : subCurr.CurrencyExchangeRate
-                };
-
-
-            foreach (var data in query)
+            foreach (var data in result)
             {
                 betDtoStorage.Add(new BetDto
                 {
