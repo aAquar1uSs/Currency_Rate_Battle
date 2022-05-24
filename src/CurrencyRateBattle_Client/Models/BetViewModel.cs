@@ -1,6 +1,11 @@
-﻿namespace CurrencyRateBattleServer.Dto;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
-public class BetDto
+namespace CRBClient.Models;
+
+public class BetViewModel
 {
     public Guid Id { get; set; }
 
@@ -21,5 +26,4 @@ public class BetDto
     public DateTime SetDate { get; set; }
 
     public bool IsClosed { get; set; }
-
 }

@@ -1,4 +1,5 @@
 ﻿using CurrencyRateBattleServer.Data;
+using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Models;
 using CurrencyRateBattleServer.Services.Interfaces;
@@ -99,23 +100,83 @@ public class RateService : IRateService
 
         return result;
     }
-    public async Task<List<Rate>> GetRatesByAccountIdAsync(Guid accountId)
+    public async Task<List<BetDto>> GetRatesByAccountIdAsync(Guid accountId)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        List<Rate> result;
+        List<BetDto> betDtoStorage = new();
         await _semaphoreSlim.WaitAsync();
         try
         {
-            result = await db.Rates.Where(r => r.AccountId == accountId).ToListAsync();
+            var result = from rate in db.Rates
+                         join curr in db.Currencies on rate.CurrencyId equals curr.Id
+                         join room in db.Rooms on rate.RoomId equals room.Id
+                         where rate.AccountId == accountId
+                         select new
+                         {
+                             rate.Id,
+                             rate.Amount,
+                             rate.SettleDate,
+                             rate.SetDate,
+                             rate.IsWon,
+                             rate.IsClosed,
+                             rate.AccountId,
+                             rate.RateCurrencyExchange,
+                             rate.Payout,
+                             room.Date,
+                             rate.RoomId,
+                             curr.CurrencyName,
+                             rate.CurrencyId
+                         };
+
+            var query = from res in result
+                        join currState in db.CurrencyStates 
+                        on new { res.RoomId, res.CurrencyId } equals new { currState.RoomId, currState.CurrencyId }
+                        into gj
+                        from subCurr in gj.DefaultIfEmpty()
+                        select new
+                        {
+                            res.Id,
+                            res.Amount,
+                            res.SettleDate,
+                            res.SetDate,
+                            res.IsWon,
+                            res.IsClosed,
+                            res.AccountId,
+                            res.RateCurrencyExchange,
+                            res.Payout,
+                            res.Date,
+                            res.RoomId,
+                            res.CurrencyName,
+                            res.CurrencyId,
+                            CurrencyExchangeRate = subCurr == null ? 0 : subCurr.CurrencyExchangeRate
+                        };
+
+
+            foreach (var data in query)
+            {
+                betDtoStorage.Add(new BetDto
+                {
+                    Id = data.Id,
+                    SetDate = data.SetDate,
+                    BetAmount = data.Amount,
+                    SettleDate = data.SettleDate,
+                    WonCurrencyExchange = data.CurrencyExchangeRate == 0 ? null : Math.Round(data.CurrencyExchangeRate, 2),
+                    UserCurrencyExchange = Math.Round(data.RateCurrencyExchange, 2),
+                    PayoutAmount = data.Payout,
+                    СurrencyName = data.CurrencyName,
+                    IsClosed = data.IsClosed,
+                    RoomDate = data.Date
+                });
+            }
         }
         finally
         {
             _ = _semaphoreSlim.Release();
         }
 
-        return result;
+        return betDtoStorage;
     }
 
     public async void DeleteRateAsync(Guid id)

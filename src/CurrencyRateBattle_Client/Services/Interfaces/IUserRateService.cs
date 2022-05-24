@@ -3,7 +3,7 @@
 namespace CRBClient.Services.Interfaces;
 public interface IUserRateService
 {
-    public string GetUserRates();
+    Task<List<BetViewModel>> GetUserRates();
     public string InsertUserRate();
     public string UpdateUserRate();
     public string DeleteUserRate();
