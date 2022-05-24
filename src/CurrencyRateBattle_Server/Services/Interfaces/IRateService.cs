@@ -1,4 +1,5 @@
-﻿using CurrencyRateBattleServer.Models;
+﻿using CurrencyRateBattleServer.Dto;
+using CurrencyRateBattleServer.Models;
 
 namespace CurrencyRateBattleServer.Services.Interfaces;
 
@@ -12,6 +13,6 @@ public interface IRateService
 
     public Task<List<Rate>> GetRatesAsync(bool? isActive, string? currencyCode);
 
-    public Task<List<Rate>> GetRatesByAccountIdAsync(Guid accountId);
+    public Task<List<BetDto>> GetRatesByAccountIdAsync(Guid accountId);
 
 }

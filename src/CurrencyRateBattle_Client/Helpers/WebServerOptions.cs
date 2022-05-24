@@ -17,6 +17,8 @@ public class WebServerOptions
 
     public string? FilterURL { get; set; }
 
+    public string GetUserBetsURL { get; set; }
+
     public string? RegistrationAccURL { get; set; }
 
     public string? LoginAccURL { get; set; }

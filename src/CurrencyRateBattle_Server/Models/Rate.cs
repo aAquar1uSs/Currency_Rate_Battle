@@ -12,6 +12,8 @@ public class Rate
     [Required]
     public DateTime SetDate { get; set; }
 
+    public decimal RateCurrencyExchange { get; set; }
+
     public decimal Amount { get; set; }
 
     //Date when the rate is settled

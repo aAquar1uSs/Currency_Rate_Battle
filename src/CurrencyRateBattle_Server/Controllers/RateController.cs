@@ -1,4 +1,6 @@
-﻿using CurrencyRateBattleServer.Helpers;
+﻿using System.Net;
+using CurrencyRateBattleServer.Dto;
+using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Models;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -16,11 +18,17 @@ public class RateController : ControllerBase
 
     private readonly IRateService _rateService;
 
+    private readonly IAccountService _accountService;
+
     public RateController(ILogger<RoomController> logger,
-        IRateService rateService)
+        IRateService rateService,
+        IAccountService accountService)
     {
         _logger = logger;
+
         _rateService = rateService;
+
+        _accountService = accountService;
     }
 
     [HttpGet]
@@ -31,12 +39,22 @@ public class RateController : ControllerBase
         return Ok(rates);
     }
 
-    // GET api/Rates/{accountId}
-    [HttpGet("{accountId}")]
-     public async Task<List<Rate>> GetRatesByAccountIdAsync(Guid accountId)
+    // GET api/rates/
+    [HttpGet("get-user-bets")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> GetUserBetsAsync()
     {
-        var rates = await _rateService.GetRatesByAccountIdAsync(accountId);
-        return rates;
+        var userId = _accountService.GetGuidFromRequest(HttpContext);
+        if (userId is null)
+            return BadRequest();
+
+        var account = await _accountService.GetAccountByUserIdAsync(userId);
+        if (account is null)
+            return BadRequest();
+
+        var bets = await _rateService.GetRatesByAccountIdAsync(account.Id);
+        return Ok(bets);
     }
 
 
