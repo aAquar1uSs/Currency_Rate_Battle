@@ -5,6 +5,8 @@ using CurrencyRateBattleServer.Managers;
 using CurrencyRateBattleServer.Managers.Interfaces;
 using CurrencyRateBattleServer.Services;
 using CurrencyRateBattleServer.Services.HostedServices;
+using CurrencyRateBattleServer.Services.HostedServices.Handlers;
+using CurrencyRateBattleServer.Services.HostedServices.Handlers.Interface;
 using CurrencyRateBattleServer.Services.Interfaces;
 using CurrencyRateBattleServer.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -105,11 +107,13 @@ host.ConfigureAppConfiguration(app =>
             .AddSingleton<IRateService, RateService>()
             .AddSingleton<ICurrencyStateService, CurrencyStateService>()
             .AddSingleton<IAccountHistoryService, AccountHistoryService>()
+            .AddSingleton<IRateCalculationService, RateCalculationService>()
+            .AddSingleton<IPaymentService, PaymentService>()
             .Configure<WebServerOptions>(builder.Configuration.GetSection(WebServerOptions.SectionName));
 
         _ = service.AddControllers();
 
-        _ = service.AddScoped<CurrencyRateBattleContext>();
+        //_ = service.AddScoped<CurrencyRateBattleContext>();
     });
 
 var app = builder.Build();

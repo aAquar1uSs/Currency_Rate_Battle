@@ -85,7 +85,7 @@ public class CurrencyStateService : ICurrencyStateService
             foreach (var curr in currencyStates)
             {
                 curr.Date = currentDate;
-                curr.CurrencyExchangeRate = currencyDto.Rate;
+                curr.CurrencyExchangeRate = Math.Round(currencyDto.Rate, 2);
             }
 
             await db.SaveChangesAsync();

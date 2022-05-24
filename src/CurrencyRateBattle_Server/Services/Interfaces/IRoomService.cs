@@ -10,7 +10,7 @@ public interface IRoomService
 
     Task CreateRoomAsync(CurrencyRateBattleContext db, Currency curr);
 
-    void UpdateRoomAsync(Guid id, Room updatedRoom);
+    Task UpdateRoomAsync(Guid id, Room updatedRoom);
 
     Task CheckRoomsStateAsync();
 

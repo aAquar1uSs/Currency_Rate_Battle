@@ -2,7 +2,7 @@
 
 namespace CurrencyRateBattleServer.Services.Interfaces;
 
-public interface IRateCalculationService
+public interface IPaymentService
 {
-    Task StartRateCalculationByRoomIdAsync(Guid roomId);
+    Task ApportionCashByRateAsync(Guid accId, decimal amount);
 }

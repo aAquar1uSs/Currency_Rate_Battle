@@ -2,6 +2,7 @@
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Models;
+using CurrencyRateBattleServer.Services.HostedServices.Handlers;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,16 +14,16 @@ public class RoomService : IRoomService
 
     private readonly IServiceScopeFactory _scopeFactory;
 
-    private readonly IRateService _rateService;
+    private readonly IRateCalculationService _rateCalculationService;
 
     private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
     public RoomService(ILogger<RoomService> logger,
-        IRateService rateService,
+        IRateCalculationService rateCalculationService,
         IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
-        _rateService = rateService;
+        _rateCalculationService = rateCalculationService;
         _scopeFactory = scopeFactory;
     }
 
@@ -64,7 +65,7 @@ public class RoomService : IRoomService
         }
     }
 
-    public async void UpdateRoomAsync(Guid id, Room updatedRoom)
+    public async Task UpdateRoomAsync(Guid id, Room updatedRoom)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -95,19 +96,21 @@ public class RoomService : IRoomService
         {
             foreach (var r in db.Rooms)
             {
+                await _rateCalculationService.StartRateCalculationByRoomIdAsync(r.Id);
+
                 if ((r.Date.Date == DateTime.Today
-                    && r.Date.Hour == DateTime.UtcNow.AddHours(1).Hour)
+                     && r.Date.Hour == DateTime.UtcNow.AddHours(1).Hour)
                     || (r.Date.Date == DateTime.Today.AddDays(1))
                     && (r.Date.Hour == DateTime.UtcNow.AddHours(1).Hour))
                 {
                     r.IsClosed = true;
+                    await UpdateRoomAsync(r.Id, r);
                 }
                 else if (r.Date.Date == DateTime.Today
                          && r.Date.Hour == DateTime.UtcNow.Hour)
                 {
-                    var rates = await _rateService.GetRateByRoomIdAsync(r.Id);
-                    var closedRates = await _rateService.DefinedWinnerOrLoserAsync(rates);
-                    var calculatedRates = _rateService.CalculatePayout(closedRates);
+                   await _rateCalculationService.StartRateCalculationByRoomIdAsync(r.Id);
+                   await UpdateRoomAsync(r.Id, r);
                 }
             }
         }

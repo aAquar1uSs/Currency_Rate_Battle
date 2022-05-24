@@ -44,7 +44,7 @@ public class RoomController : ControllerBase
     {
         try
         {
-            _roomService.UpdateRoomAsync(id, updatedRoom);
+            await _roomService.UpdateRoomAsync(id, updatedRoom);
             _logger.LogInformation($"Room has been updated successfully ({id})");
             return Ok();
         }

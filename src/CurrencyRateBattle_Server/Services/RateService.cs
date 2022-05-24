@@ -53,7 +53,7 @@ public class RateService : IRateService
         return rates;
     }
 
-    public async void UpdateRateAsync(Guid id, Rate updatedRate)
+    public async Task UpdateRateByRoomIdAsync(Guid id, Rate updatedRate)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -197,7 +197,7 @@ public class RateService : IRateService
         return betDtoStorage;
     }
 
-    public async void DeleteRateAsync(Guid id)
+    public async Task DeleteRateAsync(Guid id)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -213,61 +213,5 @@ public class RateService : IRateService
         {
             _ = _semaphoreSlim.Release();
         }
-    }
-
-    public async Task<List<Rate>> DefinedWinnerOrLoserAsync(List<Rate> rates)
-    {
-        var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
-        var currState = await db.CurrencyStates
-            .FirstOrDefaultAsync(currState => currState.CurrencyId == rates.First().CurrencyId);
-
-        foreach (var rate in rates)
-        {
-            rate.IsWon = rate.RateCurrencyExchange == currState.CurrencyExchangeRate;
-            rate.IsClosed = true;
-        }
-
-        return rates;
-    }
-
-    public bool IsCorrectRateStates(List<Rate> rates)
-    {
-        if (rates.Count <= 1)
-            return false;
-        var winCount = 0;
-        var loseCount = 0;
-
-        foreach (var rate in rates)
-        {
-            if (rate.IsWon)
-                winCount++;
-            else
-                loseCount++;
-        }
-
-        return true;
-    }
-
-    public List<Rate> CalculatePayout(List<Rate> rates)
-    {
-        var commonBank = rates.Sum(rate => rate.Amount);
-
-        var winnerBank = rates
-            .Where(rate => rate.IsWon)
-            .Sum(rate => rate.Amount);
-
-        var koef = commonBank / winnerBank;
-
-        foreach (var rate in rates)
-        {
-            if (rate.IsWon)
-                rate.Payout = rate.Amount * koef;
-            else
-                rate.Payout = 0;
-        }
-
-        return rates;
     }
 }
