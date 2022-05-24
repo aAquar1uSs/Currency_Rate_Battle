@@ -3,9 +3,11 @@ using CurrencyRateBattleServer.Models;
 
 namespace CurrencyRateBattleServer.Services.Interfaces;
 
-public interface IRateService
+public interface IRateService : IRateCalculationService
 {
     public Task<Rate> CreateRateAsync(Rate rate);
+
+    public Task<List<Rate>> GetRateByRoomIdAsync(Guid roomId);
 
     public void UpdateRateAsync(Guid id, Rate updatedRate);
 

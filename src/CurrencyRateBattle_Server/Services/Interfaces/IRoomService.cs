@@ -6,13 +6,17 @@ namespace CurrencyRateBattleServer.Services.Interfaces;
 
 public interface IRoomService
 {
-    public Task CreateRoomAsync(CurrencyRateBattleContext db, Currency curr);
+    Task GenerateRoomsByCurrencyCountAsync();
 
-    public void UpdateRoomAsync(Guid id, Room updatedRoom);
+    Task CreateRoomAsync(CurrencyRateBattleContext db, Currency curr);
 
-    public Task<List<RoomDto>> GetRoomsAsync(bool? isActive);
+    void UpdateRoomAsync(Guid id, Room updatedRoom);
 
-    public Task<Room?> GetRoomByIdAsync(Guid id);
+    Task CheckRoomsStateAsync();
 
-    public Task<List<RoomDto>?> GetActiveRoomsWithFilterByCurrencyNameAsync(string currencyName);
+    Task<List<RoomDto>> GetRoomsAsync(bool? isActive);
+
+    Task<Room?> GetRoomByIdAsync(Guid id);
+
+    Task<List<RoomDto>?> GetActiveRoomsWithFilterByCurrencyNameAsync(string currencyName);
 }

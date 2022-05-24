@@ -20,7 +20,7 @@ var services = builder.Services;
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen(opt =>
 {
-    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "CBR API", Version = "v1" });
+    opt.SwaggerDoc("v1", new OpenApiInfo {Title = "CBR API", Version = "v1"});
     opt.AddSecurityDefinition("Bearer",
         new OpenApiSecurityScheme
         {
@@ -94,7 +94,8 @@ host.ConfigureAppConfiguration(app =>
         });
 
         _ = service.AddHostedService<CurrencyHostedService>()
-            .AddHostedService<RoomHostedService>();
+            .AddHostedService<RoomHostedService>()
+            .AddHostedService<RateHostedService>();
 
         _ = service.AddOptions()
             .AddSingleton<IJwtManager, JwtManager>()
@@ -108,8 +109,7 @@ host.ConfigureAppConfiguration(app =>
 
         _ = service.AddControllers();
 
-        _= service.AddScoped<CurrencyRateBattleContext>();
-
+        _ = service.AddScoped<CurrencyRateBattleContext>();
     });
 
 var app = builder.Build();

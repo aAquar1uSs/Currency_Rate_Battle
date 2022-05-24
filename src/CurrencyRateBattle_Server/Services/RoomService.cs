@@ -9,17 +9,34 @@ namespace CurrencyRateBattleServer.Services;
 
 public class RoomService : IRoomService
 {
-    private readonly ILogger<IAccountService> _logger;
+    private readonly ILogger<IRoomService> _logger;
 
     private readonly IServiceScopeFactory _scopeFactory;
 
+    private readonly IRateService _rateService;
+
     private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
-    public RoomService(ILogger<AccountService> logger,
+    public RoomService(ILogger<RoomService> logger,
+        IRateService rateService,
         IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
+        _rateService = rateService;
         _scopeFactory = scopeFactory;
+    }
+
+    public async Task GenerateRoomsByCurrencyCountAsync()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        foreach (var curr in dbContext.Currencies)
+        {
+            await CreateRoomAsync(dbContext, curr);
+        }
+
+        _ = await dbContext.SaveChangesAsync();
     }
 
     public async Task CreateRoomAsync(CurrencyRateBattleContext db, Currency curr)
@@ -66,6 +83,40 @@ public class RoomService : IRoomService
         {
             _ = _semaphoreSlim.Release();
         }
+    }
+
+    public async Task CheckRoomsStateAsync()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            foreach (var r in db.Rooms)
+            {
+                if ((r.Date.Date == DateTime.Today
+                    && r.Date.Hour == DateTime.UtcNow.AddHours(1).Hour)
+                    || (r.Date.Date == DateTime.Today.AddDays(1))
+                    && (r.Date.Hour == DateTime.UtcNow.AddHours(1).Hour))
+                {
+                    r.IsClosed = true;
+                }
+                else if (r.Date.Date == DateTime.Today
+                         && r.Date.Hour == DateTime.UtcNow.Hour)
+                {
+                    var rates = await _rateService.GetRateByRoomIdAsync(r.Id);
+                    var closedRates = await _rateService.DefinedWinnerOrLoserAsync(rates);
+                    var calculatedRates = _rateService.CalculatePayout(closedRates);
+                }
+            }
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
+        }
+
+        await db.SaveChangesAsync();
     }
 
     public async Task<List<RoomDto>> GetRoomsAsync(bool? isActive)
@@ -115,7 +166,7 @@ public class RoomService : IRoomService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        Room result;
+        Room? result;
         await _semaphoreSlim.WaitAsync();
         try
         {

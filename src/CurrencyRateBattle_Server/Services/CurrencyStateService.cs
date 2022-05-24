@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using CurrencyRateBattleServer.Data;
+﻿using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Services.Interfaces;
 using System.Text.Json;
@@ -27,7 +26,20 @@ public class CurrencyStateService : ICurrencyStateService
         _rateStorage = new List<CurrencyStateDto>();
     }
 
-    public async Task GetCurrencyRateByNameFromNbuApiAsync()
+    public async Task PrepareUpdateCurrencyRateAsync()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        await GetCurrencyRatesFromNbuApiAsync();
+
+        foreach (var currState in dbContext.CurrencyStates)
+        {
+            await UpdateCurrencyRateByIdAsync(currState.CurrencyId);
+        }
+    }
+
+    public async Task GetCurrencyRatesFromNbuApiAsync()
     {
         using var client = new HttpClient();
         try

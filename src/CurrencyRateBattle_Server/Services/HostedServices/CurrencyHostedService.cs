@@ -1,5 +1,4 @@
-﻿using CurrencyRateBattleServer.Data;
-using CurrencyRateBattleServer.Services.Interfaces;
+﻿using CurrencyRateBattleServer.Services.Interfaces;
 
 
 namespace CurrencyRateBattleServer.Services.HostedServices;
@@ -10,16 +9,12 @@ public class CurrencyHostedService : IHostedService, IDisposable
 
     private Timer _timer;
 
-    private readonly IServiceScopeFactory _scopeFactory;
-
     private readonly ICurrencyStateService _currencyStateService;
 
     public CurrencyHostedService(ILogger<CurrencyHostedService> logger,
-        IServiceScopeFactory scopeFactory,
         ICurrencyStateService currencyStateService)
     {
         _logger = logger;
-        _scopeFactory = scopeFactory;
         _currencyStateService = currencyStateService;
     }
 
@@ -35,15 +30,7 @@ public class CurrencyHostedService : IHostedService, IDisposable
 
     private async void Callback(object? state)
     {
-        using var scope = _scopeFactory.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
-        await _currencyStateService.GetCurrencyRateByNameFromNbuApiAsync();
-
-        foreach (var currState in dbContext.CurrencyStates)
-        {
-            await _currencyStateService.UpdateCurrencyRateByIdAsync(currState.CurrencyId);
-        }
+        await _currencyStateService.PrepareUpdateCurrencyRateAsync();
     }
 
 
