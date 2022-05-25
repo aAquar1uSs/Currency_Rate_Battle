@@ -84,7 +84,6 @@ public class RateService : IRateService
         Guid? currencyId = Guid.Empty;
         if (currencyCode is not null)
         {
-            Currency currency;
             await _semaphoreSlim.WaitAsync();
             try
             {
