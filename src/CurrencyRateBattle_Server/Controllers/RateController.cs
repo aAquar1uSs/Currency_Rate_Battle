@@ -57,6 +57,15 @@ public class RateController : ControllerBase
         return Ok(bets);
     }
 
+    // GET api/rates/
+    [HttpGet("get-users-rating")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> GetUsersRatingAsyn()
+    {
+        return Ok(await _rateService.GetUsersRatingAsyn());
+    }
+
 
     [HttpPost]
     public async Task<IActionResult> CreateRateAsync([FromBody] Rate rateToCreate)

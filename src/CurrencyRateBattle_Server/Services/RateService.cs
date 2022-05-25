@@ -40,7 +40,7 @@ public class RateService : IRateService
 
         return newRate ?? throw new CustomException($"{nameof(Rate)} can not be created.");
     }
-    public async void UpdateRateAsync(Guid id, Rate updatedRate)
+    public async Task UpdateRateAsync(Guid id, Rate updatedRate)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -131,7 +131,7 @@ public class RateService : IRateService
                          };
 
             var query = from res in result
-                        join currState in db.CurrencyStates 
+                        join currState in db.CurrencyStates
                         on new { res.RoomId, res.CurrencyId } equals new { currState.RoomId, currState.CurrencyId }
                         into gj
                         from subCurr in gj.DefaultIfEmpty()
@@ -179,7 +179,7 @@ public class RateService : IRateService
         return betDtoStorage;
     }
 
-    public async void DeleteRateAsync(Guid id)
+    public async Task DeleteRateAsync(Guid id)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -196,5 +196,97 @@ public class RateService : IRateService
         {
             _ = _semaphoreSlim.Release();
         }
+    }
+
+    public async Task<List<UserRatingDto>> GetUsersRatingAsyn()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        List<UserRatingDto> userRatings = new();
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            var query1 = from rate in db.Rates
+                         join acc in db.Accounts on rate.AccountId equals acc.Id
+                         join user in db.Users on acc.UserId equals user.Id
+                         where rate.IsClosed
+                         select new
+                         {
+                             user.Email,
+                             rate.AccountId,
+                             BetAmount = rate.Amount,
+                             rate.IsWon,
+                             rate.Payout
+                         };
+
+            var totalQuery = from res in query1
+                             group res by new { res.AccountId, res.Email } into grp
+                             select new
+                             {
+                                 AccountId = grp.Key.AccountId,
+                                 Email = grp.Key.Email,
+                                 TotalBetAmount = grp.Sum(s => s.BetAmount),
+                                 TotalPayout = grp.Sum(s => s.Payout),
+                                 TotalBetCount = grp.Count()
+                             };
+
+            var wonQuery = from res in query1
+                           where res.IsWon
+                           group res by new { res.AccountId, res.Email } into grp
+                           select new
+                           {
+                               AccountId = grp.Key.AccountId,
+                               Email = grp.Key.Email,
+                               WonBetAmount = grp.Sum(s => s.BetAmount),
+                               WonPayout = grp.Sum(s => s.Payout),
+                               WonBetCount = grp.Count()
+                           };
+
+            var query = from totalQ in totalQuery
+                        from wonQ in wonQuery.DefaultIfEmpty()
+                        where totalQ.AccountId == wonQ.AccountId
+                        select new
+                        {
+                            totalQ,
+                            wonQ
+                        };
+
+            //TODO - we should disply accounts that have only lose bets
+            var query21 = from totalQ in totalQuery
+                          join wonQ in wonQuery
+                          on totalQ.AccountId equals wonQ.AccountId
+                          into gj
+                          from subCurr in gj.DefaultIfEmpty()
+                          select new
+                          {
+                              totalQ.AccountId,
+                              totalQ.TotalPayout,
+                              totalQ.TotalBetAmount,
+                              totalQ.TotalBetCount,
+                              WonBetAmount = subCurr == null ? 0 : subCurr.WonBetAmount,
+                              WonPayout = subCurr == null ? 0 : subCurr.WonPayout,
+                              WonBetCount = subCurr == null ? int.MinValue : subCurr.WonBetCount
+                          };
+
+            foreach (var data in query)
+            {
+                userRatings.Add(new UserRatingDto
+                {
+                    Email = data.totalQ.Email,
+                    BetsNo = data.totalQ.TotalBetCount,
+                    WonBetsNo = data.wonQ.WonBetCount,
+                    LastBetDate = DateTime.UtcNow,//TODO or remove
+                    ProfitPercentage = data.wonQ.WonBetAmount / data.totalQ.TotalBetAmount,
+                    WonBetsPercentage = data.wonQ.WonBetCount / data.totalQ.TotalBetCount
+                });
+            }
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
+        }
+
+        return userRatings;
     }
 }
