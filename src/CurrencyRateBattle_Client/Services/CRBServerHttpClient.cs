@@ -22,7 +22,7 @@ public class CRBServerHttpClient : ICRBServerHttpClient
         _options = options.Value;
         _logger = logger;
         _httpContextAccessor = httpContextAccessor;
-        _httpClient = new HttpClient {BaseAddress = new Uri(_options.BaseUrl)};
+        _httpClient = new HttpClient { BaseAddress = new Uri(_options.BaseUrl ?? "") };
     }
 
     public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage)

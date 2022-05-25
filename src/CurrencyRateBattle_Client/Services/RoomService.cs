@@ -32,13 +32,12 @@ public class RoomService : IRoomService
             var rooms = JsonSerializer.Deserialize<IEnumerable<RoomViewModel>>(result);
 
             _logger.LogInformation("Rooms are loaded successfully.");
-            return rooms.ToList();
+            return rooms == null ? throw new CustomException("No rooms are available.") : rooms.ToList();
         }
 
-        if (responseTask.StatusCode == HttpStatusCode.Unauthorized)
-            throw new CustomException("User unauthorized");
-
-        return new List<RoomViewModel>();
+        return responseTask.StatusCode == HttpStatusCode.Unauthorized
+            ? throw new CustomException("User unauthorized")
+            : new List<RoomViewModel>();
     }
 
     public async Task<List<RoomViewModel>> GetFilteredCurrencyAsync(FilterDto filter)
@@ -51,12 +50,11 @@ public class RoomService : IRoomService
             var rooms = JsonSerializer.Deserialize<IEnumerable<RoomViewModel>>(result);
 
             _logger.LogInformation("Rooms are loaded successfully.");
-            return rooms.ToList();
+            return rooms == null ? throw new CustomException("No rooms are available.") : rooms.ToList();
         }
 
-        if (responseTask.StatusCode == HttpStatusCode.Unauthorized)
-            throw new CustomException("User unauthorized");
-
-        return new List<RoomViewModel>();
+        return responseTask.StatusCode == HttpStatusCode.Unauthorized
+            ? throw new CustomException("User unauthorized")
+            : new List<RoomViewModel>();
     }
 }

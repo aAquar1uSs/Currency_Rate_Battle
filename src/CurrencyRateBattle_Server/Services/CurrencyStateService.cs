@@ -2,6 +2,7 @@
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Services.Interfaces;
 using System.Text.Json;
+using CurrencyRateBattleServer.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyRateBattleServer.Services;
@@ -33,9 +34,29 @@ public class CurrencyStateService : ICurrencyStateService
 
         await GetCurrencyRatesFromNbuApiAsync();
 
-        foreach (var currState in dbContext.CurrencyStates)
+        await UpdateEmptyCurrencyStateAsync();
+
+        foreach (var room in dbContext.Rooms.Where(room => room.Date.Date == DateTime.UtcNow.Date
+                                                           && room.Date.Hour == DateTime.UtcNow.Hour))
         {
-            await UpdateCurrencyRateByIdAsync(currState.CurrencyId);
+            var currencyState = await dbContext.CurrencyStates
+                .FirstOrDefaultAsync(currState => currState.RoomId == room.Id);
+
+            await UpdateCurrencyRateByIdAsync(currencyState);
+        }
+    }
+
+    public async Task UpdateEmptyCurrencyStateAsync()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        var currStates = await dbContext.CurrencyStates
+            .Where(currState => currState.CurrencyExchangeRate == 0).ToListAsync();
+
+        foreach (var currencyState in currStates)
+        {
+            await UpdateCurrencyRateByIdAsync(currencyState);
         }
     }
 
@@ -62,13 +83,13 @@ public class CurrencyStateService : ICurrencyStateService
         }
     }
 
-    public async Task UpdateCurrencyRateByIdAsync(Guid currId)
+    public async Task UpdateCurrencyRateByIdAsync(CurrencyState currencyState)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         var currencyName = (await db.Currencies
-            .FirstOrDefaultAsync(curr => curr.Id == currId))?.CurrencyName;
+            .FirstOrDefaultAsync(curr => curr.Id == currencyState.CurrencyId))?.CurrencyName;
 
         var currencyDto = _rateStorage.FirstOrDefault(curr => curr.Currency.Equals(currencyName,
             StringComparison.Ordinal));
@@ -79,14 +100,10 @@ public class CurrencyStateService : ICurrencyStateService
         await _semaphoreSlim.WaitAsync();
         try
         {
-            var currencyStates = db
-                .CurrencyStates.Where(curr => curr.CurrencyId == currId);
+            currencyState.Date = currentDate;
+            currencyState.CurrencyExchangeRate = Math.Round(currencyDto.Rate, 2);
 
-            foreach (var curr in currencyStates)
-            {
-                curr.Date = currentDate;
-                curr.CurrencyExchangeRate = Math.Round(currencyDto.Rate, 2);
-            }
+            db.CurrencyStates.Update(currencyState);
 
             await db.SaveChangesAsync();
         }

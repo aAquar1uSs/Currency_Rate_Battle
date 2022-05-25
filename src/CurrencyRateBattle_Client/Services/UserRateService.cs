@@ -27,19 +27,13 @@ public class UserRateService : IUserRateService
 
     public async Task<List<BetViewModel>> GetUserRates()
     {
-        var response = await _httpClient.GetAsync(_options.GetUserBetsURL);
-        //var response = await _httpClient.GetAsync("api/rates/get-user-bets");
+        var response = await _httpClient.GetAsync(_options.GetUserBetsURL ?? "");
         if (response.StatusCode == HttpStatusCode.OK)
         {
             return await response.Content.ReadAsAsync<List<BetViewModel>>();
         }
 
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-        {
-            throw new CustomException();
-        }
-
-        return new List<BetViewModel>();
+        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : new List<BetViewModel>();
     }
 
 
