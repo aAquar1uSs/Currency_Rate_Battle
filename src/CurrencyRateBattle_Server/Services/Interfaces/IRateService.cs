@@ -5,16 +5,21 @@ namespace CurrencyRateBattleServer.Services.Interfaces;
 
 public interface IRateService
 {
-    public Task<Rate> CreateRateAsync(Rate rate);
+    Task<Rate> CreateRateAsync(Rate rate);
 
-    public Task<List<Rate>> GetRateByRoomIdAsync(Guid roomId);
+    Task UpdateRateAsync(Guid id, Rate updatedRate);
 
-    public Task UpdateRateByRoomIdAsync(Guid id, Rate updatedRate);
+    Task<List<Rate>> GetRateByRoomIdAsync(Guid roomId);
 
-    public Task DeleteRateAsync(Guid id);
+    Task DeleteRateAsync(Guid id);
 
-    public Task<List<Rate>> GetRatesAsync(bool? isActive, string? currencyCode);
+    Task UpdateRateByRoomIdAsync(Guid id, Rate updatedRate);
 
-    public Task<List<BetDto>> GetRatesByAccountIdAsync(Guid accountId);
+    Task DeleteRateAsync(Guid id);
 
+    Task<List<Rate>> GetRatesAsync(bool? isActive, string? currencyCode);
+
+    Task<List<BetDto>> GetRatesByAccountIdAsync(Guid accountId);
+
+    Task<List<UserRatingDto>> GetUsersRatingAsyn();
 }
