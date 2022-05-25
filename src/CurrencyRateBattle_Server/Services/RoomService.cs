@@ -184,7 +184,7 @@ public class RoomService : IRoomService
                 from currencyState in db.CurrencyStates
                 join room in db.Rooms on currencyState.RoomId equals room.Id
                 join curr in db.Currencies on currencyState.CurrencyId equals curr.Id
-                where room.IsClosed == false && curr.CurrencyName == filter.CurrencyName
+                where room.IsClosed == false && curr.CurrencyName == filter.CurrencyName.ToUpperInvariant()
                 select new
                 {
                     room.Date,

@@ -15,7 +15,7 @@ public class Filter
     public string EndDate { get; set; }
 
     [JsonIgnore]
-    public const string DateFormat = "dd/MM/yyyy hh";
+    public const string DateFormat = "dd.MM.yyyy HH";
 
     [JsonIgnore]
     private static readonly TimeSpan _timeDifference = DateTime.Now - DateTime.UtcNow;
