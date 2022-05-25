@@ -17,17 +17,17 @@ public class PaymentService : IPaymentService
         _scopeFactory = scopeFactory;
     }
 
-    public async Task ApportionCashByRateAsync(Guid accountId, decimal amount)
+    public async Task ApportionCashByRateAsync(Guid accountId, decimal? amount)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         var account = await db.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId);
 
-        if (account is null)
+        if (account is null || amount is null)
             return;
 
-        account.Amount += amount;
+        account.Amount += (decimal)amount;
 
         _ = await db.SaveChangesAsync();
     }
