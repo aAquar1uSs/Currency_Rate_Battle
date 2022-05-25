@@ -177,6 +177,7 @@ public class RateService : IRateService
             {
                 betDtoStorage.Add(new BetDto
                 {
+
                     Id = data.Id,
                     SetDate = data.SetDate,
                     BetAmount = data.Amount,

@@ -10,7 +10,7 @@
 {
     <center> 
     <div class="tableTitle">
-        <h2>Account History</h2>
+        <h2>@ViewData["Title"]</h2>
     </div>
     <br/>
     <div  class="tableBody">
@@ -24,7 +24,7 @@
    @for (int i = 0; i < Model.Count; i++)
    {
        <tr>
-           <td style="text-align:right">@Model[i].Date</td>
+           <td style="text-align:right">@Model[i].Date.ToLocalTime().ToString()</td>
            <td style="text-align:right">@Model[i].Amount.ToString("C", new CultureInfo("uk-UA"))</td>
            <td style="text-align:right">@Model[i].IsCredit</td>
        </tr>

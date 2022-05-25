@@ -10,21 +10,21 @@ using System.Globalization;
 
 namespace CRBClient.Controllers
 {
-    public class BetController : Controller
+    public class RatingsController : Controller
     {
         private readonly ILogger<HomeController> _logger;
 
+        private readonly IRatingService _ratingService;
+
         private readonly IUserService _userService;
 
-        private readonly IUserRateService _userRateService;
-
-
-        public BetController(ILogger<HomeController> logger,
-            IUserService userService, IUserRateService userRateService)
+        public RatingsController(ILogger<HomeController> logger,
+            IRatingService ratingService,
+            IUserService userService)
         {
             _logger = logger;
+            _ratingService = ratingService;
             _userService = userService;
-            _userRateService = userRateService;
         }
 
         public async Task<IActionResult> Index(int? page)
@@ -32,12 +32,12 @@ namespace CRBClient.Controllers
             var pageSize = 10;
             var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
             ViewBag.Balance = await _userService.GetUserBalanceAsync();
-            ViewBag.Title = "My Bets";
+            ViewBag.Title = "Users Ratings";
             try
             {
-                var betInfo = await _userRateService.GetUserRates();
-                var bets = PagedListExtensions.ToPagedList(betInfo, pageIndex, pageSize);
-                return View(bets);
+                var ratingInfo = await _ratingService.GetUserRatings();
+                var ratings = PagedListExtensions.ToPagedList(ratingInfo, pageIndex, pageSize);
+                return View(ratings);
             }
             catch (CustomException)
             {

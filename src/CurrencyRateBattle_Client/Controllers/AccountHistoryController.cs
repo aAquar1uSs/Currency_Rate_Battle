@@ -5,7 +5,7 @@ using CRBClient.Services.Interfaces;
 using PagedList;
 using CRBClient.Helpers;
 using PagedListExtensions = X.PagedList.PagedListExtensions;
-
+using System.Globalization;
 
 namespace CRBClient.Controllers
 {
@@ -25,7 +25,7 @@ namespace CRBClient.Controllers
         public async Task<IActionResult> Index(int? page)
         {
             var pageSize = 10;
-            var pageIndex = page.HasValue ? Convert.ToInt32(page) : 1;
+            var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
             ViewBag.Balance = await _userService.GetUserBalanceAsync();
             ViewBag.Title = "Account History";
             try
