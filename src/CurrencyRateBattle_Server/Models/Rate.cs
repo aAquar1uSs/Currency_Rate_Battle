@@ -19,7 +19,7 @@ public class Rate
     //Date when the rate is settled
     public DateTime? SettleDate { get; set; }
 
-    public decimal Payout { get; set; }
+    public decimal? Payout { get; set; }
 
     /// <summary>
     /// IsClosed must be filled when DateTime is passed (with hosted service)
