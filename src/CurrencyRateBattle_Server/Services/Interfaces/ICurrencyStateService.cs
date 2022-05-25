@@ -1,12 +1,16 @@
 ﻿
 
+using CurrencyRateBattleServer.Models;
+
 namespace CurrencyRateBattleServer.Services.Interfaces;
 
 public interface ICurrencyStateService
 {
     Task PrepareUpdateCurrencyRateAsync();
 
+    Task UpdateEmptyCurrencyStateAsync();
+
     Task GetCurrencyRatesFromNbuApiAsync();
 
-    Task UpdateCurrencyRateByIdAsync(Guid currId);
+    Task UpdateCurrencyRateByIdAsync(CurrencyState currencyState);
 }
