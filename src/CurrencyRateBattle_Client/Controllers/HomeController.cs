@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using CRBClient.Services.Interfaces;
 using CRBClient.Helpers;
+using CRBClient.Dto;
 
 namespace CRBClient.Controllers
 {
@@ -30,8 +31,9 @@ namespace CRBClient.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Main(string currentFilter,
-            string searchString,
+        public async Task<IActionResult> Main(string searchNameString,
+            string searchStartDateString,
+            string searchEndDateString,
             int? page)
         {
             try
@@ -39,19 +41,20 @@ namespace CRBClient.Controllers
                 ViewBag.Balance = await _userService.GetUserBalanceAsync();
                 ViewBag.Title = "Main Page";
 
-                if (searchString != null)
+                ViewData["CurrentNameFilter"] = searchNameString;
+                ViewData["CurrentStartDateFilter"] = searchStartDateString;
+                ViewData["CurrentEndDateFilter"] = searchEndDateString;
+
+                var filter = new FilterDto(searchNameString, searchStartDateString, searchEndDateString);
+                if (filter.CheckFilter())
+                {
                     page = 1;
+                    _roomStorage = await _roomService.GetFilteredCurrencyAsync(filter);
+                }
                 else
                 {
-                    searchString = currentFilter;
-                }
-
-                ViewData["CurrentFilter"] = searchString;
-
-                if (!string.IsNullOrEmpty(searchString))
-                    _roomStorage = await _roomService.GetFilteredCurrencyAsync(searchString.ToUpperInvariant());
-                else
                     _roomStorage = await _roomService.GetRoomsAsync(false);
+                }
             }
             catch (CustomException)
             {

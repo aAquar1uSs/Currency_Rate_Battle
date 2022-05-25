@@ -8,16 +8,26 @@
 <div class="main">
     <div class="filter">
         <h2>Filters</h2>
-        <br/>
+        <br />
         <div class="valuta">
-            @using (Html.BeginForm("Main","Home", FormMethod.Get))
+            @using (Html.BeginForm("Main", "Home", FormMethod.Get))
             {
                 <p>
-                    Find by currency name: <input type="text" name="searchString" value="@ViewData["CurrentFilter"]"/>
-                    <input type="submit" value="Search" class="btn btn-success"/>
-                    <br/>
-                    <a asp-action="Main">Back to full list</a>
+                    Find by currency name: <input type="text" name="searchNameString" value="@ViewData["CurrentNameFilter"]" />
                 </p>
+                <p>
+                    Find by start date: <input type="text" name="searchStartDateString" value="@ViewData["CurrentStartDateFilter"]" />
+                </p>
+                <p>
+                    Find by end date: <input type="text" name="searchEndDateString" value="@ViewData["CurrentEndDateFilter"]" />
+                </p>
+                <p>
+                    *please enter date in the format dd/MM/yyyy hh*
+                </p>
+                <br />
+                <input type="submit" value="Search" class="btn btn-success" />
+                <br />
+                <a asp-action="Main">Back to full list</a>
             }
         </div>
     </div>
@@ -28,10 +38,10 @@
                 <div class="info_room">
                     <p>
                         @Html.Label(room.СurrencyName + " ("
-                                    + room.CurrencyExchangeRate
-                                    + " "
-                                    + room.UpdateRateTime.ToString("MMMM-dd HH:mm", CultureInfo.InvariantCulture) +
-                                    ")")
+                    + room.CurrencyExchangeRate
+                    + " "
+                    + room.UpdateRateTime.ToString("MMMM-dd HH:mm", CultureInfo.InvariantCulture) +
+                    ")")
                     </p>
                 </div>
                 <div class="info_time">
@@ -51,18 +61,18 @@
         var prevDisabled = !Model.HasPreviousPage ? "disabled" : "active";
         var nexDisabled = !Model.HasNextPage ? "disabled" : "active";
     }
-    
+
     <a asp-action="Main"
        asp-route-currentFilter="@ViewData["CurrentFilter"]"
        asp-route-page="@(Model.PageIndex-1)"
        class="@prevDisabled">
         Previous
     </a>
-    
+
     <a asp-action="Main"
        asp-route-currentFilter="@ViewData["CurrentFilter"]"
        asp-route-page="@(Model.PageIndex+1)"
-           class="@nexDisabled">
-            Next
-        </a>
+       class="@nexDisabled">
+        Next
+    </a>
 </div>

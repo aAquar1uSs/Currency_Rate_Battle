@@ -171,7 +171,7 @@ public class RoomService : IRoomService
         return result;
     }
 
-    public async Task<List<RoomDto>?> GetActiveRoomsWithFilterByCurrencyNameAsync(string currencyName)
+    public async Task<List<RoomDto>?> GetActiveRoomsWithFilterAsync(Filter filter)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -184,15 +184,21 @@ public class RoomService : IRoomService
                 from currencyState in db.CurrencyStates
                 join room in db.Rooms on currencyState.RoomId equals room.Id
                 join curr in db.Currencies on currencyState.CurrencyId equals curr.Id
-                where (curr.CurrencyName == currencyName && room.IsClosed == false)
+                where room.IsClosed == false && curr.CurrencyName == filter.CurrencyName
                 select new
                 {
                     room.Date,
                     currencyState.CurrencyExchangeRate,
                     currencyState.CurrencyId,
                     room.IsClosed,
+                    curr.CurrencyName,
                     RateUpdateDate = currencyState.Date
                 };
+
+            if (filter.DateTryParse(filter.StartDate, out var startDate))
+                filteredRooms = filteredRooms.Where(room => room.Date >= startDate);
+            if (filter.DateTryParse(filter.EndDate, out var endDate))
+                filteredRooms = filteredRooms.Where(room => room.Date <= endDate);
 
             foreach (var room in filteredRooms)
             {
@@ -201,7 +207,7 @@ public class RoomService : IRoomService
                     {
                         CurrencyExchangeRate = room.CurrencyExchangeRate,
                         Date = room.Date,
-                        СurrencyName = currencyName,
+                        СurrencyName = room.CurrencyName,
                         UpdateRateTime = room.RateUpdateDate,
                         IsClosed = room.IsClosed
                     });
