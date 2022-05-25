@@ -33,7 +33,7 @@ public class UserService : IUserService
 
     public async Task RegisterUserAsync(UserViewModel user)
     {
-        var response = await _httpClient.PostAsync(_options.RegistrationAccURL, user);
+        var response = await _httpClient.PostAsync(_options.RegistrationAccURL ?? "", user);
 
         if (!user.Password.Equals(user.ConfirmPassword, StringComparison.Ordinal))
         {
@@ -54,7 +54,7 @@ public class UserService : IUserService
 
     public async Task LoginUserAsync(UserViewModel user)
     {
-        var response = await _httpClient.PostAsync(_options.LoginAccURL, user);
+        var response = await _httpClient.PostAsync(_options.LoginAccURL ?? "", user);
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
@@ -76,7 +76,7 @@ public class UserService : IUserService
 
     public async Task<AccountInfoViewModel> GetAccountInfoAsync()
     {
-        var response = await _httpClient.GetAsync(_options.UserProfileURL);
+        var response = await _httpClient.GetAsync(_options.UserProfileURL ?? "");
         if (response.StatusCode == HttpStatusCode.OK)
         {
             return await response.Content.ReadAsAsync<AccountInfoViewModel>();
@@ -109,7 +109,7 @@ public class UserService : IUserService
     public async Task<string> GetUserBalanceAsync()
     {
         var balance = string.Empty;
-        var response = await _httpClient.GetAsync(_options.GetBalanceURL);
+        var response = await _httpClient.GetAsync(_options.GetBalanceURL ?? "");
         if (response.StatusCode == HttpStatusCode.OK)
         {
             if (decimal.TryParse(response.Content.ReadAsStringAsync().Result, out var bal))
