@@ -184,7 +184,7 @@ public class RoomService : IRoomService
                 from currencyState in db.CurrencyStates
                 join room in db.Rooms on currencyState.RoomId equals room.Id
                 join curr in db.Currencies on currencyState.CurrencyId equals curr.Id
-                where room.IsClosed == false && curr.CurrencyName == filter.CurrencyName.ToUpperInvariant()
+                where room.IsClosed == false
                 select new
                 {
                     room.Date,
@@ -195,6 +195,8 @@ public class RoomService : IRoomService
                     RateUpdateDate = currencyState.Date
                 };
 
+            if (!string.IsNullOrWhiteSpace(filter.CurrencyName))
+                filteredRooms = filteredRooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant());
             if (filter.DateTryParse(filter.StartDate, out var startDate))
                 filteredRooms = filteredRooms.Where(room => room.Date >= startDate);
             if (filter.DateTryParse(filter.EndDate, out var endDate))

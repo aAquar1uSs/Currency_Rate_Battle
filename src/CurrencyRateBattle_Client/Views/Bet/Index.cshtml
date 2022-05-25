@@ -29,7 +29,13 @@
    {
        <tr>
            <td style="text-align:right">@Model[i].RoomDate.ToLocalTime().ToString()</td>
-           <td style="text-align:right">@Model[i].SettleDate.ToLocalTime().ToString()</td>
+           <td style="text-align:right">@if (Model[i].SettleDate == null) 
+               { 
+                   @("--") ;
+               } 
+               else { 
+                   @((Model[i].SettleDate)); 
+               }</td>
            <td style="text-align:right">@Model[i].BetAmount.ToString("C", new CultureInfo("uk-UA"))</td>
            <td style="text-align:right">
                @if (Model[i].PayoutAmount == null) 

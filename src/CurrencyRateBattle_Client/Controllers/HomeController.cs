@@ -46,15 +46,9 @@ namespace CRBClient.Controllers
                 ViewData["CurrentEndDateFilter"] = searchEndDateString;
 
                 var filter = new FilterDto(searchNameString, searchStartDateString, searchEndDateString);
-                if (filter.CheckFilter())
-                {
-                    page = 1;
-                    _roomStorage = await _roomService.GetFilteredCurrencyAsync(filter);
-                }
-                else
-                {
-                    _roomStorage = await _roomService.GetRoomsAsync(false);
-                }
+                _roomStorage = filter.CheckFilter() ?
+                    await _roomService.GetFilteredCurrencyAsync(filter)
+                    : await _roomService.GetRoomsAsync(false);
             }
             catch (CustomException)
             {

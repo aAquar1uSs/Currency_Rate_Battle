@@ -17,8 +17,8 @@ public class FilterDto
 
     public bool CheckFilter()
     {
-        return (CurrencyName is not null && !string.IsNullOrWhiteSpace(CurrencyName))
-            || (StartDate is not null && !string.IsNullOrWhiteSpace(StartDate))
-            || (EndDate is not null && !string.IsNullOrWhiteSpace(EndDate));
+        return (!string.IsNullOrWhiteSpace(CurrencyName))
+            || (!string.IsNullOrWhiteSpace(StartDate))
+            || (!string.IsNullOrWhiteSpace(EndDate));
     }
 }

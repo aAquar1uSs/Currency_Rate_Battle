@@ -22,7 +22,7 @@
                     Find by end date: <input type="text" name="searchEndDateString" value="@ViewData["CurrentEndDateFilter"]" />
                 </p>
                 <p>
-                    *please enter date in the format dd.MM.yyyy HH*
+                    *please enter date in the format MM.dd.yyyy HH*
                 </p>
                 <br />
                 <input type="submit" value="Search" class="btn btn-success" />
@@ -63,14 +63,18 @@
     }
 
     <a asp-action="Main"
-       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       asp-route-searchNameString="@ViewData["CurrentNameFilter"]"
+       asp-route-searchStartDateString="@ViewData["CurrentStartDateFilter"]"
+       asp-route-searchEndDateString="@ViewData["CurrentEndDateFilter"]"
        asp-route-page="@(Model.PageIndex-1)"
        class="@prevDisabled">
         Previous
     </a>
 
     <a asp-action="Main"
-       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       asp-route-searchNameString="@ViewData["CurrentNameFilter"]"
+       asp-route-searchStartDateString="@ViewData["CurrentStartDateFilter"]"
+       asp-route-searchEndDateString="@ViewData["CurrentEndDateFilter"]"
        asp-route-page="@(Model.PageIndex+1)"
        class="@nexDisabled">
         Next

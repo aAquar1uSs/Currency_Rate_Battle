@@ -15,10 +15,10 @@ public class Filter
     public string EndDate { get; set; }
 
     [JsonIgnore]
-    public const string DateFormat = "dd.MM.yyyy HH";
+    public const string DateFormat = "MM.dd.yyyy HH";
 
     [JsonIgnore]
-    private static readonly TimeSpan _timeDifference = DateTime.Now - DateTime.UtcNow;
+    private static readonly TimeSpan _timeDifference = DateTime.UtcNow - DateTime.Now;
 
     [JsonConstructor]
     public Filter(string currencyName, string startDate, string endDate)
@@ -33,7 +33,7 @@ public class Filter
         try
         {
             dateTime = DateTime.ParseExact(date, DateFormat, CultureInfo.InvariantCulture)
-                - _timeDifference;
+                + _timeDifference;
             return true;
         }
         catch
