@@ -41,7 +41,7 @@ public class RoomService : IRoomService
 
     public async Task CreateRoomAsync(CurrencyRateBattleContext db, Currency curr)
     {
-        var currentDate = DateTime.ParseExact(DateTime.Now.ToString("MM.dd.yyyy HH:00:00"),
+        var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00"),
             "MM.dd.yyyy HH:mm:ss", null);
 
         var currState = new CurrencyState
@@ -88,15 +88,15 @@ public class RoomService : IRoomService
             foreach (var r in db.Rooms)
             {
                 if ((r.Date.Date == DateTime.Today
-                     && r.Date.Hour == DateTime.Now.AddHours(1).Hour)
+                     && r.Date.Hour == DateTime.UtcNow.AddHours(1).Hour)
                     || (r.Date.Date == DateTime.Today.AddDays(1))
-                    && (r.Date.Hour == 0 && DateTime.Now.Hour == 23))
+                    && (r.Date.Hour == 0 && DateTime.UtcNow.Hour == 23))
                 {
                     r.IsClosed = true;
                     await UpdateRoomAsync(r.Id, r);
                 }
                 else if (r.Date.Date == DateTime.Today
-                         && r.Date.Hour == DateTime.Now.Hour
+                         && r.Date.Hour == DateTime.UtcNow.Hour
                          && r.IsClosed)
                 {
                     await _rateCalculationService.StartRateCalculationByRoomIdAsync(r.Id);
