@@ -4,6 +4,7 @@ using CRBClient.Models;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using CRBClient.Services.Interfaces;
+using CRBClient.Dto;
 
 namespace CRBClient.Services;
 
@@ -39,9 +40,9 @@ public class RoomService : IRoomService
             : new List<RoomViewModel>();
     }
 
-    public async Task<List<RoomViewModel>> GetFilteredCurrencyAsync(string currencyName)
+    public async Task<List<RoomViewModel>> GetFilteredCurrencyAsync(FilterDto filter)
     {
-        var responseTask = await _httpClient.GetAsync(_options.FilterURL + $"/{currencyName}");
+        var responseTask = await _httpClient.PostAsync(_options.FilterURL, filter);
 
         if (responseTask.StatusCode == HttpStatusCode.OK)
         {

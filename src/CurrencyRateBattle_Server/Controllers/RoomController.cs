@@ -62,14 +62,14 @@ public class RoomController : ControllerBase
         }
     }
 
-    [HttpGet("filter/{currencyName}")]
+    [HttpPost("filter")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromRoute] string currencyName)
+    public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromBody] Filter filter)
     {
-        _logger.LogDebug("Filtered by currency room list.");
+        _logger.LogDebug("Filtered room list.");
 
-        var rooms = await _roomService.GetActiveRoomsWithFilterByCurrencyNameAsync(currencyName);
+        var rooms = await _roomService.GetActiveRoomsWithFilterAsync(filter);
 
         return rooms is null ? BadRequest() : Ok(rooms);
     }
