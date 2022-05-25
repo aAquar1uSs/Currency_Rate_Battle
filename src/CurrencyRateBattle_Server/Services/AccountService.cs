@@ -74,6 +74,16 @@ public class AccountService : IAccountService
         try
         {
             _ = await db.Users.AddAsync(user);
+            _ = await db.SaveChangesAsync();
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
+        }
+
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
 
             _ = _accountHistoryService.CreateHistoryByValuesAsync(null, user.Account.Id, DateTime.Now,
                 _accountStartBalance, true);
