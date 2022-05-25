@@ -94,7 +94,7 @@ public class RateController : ControllerBase
     {
         try
         {
-            _rateService.UpdateRateAsync(id, updatedRate);
+            _rateService.UpdateRateByRoomIdAsync(id, updatedRate);
             _logger.LogInformation($"Rate has been updated successfully ({id})");
             return Ok();
         }
@@ -115,7 +115,7 @@ public class RateController : ControllerBase
     {
         try
         {
-            _rateService.DeleteRateAsync(id);
+            await _rateService.DeleteRateAsync(id);
             _logger.LogInformation($"Rate has been deleted successfully ({id})");
             return Ok();
         }

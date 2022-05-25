@@ -5,6 +5,8 @@ using CurrencyRateBattleServer.Managers;
 using CurrencyRateBattleServer.Managers.Interfaces;
 using CurrencyRateBattleServer.Services;
 using CurrencyRateBattleServer.Services.HostedServices;
+using CurrencyRateBattleServer.Services.HostedServices.Handlers;
+using CurrencyRateBattleServer.Services.HostedServices.Handlers.Interface;
 using CurrencyRateBattleServer.Services.Interfaces;
 using CurrencyRateBattleServer.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,7 +22,7 @@ var services = builder.Services;
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen(opt =>
 {
-    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "CBR API", Version = "v1" });
+    opt.SwaggerDoc("v1", new OpenApiInfo {Title = "CBR API", Version = "v1"});
     opt.AddSecurityDefinition("Bearer",
         new OpenApiSecurityScheme
         {
@@ -94,7 +96,8 @@ host.ConfigureAppConfiguration(app =>
         });
 
         _ = service.AddHostedService<CurrencyHostedService>()
-            .AddHostedService<RoomHostedService>();
+            .AddHostedService<RoomHostedService>()
+            .AddHostedService<RateHostedService>();
 
         _ = service.AddOptions()
             .AddSingleton<IJwtManager, JwtManager>()
@@ -104,12 +107,13 @@ host.ConfigureAppConfiguration(app =>
             .AddSingleton<IRateService, RateService>()
             .AddSingleton<ICurrencyStateService, CurrencyStateService>()
             .AddSingleton<IAccountHistoryService, AccountHistoryService>()
+            .AddSingleton<IRateCalculationService, RateCalculationService>()
+            .AddSingleton<IPaymentService, PaymentService>()
             .Configure<WebServerOptions>(builder.Configuration.GetSection(WebServerOptions.SectionName));
 
         _ = service.AddControllers();
 
-        _= service.AddScoped<CurrencyRateBattleContext>();
-
+        //_ = service.AddScoped<CurrencyRateBattleContext>();
     });
 
 var app = builder.Build();

@@ -4,7 +4,9 @@ namespace CurrencyRateBattleServer.Services.Interfaces;
 
 public interface ICurrencyStateService
 {
-    Task GetCurrencyRateByNameFromNbuApiAsync();
+    Task PrepareUpdateCurrencyRateAsync();
+
+    Task GetCurrencyRatesFromNbuApiAsync();
 
     Task UpdateCurrencyRateByIdAsync(Guid currId);
 }

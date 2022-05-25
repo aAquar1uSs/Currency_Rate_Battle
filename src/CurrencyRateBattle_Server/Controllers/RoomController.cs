@@ -1,4 +1,5 @@
-﻿using CurrencyRateBattleServer.Helpers;
+﻿using System.Net;
+using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Models;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -24,6 +25,7 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet("get-rooms/{isClosed}")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
     public async Task<ActionResult<IEnumerable<Room>>> GetRoomsAsync([FromRoute] bool isClosed)
     {
         _logger.LogDebug("List of rooms are retrieving.");
@@ -44,7 +46,7 @@ public class RoomController : ControllerBase
     {
         try
         {
-            _roomService.UpdateRoomAsync(id, updatedRoom);
+            await _roomService.UpdateRoomAsync(id, updatedRoom);
             _logger.LogInformation($"Room has been updated successfully ({id})");
             return Ok();
         }
@@ -61,6 +63,8 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet("filter/{currencyName}")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromRoute] string currencyName)
     {
         _logger.LogDebug("Filtered by currency room list.");

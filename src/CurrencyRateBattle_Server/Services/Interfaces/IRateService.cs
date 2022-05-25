@@ -7,9 +7,11 @@ public interface IRateService
 {
     Task<Rate> CreateRateAsync(Rate rate);
 
-    Task UpdateRateAsync(Guid id, Rate updatedRate);
+    Task<List<Rate>> GetRateByRoomIdAsync(Guid roomId);
 
     Task DeleteRateAsync(Guid id);
+
+    Task UpdateRateByRoomIdAsync(Guid id, Rate updatedRate);
 
     Task<List<Rate>> GetRatesAsync(bool? isActive, string? currencyCode);
 

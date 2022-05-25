@@ -9,17 +9,34 @@ namespace CurrencyRateBattleServer.Services;
 
 public class RoomService : IRoomService
 {
-    private readonly ILogger<IAccountService> _logger;
+    private readonly ILogger<IRoomService> _logger;
 
     private readonly IServiceScopeFactory _scopeFactory;
 
+    private readonly IRateCalculationService _rateCalculationService;
+
     private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
-    public RoomService(ILogger<AccountService> logger,
+    public RoomService(ILogger<RoomService> logger,
+        IRateCalculationService rateCalculationService,
         IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
+        _rateCalculationService = rateCalculationService;
         _scopeFactory = scopeFactory;
+    }
+
+    public async Task GenerateRoomsByCurrencyCountAsync()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        foreach (var curr in dbContext.Currencies)
+        {
+            await CreateRoomAsync(dbContext, curr);
+        }
+
+        _ = await dbContext.SaveChangesAsync();
     }
 
     public async Task CreateRoomAsync(CurrencyRateBattleContext db, Currency curr)
@@ -52,15 +69,40 @@ public class RoomService : IRoomService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
+        var roomExists = await db.Rooms.AnyAsync(r => r.Id == id);
+        if (!roomExists)
+            throw new CustomException($"{nameof(Room)} with Id={id} is not found.");
+
+        _ = db.Rooms.Update(updatedRoom);
+        _ = await db.SaveChangesAsync();
+    }
+
+    public async Task CheckRoomsStateAsync()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
         await _semaphoreSlim.WaitAsync();
         try
         {
-            var roomExists = await db.Rooms.AnyAsync(r => r.Id == id);
-            if (!roomExists)
-                throw new CustomException($"{nameof(Room)} with Id={id} is not found.");
-
-            _ = db.Rooms.Update(updatedRoom);
-            _ = await db.SaveChangesAsync();
+            foreach (var r in db.Rooms)
+            {
+                if ((r.Date.Date == DateTime.Today
+                     && r.Date.Hour == DateTime.UtcNow.AddHours(1).Hour)
+                    || (r.Date.Date == DateTime.Today.AddDays(1))
+                    && (r.Date.Hour == 0 && DateTime.UtcNow.Hour == 23))
+                {
+                    r.IsClosed = true;
+                    await UpdateRoomAsync(r.Id, r);
+                }
+                else if (r.Date.Date == DateTime.Today
+                         && r.Date.Hour == DateTime.UtcNow.Hour
+                         && r.IsClosed)
+                {
+                    await _rateCalculationService.StartRateCalculationByRoomIdAsync(r.Id);
+                    await UpdateRoomAsync(r.Id, r);
+                }
+            }
         }
         finally
         {
@@ -115,7 +157,7 @@ public class RoomService : IRoomService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        Room result;
+        Room? result;
         await _semaphoreSlim.WaitAsync();
         try
         {
