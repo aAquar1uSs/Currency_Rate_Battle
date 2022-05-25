@@ -12,32 +12,28 @@
         <h2>@ViewData["Title"]</h2>
     </div>
     <br/>
-        <div id="tabs">
-
-     <ul>
-        <li><a href="#tab-1">Tab 1</a></li>
-         <li><a href="#tab-2">Tab 2</a></li>
-
-         </ul>
-      </div>
-
-         <div id="tab-1"> 
         <div  class="tableBody">
     <table style="background-color: rgba(145, 145, 145, 0.8);">
         <tr>
             <th style="width:20px; text-align:right">@Html.Label("Rank")</th>
             <th style="width:20px; text-align:right">@Html.Label("Email")</th>
-            <th style="width:20px; text-align:right">@Html.Label("Last Bet Date")</th>
+            <th style="width:50px; text-align:right">@Html.Label("Last Bet Date")</th>
             <th style="width:20px; text-align:right">@Html.Label("Bets Number")</th>
+            <th style="width:20px; text-align:right">@Html.Label("Won Number")</th>
+            <th style="width:20px; text-align:right">@Html.Label("Profit Percentage (%)")</th>
+            <th style="width:20px; text-align:right">@Html.Label("Won Percentage (%)")</th>
         </tr>
 
    @for (int i = 0; i < Model.Count; i++)
    {
        <tr>
-           <td style="text-align:right">111</td>
+           <td style="text-align:right">@(i+1)</td>
            <td style="text-align:right">@Model[i].Email</td>
-           <td style="text-align:right">@Model[i].LastBetDate.ToLocalTime().ToString()</td>
+           <td style="text-align:right">@Model[i].LastBetDate.ToLocalTime().ToString("MM.dd.yyyy HH:mm")</td>
            <td style="text-align:right">@Model[i].BetsNo</td>
+           <td style="text-align:right">@Model[i].WonBetsNo</td>
+           <td style="text-align:right">@(Math.Round(Model[i].ProfitPercentage * 100,2))</td>
+           <td style="text-align:right">@(Math.Round(Model[i].WonBetsPercentage * 100,2))</td>
        </tr>
    }
  </table>
@@ -50,14 +46,6 @@
             of @Model.PageCount   @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
         </div>
     </div>
-
-       </div>
-     <div id="tab-2">
-
-             'content which you want to display on click of second tab'
-             </div>
-
-
-    
+       
 }
 

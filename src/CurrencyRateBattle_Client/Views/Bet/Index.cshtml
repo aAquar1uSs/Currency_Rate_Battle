@@ -16,8 +16,8 @@
     <div  class="tableBody">
     <table style="background-color: rgba(145, 145, 145, 0.8);">
         <tr>
-            <th style="width:20px; text-align:right">@Html.Label("Date")</th>
-            <th style="width:20px; text-align:right">@Html.Label("Settle Date")</th>
+            <th style="width:60px; text-align:right">@Html.Label("Date")</th>
+            <th style="width:60px; text-align:right">@Html.Label("Settle Date")</th>
             <th style="width:20%; text-align:right">@Html.Label("Bet Amount")</th>
             <th style="width:20%; text-align:right">@Html.Label("Payout Amount")</th>
             <th style="width:20px; text-align:center">@Html.Label("Сurrency")</th>
@@ -28,19 +28,19 @@
    @for (int i = 0; i < Model.Count; i++)
    {
        <tr>
-           <td style="text-align:right">@Model[i].RoomDate.ToLocalTime().ToString()</td>
-           <td style="text-align:right">@if (Model[i].SettleDate == null) 
-               { 
-                   @("--") ;
-               } 
-               else { 
-                   @((Model[i].SettleDate)); 
+           <td style="text-align:right">@Model[i].RoomDate.ToLocalTime().ToString("MM.dd.yyyy HH:mm")</td>
+           <td style="text-align:right">@if (Model[i].SettleDate == null)
+                            {
+                                @("--");
+                               } 
+                               else { 
+                                   @((Model[i].SettleDate?.ToLocalTime().ToString("MM.dd.yyyy HH:mm"))); 
                }</td>
            <td style="text-align:right">@Model[i].BetAmount.ToString("C", new CultureInfo("uk-UA"))</td>
            <td style="text-align:right">
                @if (Model[i].PayoutAmount == null) 
                { 
-                   @("--") ;
+                   @("--");
                } 
                else { 
                    @(((decimal)Model[i].PayoutAmount).ToString("C", new CultureInfo("uk-UA"))); 

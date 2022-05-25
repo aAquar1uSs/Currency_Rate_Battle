@@ -36,7 +36,7 @@ namespace CRBClient.Controllers
             try
             {
                 var ratingInfo = await _ratingService.GetUserRatings();
-                var ratings = PagedListExtensions.ToPagedList(ratingInfo, pageIndex, pageSize);
+                var ratings = PagedListExtensions.ToPagedList(ratingInfo.OrderByDescending(s => s.BetsNo), pageIndex, pageSize);
                 return View(ratings);
             }
             catch (CustomException)
