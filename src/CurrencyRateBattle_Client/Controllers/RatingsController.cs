@@ -2,10 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using CRBClient.Services.Interfaces;
-using PagedList;
 using CRBClient.Helpers;
 using PagedListExtensions = X.PagedList.PagedListExtensions;
-using CRBClient.Services;
 using System.Globalization;
 
 namespace CRBClient.Controllers
@@ -47,27 +45,35 @@ namespace CRBClient.Controllers
                     case "bets_no":
                         ratingInfo = ratingInfo.OrderByDescending(s => s.BetsNo).ToList();
                         break;
+
                     case "bets_no_asc":
                         ratingInfo = ratingInfo.OrderBy(s => s.BetsNo).ToList();
                         break;
+
                     case "won_bets_no":
                         ratingInfo = ratingInfo.OrderByDescending(s => s.WonBetsNo).ToList();
                         break;
+
                     case "won_bets_no_asc":
                         ratingInfo = ratingInfo.OrderBy(s => s.WonBetsNo).ToList();
                         break;
+
                     case "profitperc":
                         ratingInfo = ratingInfo.OrderByDescending(s => s.ProfitPercentage).ToList();
                         break;
+
                     case "profitperc_asc":
                         ratingInfo = ratingInfo.OrderBy(s => s.ProfitPercentage).ToList();
                         break;
+
                     case "wonbetsperc":
                         ratingInfo = ratingInfo.OrderByDescending(s => s.WonBetsPercentage).ToList();
                         break;
+
                     case "wonbetsperc_asc":
                         ratingInfo = ratingInfo.OrderBy(s => s.WonBetsPercentage).ToList();
                         break;
+
                     default:
                         ratingInfo = ratingInfo.OrderByDescending(s => s.BetsNo).ToList();
                         break;
@@ -81,13 +87,17 @@ namespace CRBClient.Controllers
                 _logger.LogDebug("User is unauthorized");
                 return Redirect("/Account/Authorization");
             }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex.Message);
+                return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            }
         }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
     }
 }

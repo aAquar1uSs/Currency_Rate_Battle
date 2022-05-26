@@ -66,7 +66,7 @@
 
 .valuta a {
     text-decoration: none;
-    color: yellow;
+    color: black;
     transition: color 0.3s ease;
 }
 
@@ -283,6 +283,8 @@
 }
 
 .filter {
+    display: flex;
+    flex-direction: column;
     padding: 15px;
     height: 600px;
     width: 300px;
@@ -290,8 +292,12 @@
     background-color: rgb(32, 32, 32);
     box-shadow: 0px 0px 21px 8px #000000;
 }
+.filter p{
+    display: flex;
+flex-direction: column;
+}
 
-.filter h2{
+.filter h2 {
     color: yellow;
     text-align: center;
 }
@@ -307,29 +313,53 @@
 .valuta {
     display: flex;
     flex-direction: column;
-    gap: 20px;
     color: yellow;
 }
 
 .valuta form{
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 20px;
+    font-weight: 515;
+    align-items: center;
+    font-size: 20px;
+}
+.btn-main{
+    text-decoration: none;
+    width: 200px;
+    height: 43px;
+    line-height: 39px;
+    border-radius: 45px;
+    margin: 30px 20px;
+    font-size: 11px;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 3px;
+    font-weight: 600;
+    background: lightgrey;
+    box-shadow: 0 8px 15px rgb(0 0 0 / 10%);
+    transition: .3s;
+    border: none;
+    display: flex;
+    align-items: center;
+    
 }
 
-.valuta input[type="submit"]{
-    border: 1px solid black; 
-    border-radius: 3px; 
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px; 
-    -khtml-border-radius: 3px; 
-    background: yellow ;
-    outline: none; 
-    height: 24px; 
-    width: 50px; 
+.btn-main:hover {
+    box-shadow: 0 4px 20px rgba(251, 255, 0, 0.932);
     color: black;
-    font-size: 11px;
-    font-family: Tahoma;
+}
+.btn-success{
+    width: 200px;
+    height: 43px;
+    border-radius: 20px;
+    font-size: 20px;
+    background-color: inherit;
+    border:2px solid gray;
+}
+.btn-success:hover{
+    border:2px solid yellow;
+    box-shadow: 0 4px 20px rgba(251, 255, 0, 0.932);
 }
 
 .content_room {

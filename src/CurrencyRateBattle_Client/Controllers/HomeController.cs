@@ -54,8 +54,8 @@ public class HomeController : Controller
             ViewData["CurrentEndDateFilter"] = searchEndDateString;
 
             var filter = new FilterDto(searchNameString, searchStartDateString, searchEndDateString);
-            _roomStorage = filter.CheckFilter() ?
-                await _roomService.GetFilteredCurrencyAsync(filter)
+            _roomStorage = filter.CheckFilter()
+                ? await _roomService.GetFilteredCurrencyAsync(filter)
                 : await _roomService.GetRoomsAsync(false);
         }
         catch (CustomException)
@@ -83,6 +83,11 @@ public class HomeController : Controller
             _logger.LogDebug("User unauthorized");
             return Redirect("/Account/Authorization");
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex.Message);
+            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+        }
 
         return View(accountInfo);
     }
@@ -102,6 +107,8 @@ public class HomeController : Controller
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
     }
+}
+
 }

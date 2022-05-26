@@ -1,4 +1,5 @@
-﻿using CRBClient.Helpers;
+﻿using System.Diagnostics;
+using CRBClient.Helpers;
 using CRBClient.Models;
 using CRBClient.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -65,11 +66,15 @@ public class RateController : Controller
         catch (HttpRequestException ex)
         {
             _logger.LogInformation(ex.Message);
-            ViewData["ErrorMsg"] = "The request could not be processed";
-            ViewBag.Balance = await _userService.GetUserBalanceAsync();
-            return View("Index", rateViewModel);
+            return View("Error", new ErrorViewModel {RequestId = ex.Message});
         }
 
         return Redirect("/Home/Main");
+    }
+
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
     }
 }

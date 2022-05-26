@@ -18,18 +18,17 @@
                     Find by currency name: <input type="text" name="searchNameString" value="@ViewData["CurrentNameFilter"]"/>
                 </p>
                 <p>
-                    Find by start date: <input type="text" name="searchStartDateString" value="@ViewData["CurrentStartDateFilter"]"/>
+                    Find by start date: <input type="text" name="searchStartDateString" value="@ViewData["CurrentStartDateFilter"]" placeholder="format MM.dd.yyyy HH"/>
                 </p>
                 <p>
-                    Find by end date: <input type="text" name="searchEndDateString" value="@ViewData["CurrentEndDateFilter"]"/>
-                </p>
-                <p>
-                    *please enter date in the format MM.dd.yyyy HH*
+                    Find by end date: <input type="text" name="searchEndDateString" value="@ViewData["CurrentEndDateFilter"]" placeholder="format MM.dd.yyyy HH"/>
                 </p>
                 <br/>
-                <input type="submit" value="Search" class="btn btn-success"/>
+                <input type="submit" value="Search" class="btn-success"/>
                 <br/>
+                <div class="btn-main">
                 <a asp-action="Main">Back to full list</a>
+                </div>
             }
         </div>
     </div>
