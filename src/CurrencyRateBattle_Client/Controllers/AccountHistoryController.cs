@@ -42,7 +42,7 @@ namespace CRBClient.Controllers
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex.Message);
-                return View("Error");
+                return View("Error", new ErrorViewModel {RequestId = ex.Message});
             }
         }
 

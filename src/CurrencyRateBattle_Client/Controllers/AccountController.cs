@@ -62,7 +62,7 @@ public class AccountController : Controller
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex.Message);
-            return View("Error");
+            return View("Error", new ErrorViewModel {RequestId = ex.Message});
         }
 
         return Redirect("/Home/Main");

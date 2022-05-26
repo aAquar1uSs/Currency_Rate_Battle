@@ -67,7 +67,7 @@ namespace CRBClient.Controllers
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex.Message);
-                return View("Error");
+                return View("Error", new ErrorViewModel {RequestId = ex.Message});
             }
 
             var pageSize = 4;
@@ -92,7 +92,7 @@ namespace CRBClient.Controllers
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex.Message);
-                return View("Error");
+                return View("Error", new ErrorViewModel {RequestId = ex.Message});
             }
 
             return View(accountInfo);
