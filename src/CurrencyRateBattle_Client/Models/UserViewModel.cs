@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace CRBClient.Models;
 
@@ -9,11 +7,11 @@ public class UserViewModel
 {
     [BindProperty]
     [DisplayName("Email")]
-    public string Email { get; set; }
+    public string Email { get; set; } = default!;
 
     [BindProperty]
     [DisplayName("Password")]
-    public string Password { get; set; }
+    public string Password { get; set; } = default!;
 
     [BindProperty]
     [DisplayName("Confirm password")]

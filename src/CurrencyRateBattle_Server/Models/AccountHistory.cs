@@ -24,5 +24,5 @@ public class AccountHistory
     [ForeignKey("AccountId")]
     public Guid AccountId { get; set; }
 
-    public virtual Account Account { get; set; }
+    public virtual Account Account { get; set; } = default!;
 }

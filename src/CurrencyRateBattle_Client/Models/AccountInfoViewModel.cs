@@ -2,7 +2,7 @@
 
 public class AccountInfoViewModel
 {
-    public string Email { get; set; }
+    public string Email { get; set; } = default!;
 
     public decimal Amount { get; set; }
 }

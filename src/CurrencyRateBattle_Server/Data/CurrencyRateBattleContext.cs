@@ -6,19 +6,19 @@ namespace CurrencyRateBattleServer.Data;
 
 public class CurrencyRateBattleContext : DbContext
 {
-    public DbSet<User> Users { get; set; }
+    public DbSet<User> Users { get; set; } = default!;
 
-    public DbSet<Account> Accounts { get; set; }
+    public DbSet<Account> Accounts { get; set; } = default!;
 
-    public DbSet<AccountHistory> AccountHistory { get; set; }
+    public DbSet<AccountHistory> AccountHistory { get; set; } = default!;
 
-    public DbSet<Rate> Rates { get; set; }
+    public DbSet<Rate> Rates { get; set; } = default!;
 
-    public DbSet<Room> Rooms { get; set; }
+    public DbSet<Room> Rooms { get; set; } = default!;
 
-    public DbSet<Currency> Currencies { get; set; }
+    public DbSet<Currency> Currencies { get; set; } = default!;
 
-    public DbSet<CurrencyState> CurrencyStates { get; set; }
+    public DbSet<CurrencyState> CurrencyStates { get; set; } = default!;
 
     public CurrencyRateBattleContext(DbContextOptions<CurrencyRateBattleContext> options)
     : base(options)
@@ -27,18 +27,17 @@ public class CurrencyRateBattleContext : DbContext
         {
             throw new ArgumentNullException(nameof(options));
         }
-        //Database.EnsureCreated();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new CurrencyStateConfiguration());
-        modelBuilder.ApplyConfiguration(new RoomConfiguration());
-        modelBuilder.ApplyConfiguration(new UserConfiguration());
-        modelBuilder.ApplyConfiguration(new AccountConfiguration());
-        modelBuilder.ApplyConfiguration(new RateConfiguration());
-        modelBuilder.ApplyConfiguration(new AccountHistoryConfiguration());
-        modelBuilder.ApplyConfiguration(new CurrencyConfiguration());
+        _ = modelBuilder.ApplyConfiguration(new CurrencyStateConfiguration());
+        _ = modelBuilder.ApplyConfiguration(new RoomConfiguration());
+        _ = modelBuilder.ApplyConfiguration(new UserConfiguration());
+        _ = modelBuilder.ApplyConfiguration(new AccountConfiguration());
+        _ = modelBuilder.ApplyConfiguration(new RateConfiguration());
+        _ = modelBuilder.ApplyConfiguration(new AccountHistoryConfiguration());
+        _ = modelBuilder.ApplyConfiguration(new CurrencyConfiguration());
 
         //seeding
         _ = modelBuilder.Entity<Currency>()

@@ -4,6 +4,7 @@ using CurrencyRateBattleServer.Services.Interfaces;
 using System.Text.Json;
 using CurrencyRateBattleServer.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace CurrencyRateBattleServer.Services;
 
@@ -53,8 +54,8 @@ public class CurrencyStateService : ICurrencyStateService
         {
             var currencyState = await dbContext.CurrencyStates
                 .FirstOrDefaultAsync(currState => currState.RoomId == room.Id);
-
-            await UpdateCurrencyRateByIdAsync(currencyState);
+            if (currencyState != null)
+                await UpdateCurrencyRateByIdAsync(currencyState);
         }
     }
 
@@ -71,7 +72,7 @@ public class CurrencyStateService : ICurrencyStateService
         {
             foreach (var curr in dbContext.Currencies)
             {
-                var item = _rateStorage.Find(x => x.Currency.Equals(curr.CurrencyName));
+                var item = _rateStorage.Find(x => x.Currency == curr.CurrencyName);
 
                 if (item is null)
                     continue;
@@ -81,7 +82,7 @@ public class CurrencyStateService : ICurrencyStateService
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _ = _semaphoreSlim.Release();
         }
 
         return currencyStates;
@@ -118,25 +119,29 @@ public class CurrencyStateService : ICurrencyStateService
         var currencyName = (await db.Currencies
             .FirstOrDefaultAsync(curr => curr.Id == currencyState.CurrencyId))?.CurrencyName;
 
-        var currencyDto = _rateStorage.FirstOrDefault(curr => curr.Currency.Equals(currencyName,
-            StringComparison.Ordinal));
-
-        var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00"),
-            "MM.dd.yyyy HH:mm:ss", null);
-
-        await _semaphoreSlim.WaitAsync();
-        try
+        if (_rateStorage != null)
         {
-            currencyState.Date = currentDate;
-            currencyState.CurrencyExchangeRate = Math.Round(currencyDto.Rate, 2);
+            var currencyDto = _rateStorage.FirstOrDefault(curr => curr.Currency == currencyName);
+            if (currencyDto != null)
+            {
+                var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
+                "MM.dd.yyyy HH:mm:ss", null);
 
-            db.CurrencyStates.Update(currencyState);
+                await _semaphoreSlim.WaitAsync();
+                try
+                {
+                    currencyState.Date = currentDate;
+                    currencyState.CurrencyExchangeRate = Math.Round(currencyDto.Rate, 2);
 
-            await db.SaveChangesAsync();
-        }
-        finally
-        {
-            _semaphoreSlim.Release();
+                    _ = db.CurrencyStates.Update(currencyState);
+
+                    _ = await db.SaveChangesAsync();
+                }
+                finally
+                {
+                    _ = _semaphoreSlim.Release();
+                }
+            }
         }
     }
 }

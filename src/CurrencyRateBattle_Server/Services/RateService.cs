@@ -141,48 +141,48 @@ public class RateService : IRateService
         try
         {
             var result = from rate in db.Rates
-                join curr in db.Currencies on rate.CurrencyId equals curr.Id
-                join room in db.Rooms on rate.RoomId equals room.Id
-                where rate.AccountId == accountId
-                select new
-                {
-                    rate.Id,
-                    rate.Amount,
-                    rate.SettleDate,
-                    rate.SetDate,
-                    rate.IsWon,
-                    rate.IsClosed,
-                    rate.AccountId,
-                    rate.RateCurrencyExchange,
-                    rate.Payout,
-                    room.Date,
-                    rate.RoomId,
-                    curr.CurrencyName,
-                    rate.CurrencyId
-                };
+                         join curr in db.Currencies on rate.CurrencyId equals curr.Id
+                         join room in db.Rooms on rate.RoomId equals room.Id
+                         where rate.AccountId == accountId
+                         select new
+                         {
+                             rate.Id,
+                             rate.Amount,
+                             rate.SettleDate,
+                             rate.SetDate,
+                             rate.IsWon,
+                             rate.IsClosed,
+                             rate.AccountId,
+                             rate.RateCurrencyExchange,
+                             rate.Payout,
+                             room.Date,
+                             rate.RoomId,
+                             curr.CurrencyName,
+                             rate.CurrencyId
+                         };
 
             var query = from res in result
-                join currState in db.CurrencyStates
-                    on new {res.RoomId, res.CurrencyId} equals new {currState.RoomId, currState.CurrencyId}
-                    into gj
-                from subCurr in gj.DefaultIfEmpty()
-                select new
-                {
-                    res.Id,
-                    res.Amount,
-                    res.SettleDate,
-                    res.SetDate,
-                    res.IsWon,
-                    res.IsClosed,
-                    res.AccountId,
-                    res.RateCurrencyExchange,
-                    res.Payout,
-                    res.Date,
-                    res.RoomId,
-                    res.CurrencyName,
-                    res.CurrencyId,
-                    CurrencyExchangeRate = subCurr == null ? 0 : subCurr.CurrencyExchangeRate
-                };
+                        join currState in db.CurrencyStates
+                        on new { res.RoomId, res.CurrencyId } equals new { currState.RoomId, currState.CurrencyId }
+                        into gj
+                        from subCurr in gj.DefaultIfEmpty()
+                        select new
+                        {
+                            res.Id,
+                            res.Amount,
+                            res.SettleDate,
+                            res.SetDate,
+                            res.IsWon,
+                            res.IsClosed,
+                            res.AccountId,
+                            res.RateCurrencyExchange,
+                            res.Payout,
+                            res.Date,
+                            res.RoomId,
+                            res.CurrencyName,
+                            res.CurrencyId,
+                            CurrencyExchangeRate = subCurr == null ? 0 : subCurr.CurrencyExchangeRate
+                        };
 
 
             foreach (var data in query)
@@ -220,8 +220,15 @@ public class RateService : IRateService
         try
         {
             var rateToDelete = await db.Rates.FindAsync(id);
-            db.Rates.Remove(rateToDelete);
-            _ = await db.SaveChangesAsync();
+            if (rateToDelete != null)
+            {
+                _ = db.Rates.Remove(rateToDelete);
+                _ = await db.SaveChangesAsync();
+            }
+            else
+            {
+                _logger.LogDebug("No rate found to be deleted.");
+}
         }
         finally
         {

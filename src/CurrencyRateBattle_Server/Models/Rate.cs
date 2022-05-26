@@ -35,15 +35,15 @@ public class Rate
     [ForeignKey("RoomId")]
     public Guid RoomId { get; set; }
 
-    public virtual Room Room { get; set; }
+    public virtual Room Room { get; set; } = default!;
 
     [ForeignKey("CurrencyId")]
     public Guid CurrencyId { get; set; }
 
-    public virtual Currency Currency { get; set; }
+    public virtual Currency Currency { get; set; } = default!;
 
     [ForeignKey("AccountId")]
     public Guid AccountId { get; set; }
 
-    public virtual Account Account { get; set; }
+    public virtual Account Account { get; set; } = default!;
 }

@@ -21,6 +21,7 @@ public class AccountController : Controller
 
     public ActionResult Authorization()
     {
+        ViewBag.Title = "Authorization - Currency Rate Battle";
         return View();
     }
 

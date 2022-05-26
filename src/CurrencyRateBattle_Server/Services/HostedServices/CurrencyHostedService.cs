@@ -7,7 +7,7 @@ public class CurrencyHostedService : IHostedService, IDisposable
 {
     private readonly ILogger<CurrencyHostedService> _logger;
 
-    private Timer _timer;
+    private Timer? _timer;
 
     private readonly ICurrencyStateService _currencyStateService;
 
@@ -36,12 +36,15 @@ public class CurrencyHostedService : IHostedService, IDisposable
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _timer.Change(Timeout.Infinite, 0);
+        if (_timer != null)
+            _ = _timer.Change(Timeout.Infinite, 0);
         return Task.CompletedTask;
     }
 
     public void Dispose()
     {
-        _timer.Dispose();
+        if (_timer != null)
+            _timer.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

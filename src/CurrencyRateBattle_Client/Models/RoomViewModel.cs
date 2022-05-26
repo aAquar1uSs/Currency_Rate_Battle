@@ -11,7 +11,7 @@ public class RoomViewModel
     public DateTime UpdateRateTime { get; set; }
 
     [JsonPropertyName("currencyName")]
-    public string СurrencyName { get; set; }
+    public string СurrencyName { get; set; } = default!;
 
     [JsonPropertyName("currencyExchangeRate")]
     public decimal CurrencyExchangeRate { get; set; }

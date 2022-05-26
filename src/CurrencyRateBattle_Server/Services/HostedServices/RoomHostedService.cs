@@ -35,12 +35,13 @@ public class RoomHostedService : IHostedService, IDisposable
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _timer?.Change(Timeout.Infinite, 0);
+        _ = (_timer?.Change(Timeout.Infinite, 0));
         return Task.CompletedTask;
     }
 
     public void Dispose()
     {
         _timer?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
