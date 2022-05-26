@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using CRBClient.Services.Interfaces;
-using PagedList;
 using CRBClient.Helpers;
 using PagedListExtensions = X.PagedList.PagedListExtensions;
 using System.Globalization;
@@ -11,11 +10,11 @@ namespace CRBClient.Controllers
 {
     public class AccountHistoryController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<AccountHistoryController> _logger;
 
         private readonly IUserService _userService;
 
-        public AccountHistoryController(ILogger<HomeController> logger,
+        public AccountHistoryController(ILogger<AccountHistoryController> logger,
             IUserService userService)
         {
             _logger = logger;

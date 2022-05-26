@@ -76,6 +76,14 @@ public class RateController : ControllerBase
         return Ok(await _rateService.GetUsersRatingAsync());
     }
 
+    [HttpGet("get-currency-rates")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> GetCurrencyRates()
+    {
+        var currencyState = await _currencyStateService.GetCurrencyStateAsync();
+        return Ok(currencyState);
+    }
 
     [HttpPost("make-bet")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -87,7 +95,6 @@ public class RateController : ControllerBase
         _logger.LogDebug("New rate creation is trigerred.");
         try
         {
-            var room = await _roomService.GetRoomByIdAsync(rateToCreate.RoomId);
             var userId = _accountService.GetGuidFromRequest(HttpContext);
 
             if (userId is null)
@@ -95,18 +102,18 @@ public class RateController : ControllerBase
 
             var account = await _accountService.GetAccountByUserIdAsync(userId);
 
-            if (account is null || room is null)
+            if (account is null)
                 return BadRequest("Incorrect data");
 
             if (!await _paymentService.WritingOffMoneyAsync(account.Id, rateToCreate.Amount))
                 return Conflict("Payment processing error");
 
-            var currencyId = await _currencyStateService.GetCurrencyIdByRoomId(room.Id);
+            var currencyId = await _currencyStateService.GetCurrencyIdByRoomId(rateToCreate.RoomId);
 
             if (currencyId == Guid.Empty)
                 return BadRequest("Incorrect data");
 
-            var rate = await _rateService.CreateRateAsync(rateToCreate, account.Id, currencyId, room);
+            var rate = await _rateService.CreateRateAsync(rateToCreate, account.Id, currencyId);
 
             _logger.LogInformation($"Rate has been created successfully ({rate.Id})");
             return Ok(rate);

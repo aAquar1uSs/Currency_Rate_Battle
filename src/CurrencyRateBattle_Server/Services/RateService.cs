@@ -9,20 +9,20 @@ namespace CurrencyRateBattleServer.Services;
 
 public class RateService : IRateService
 {
-    private readonly ILogger<IRateService> _logger;
+    private readonly ILogger<RateService> _logger;
 
     private readonly IServiceScopeFactory _scopeFactory;
 
     private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
-    public RateService(ILogger<IRateService> logger,
+    public RateService(ILogger<RateService> logger,
         IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
         _scopeFactory = scopeFactory;
     }
 
-    public async Task<Rate> CreateRateAsync(RateDto rate, Guid accountId, Guid currencyId, Room room)
+    public async Task<Rate> CreateRateAsync(RateDto rate, Guid accountId, Guid currencyId)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -32,8 +32,7 @@ public class RateService : IRateService
             RateCurrencyExchange = rate.UserCurrencyExchange,
             Amount = rate.Amount,
             SetDate = DateTime.UtcNow,
-            RoomId = room.Id,
-            SettleDate = room.Date,
+            RoomId = rate.RoomId,
             AccountId = accountId,
             CurrencyId = currencyId
         };
@@ -75,6 +74,8 @@ public class RateService : IRateService
             var rateExists = await db.Rooms.AnyAsync(r => r.Id == id);
             if (!rateExists)
                 throw new CustomException($"{nameof(Rate)} with Id={id} is not found.");
+
+            updatedRate.SettleDate = DateTime.UtcNow;
 
             _ = db.Rates.Update(updatedRate);
             _ = await db.SaveChangesAsync();

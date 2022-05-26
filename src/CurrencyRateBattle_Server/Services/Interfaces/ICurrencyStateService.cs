@@ -1,5 +1,4 @@
-﻿
-
+﻿using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Models;
 
 namespace CurrencyRateBattleServer.Services.Interfaces;
@@ -10,7 +9,7 @@ public interface ICurrencyStateService
 
     Task PrepareUpdateCurrencyRateAsync();
 
-    Task UpdateEmptyCurrencyStateAsync();
+    Task<List<CurrencyStateDto>> GetCurrencyStateAsync();
 
     Task GetCurrencyRatesFromNbuApiAsync();
 
