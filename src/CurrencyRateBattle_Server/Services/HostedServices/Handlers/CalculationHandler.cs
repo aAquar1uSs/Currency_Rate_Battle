@@ -30,8 +30,8 @@ public class CalculationHandler : AbstractHandler
                 else
                     rate.Payout = 0;
             }
-
         }
+
         return base.Handle(rates);
     }
 }

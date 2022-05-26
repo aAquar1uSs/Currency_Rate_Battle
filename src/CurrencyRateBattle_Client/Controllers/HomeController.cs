@@ -15,19 +15,25 @@ namespace CRBClient.Controllers
 
         private readonly IUserService _userService;
 
+        private readonly ICurrencyStateService _currencyStateService;
+
         private List<RoomViewModel> _roomStorage = new();
 
         public HomeController(ILogger<HomeController> logger,
-            IRoomService roomService, IUserService userService)
+            IRoomService roomService,
+            IUserService userService,
+            ICurrencyStateService currencyStateService)
         {
             _logger = logger;
             _roomService = roomService;
             _userService = userService;
+            _currencyStateService = currencyStateService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            ViewBag.Balance = _userService.GetUserBalanceAsync();
+            ViewBag.Balance = await _userService.GetUserBalanceAsync();
+
             return View();
         }
 
@@ -39,6 +45,8 @@ namespace CRBClient.Controllers
             try
             {
                 ViewBag.Balance = await _userService.GetUserBalanceAsync();
+                var currState = await _currencyStateService.GetCurrencyRatesAsync();
+                ViewBag.CurrencyRates = currState;
                 ViewBag.Title = "Main Page";
 
                 ViewData["CurrentNameFilter"] = searchNameString;

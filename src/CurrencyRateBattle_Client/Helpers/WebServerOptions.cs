@@ -30,4 +30,6 @@ public class WebServerOptions
     public string? AccountHistoryURL { get; set; }
 
     public string? MakeBetURL { get; set; }
+
+    public string? GetCurrencyRatesURL { get; set; }
 }

@@ -299,6 +299,9 @@
 .rooms {
     width: 700px;
     height: 600px;
+    padding-top: 20px;
+    margin-left: 3%;
+    margin-right: 3%;
 }
 
 .valuta {
@@ -327,12 +330,6 @@
     color: black;
     font-size: 11px;
     font-family: Tahoma;
-}
-
-.rooms {
-    padding-top: 20px;
-    margin-left: 8%;
-    margin-right: 30%;
 }
 
 .content_room {
@@ -366,6 +363,30 @@
     flex-direction: column;
     align-content: space-around;
     justify-content: space-around;
+}
+
+.currency-info{
+    padding: 15px;
+    height: 600px;
+    width: 300px;
+    opacity: 0.96;
+    background-color: rgb(32, 32, 32);
+    box-shadow: 0px 0px 21px 8px #000000;
+}
+
+.currency-info p{
+    margin-top: 10px;
+    color: yellow;
+    font-family: 'Montserrat', sans-serif;
+    text-align: center;
+}
+
+.currency-info h3{
+    text-align: center;
+    margin-top: 5px;
+    color: yellow;
+    font-family: 'Montserrat', sans-serif;
+    padding-bottom: 20px;
 }
 
 .stavka {

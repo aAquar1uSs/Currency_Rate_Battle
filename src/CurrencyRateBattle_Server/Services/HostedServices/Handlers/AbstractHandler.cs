@@ -14,11 +14,11 @@ public abstract class AbstractHandler : IHandler
         return handler;
     }
 
-    public virtual Task<List<Rate>> Handle(List<Rate> rate)
+    public virtual Task<List<Rate>> Handle(List<Rate> rates)
     {
         if (_nextHandler != null)
         {
-            return _nextHandler.Handle(rate);
+            return _nextHandler.Handle(rates);
         }
 
         return null;

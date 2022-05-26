@@ -2,24 +2,22 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using CRBClient.Services.Interfaces;
-using PagedList;
 using CRBClient.Helpers;
 using PagedListExtensions = X.PagedList.PagedListExtensions;
-using CRBClient.Services;
 using System.Globalization;
 
 namespace CRBClient.Controllers
 {
     public class BetController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<BetController> _logger;
 
         private readonly IUserService _userService;
 
         private readonly IUserRateService _userRateService;
 
 
-        public BetController(ILogger<HomeController> logger,
+        public BetController(ILogger<BetController> logger,
             IUserService userService, IUserRateService userRateService)
         {
             _logger = logger;

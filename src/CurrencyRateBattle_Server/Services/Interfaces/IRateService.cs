@@ -5,7 +5,7 @@ namespace CurrencyRateBattleServer.Services.Interfaces;
 
 public interface IRateService
 {
-    Task<Rate> CreateRateAsync(RateDto rate, Guid accountId, Guid currencyId, Room room);
+    Task<Rate> CreateRateAsync(RateDto rate, Guid accountId, Guid currencyId);
 
     Task<List<Rate>> GetRateByRoomIdAsync(Guid roomId);
 

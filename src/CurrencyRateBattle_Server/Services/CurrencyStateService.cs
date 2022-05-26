@@ -46,7 +46,7 @@ public class CurrencyStateService : ICurrencyStateService
 
         await GetCurrencyRatesFromNbuApiAsync();
 
-        await UpdateEmptyCurrencyStateAsync();
+        //await UpdateEmptyCurrencyStateAsync();
 
         foreach (var room in dbContext.Rooms.Where(room => room.Date.Date == DateTime.UtcNow.Date
                                                            && room.Date.Hour == DateTime.UtcNow.Hour))
@@ -58,18 +58,33 @@ public class CurrencyStateService : ICurrencyStateService
         }
     }
 
-    public async Task UpdateEmptyCurrencyStateAsync()
+    public async Task<List<CurrencyStateDto>> GetCurrencyStateAsync()
     {
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        var currStates = await dbContext.CurrencyStates
-            .Where(currState => currState.CurrencyExchangeRate == 0).ToListAsync();
-
-        foreach (var currencyState in currStates)
+        List<CurrencyStateDto> currencyStates = new();
+        if (_rateStorage is null)
+            return currencyStates;
+        await _semaphoreSlim.WaitAsync();
+        try
         {
-            await UpdateCurrencyRateByIdAsync(currencyState);
+            foreach (var curr in dbContext.Currencies)
+            {
+                var item = _rateStorage.Find(x => x.Currency.Equals(curr.CurrencyName));
+
+                if (item is null)
+                    continue;
+
+                currencyStates.Add(item);
+            }
         }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+
+        return currencyStates;
     }
 
     public async Task GetCurrencyRatesFromNbuApiAsync()

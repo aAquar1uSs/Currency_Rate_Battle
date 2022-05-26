@@ -12,13 +12,13 @@ namespace CRBClient.Controllers
 {
     public class RatingsController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<RatingsController> _logger;
 
         private readonly IRatingService _ratingService;
 
         private readonly IUserService _userService;
 
-        public RatingsController(ILogger<HomeController> logger,
+        public RatingsController(ILogger<RatingsController> logger,
             IRatingService ratingService,
             IUserService userService)
         {

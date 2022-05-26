@@ -1,5 +1,7 @@
 ﻿@model PaginationList<CRBClient.Models.RoomViewModel>
 @using System.Globalization
+@using System.Reflection.Emit
+@using CRBClient.Dto
 
 @{
     Layout = "~/Views/Shared/_BlackLayout.cshtml";
@@ -10,23 +12,23 @@
         <h2>Filters</h2>
         <br/>
         <div class="valuta">
-            @using (Html.BeginForm("Main","Home", FormMethod.Get))
+            @using (Html.BeginForm("Main", "Home", FormMethod.Get))
             {
                 <p>
-                    Find by currency name: <input type="text" name="searchNameString" value="@ViewData["CurrentNameFilter"]" />
+                    Find by currency name: <input type="text" name="searchNameString" value="@ViewData["CurrentNameFilter"]"/>
                 </p>
                 <p>
-                    Find by start date: <input type="text" name="searchStartDateString" value="@ViewData["CurrentStartDateFilter"]" />
+                    Find by start date: <input type="text" name="searchStartDateString" value="@ViewData["CurrentStartDateFilter"]"/>
                 </p>
                 <p>
-                    Find by end date: <input type="text" name="searchEndDateString" value="@ViewData["CurrentEndDateFilter"]" />
+                    Find by end date: <input type="text" name="searchEndDateString" value="@ViewData["CurrentEndDateFilter"]"/>
                 </p>
                 <p>
                     *please enter date in the format MM.dd.yyyy HH*
                 </p>
-                <br />
-                <input type="submit" value="Search" class="btn btn-success" />
-                <br />
+                <br/>
+                <input type="submit" value="Search" class="btn btn-success"/>
+                <br/>
                 <a asp-action="Main">Back to full list</a>
             }
         </div>
@@ -37,23 +39,26 @@
             <div class="content_room">
                 <div class="info_room">
                     <p>
-                        @Html.Label(room.СurrencyName + " ("
-                    + room.CurrencyExchangeRate
-                    + " "
-                    + room.UpdateRateTime.ToString("MMMM-dd HH:mm", CultureInfo.InvariantCulture) +
-                    ")")
+                        @Html.Label(room.СurrencyName)
                     </p>
                 </div>
                 <div class="info_time">
                     <p>@Html.Label(room.Date.ToString("MM/dd/yyyy HH:mm", CultureInfo.InvariantCulture))</p>
                 </div>
                 <div class="info_valut">
-                    <form asp-controller="Rate" asp-action="Index" asp-route-roomId="@room.Id" 
-                          asp-route-currencyName="@room.СurrencyName"  method="post">
+                    <form asp-controller="Rate" asp-action="Index" asp-route-roomId="@room.Id"
+                          asp-route-currencyName="@room.СurrencyName" method="post">
                         <button class="stavka" type="submit">Rate</button>
                     </form>
                 </div>
             </div>
+        }
+    </div>
+    <div class="currency-info">
+        <h3>Latest Exchange Rates</h3>
+        @foreach (var curr in ViewBag.CurrencyRates as List<CurrencyStateDto>)
+        {
+            <p>@curr.Currency (@Math.Round(curr.Rate, 2) -- @curr.Date)</p>
         }
     </div>
 </div>
@@ -67,7 +72,7 @@
        asp-route-searchNameString="@ViewData["CurrentNameFilter"]"
        asp-route-searchStartDateString="@ViewData["CurrentStartDateFilter"]"
        asp-route-searchEndDateString="@ViewData["CurrentEndDateFilter"]"
-       asp-route-page="@(Model.PageIndex-1)"
+       asp-route-page="@(Model.PageIndex - 1)"
        class="@prevDisabled">
         Previous
     </a>
@@ -76,7 +81,7 @@
        asp-route-searchNameString="@ViewData["CurrentNameFilter"]"
        asp-route-searchStartDateString="@ViewData["CurrentStartDateFilter"]"
        asp-route-searchEndDateString="@ViewData["CurrentEndDateFilter"]"
-       asp-route-page="@(Model.PageIndex+1)"
+       asp-route-page="@(Model.PageIndex + 1)"
        class="@nexDisabled">
         Next
     </a>

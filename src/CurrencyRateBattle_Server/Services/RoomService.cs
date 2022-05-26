@@ -9,7 +9,7 @@ namespace CurrencyRateBattleServer.Services;
 
 public class RoomService : IRoomService
 {
-    private readonly ILogger<IRoomService> _logger;
+    private readonly ILogger<RoomService> _logger;
 
     private readonly IServiceScopeFactory _scopeFactory;
 
