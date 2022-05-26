@@ -42,6 +42,11 @@ namespace CRBClient.Controllers
                 _logger.LogDebug("User is unauthorized");
                 return Redirect("/Account/Authorization");
             }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex.Message);
+                return View("Error");
+            }
         }
 
 
