@@ -25,23 +25,24 @@ public class RateController : Controller
 
     public async Task<IActionResult> Index(Guid roomId, string currencyName)
     {
-        ViewBag.Title = "Main Page";
+        ViewBag.Title = "Rate Page";
         ViewBag.Balance = await _userService.GetUserBalanceAsync();
         ViewBag.CurrencyName = currencyName;
         var rateModel = new RateViewModel
         {
-            RoomId = roomId,
+            RoomId = roomId
         };
 
         return View(rateModel);
     }
 
-    public async Task<IActionResult> MakeBet(RateViewModel rateViewModel)
+    public async Task<IActionResult> MakeBet(RateViewModel rateViewModel, string currencyName)
     {
         ViewBag.Title = "Make Bet";
         ViewBag.Balance = await _userService.GetUserBalanceAsync();
         try
         {
+            ViewBag.CurrencyName = currencyName;
             ViewBag.BalanceDecimal = await _userService.GetUserBalanceDecimalAsync();
             if (rateViewModel.Amount > ViewBag.BalanceDecimal)
             {

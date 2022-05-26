@@ -6,7 +6,7 @@
 
 <div class="rate">
     <p>UAH -> @ViewBag.CurrencyName</p>
-    <form asp-controller="Rate" asp-action="MakeBet" asp-route-roomId="@Model.RoomId" method="post">
+    <form asp-controller="Rate" asp-action="MakeBet" asp-route-roomId="@Model.RoomId" asp-route-currencyName="@ViewBag.CurrencyName" method="post">
         <div class="form-group">
             @Html.LabelFor(r => r.UserCurrencyExchange)
             @Html.TextBoxFor(r => r.UserCurrencyExchange,
