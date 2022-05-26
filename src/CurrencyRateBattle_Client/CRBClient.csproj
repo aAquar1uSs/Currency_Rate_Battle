@@ -25,5 +25,9 @@
   <ItemGroup>
     <Compile Remove="Services\Interfaces\ICommonService.cs" />
   </ItemGroup>
+    
+  <ItemGroup>
+    <Folder Include="logs" />
+  </ItemGroup>
 
 </Project>

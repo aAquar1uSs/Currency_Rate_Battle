@@ -125,6 +125,7 @@ public class RoomService : IRoomService
                 where room.IsClosed == isActive
                 select new
                 {
+                    room.Id,
                     curr.CurrencyName,
                     room.Date,
                     room.IsClosed,
@@ -136,6 +137,7 @@ public class RoomService : IRoomService
             {
                 roomDtoStorage.Add(new RoomDto
                 {
+                    Id = data.Id,
                     CurrencyExchangeRate = Math.Round(data.CurrencyExchangeRate, 2),
                     СurrencyName = data.CurrencyName,
                     Date = data.Date,
@@ -187,6 +189,7 @@ public class RoomService : IRoomService
                 where room.IsClosed == false
                 select new
                 {
+                    room.Id,
                     room.Date,
                     currencyState.CurrencyExchangeRate,
                     currencyState.CurrencyId,
@@ -207,6 +210,7 @@ public class RoomService : IRoomService
                 result.Add(
                     new RoomDto
                     {
+                        Id = room.Id,
                         CurrencyExchangeRate = room.CurrencyExchangeRate,
                         Date = room.Date,
                         СurrencyName = room.CurrencyName,

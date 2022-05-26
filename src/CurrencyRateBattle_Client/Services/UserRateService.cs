@@ -37,9 +37,19 @@ public class UserRateService : IUserRateService
     }
 
 
-    public string InsertUserRate()
+    public async Task InsertUserRateAsync(RateViewModel rateViewModel)
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.PostAsync(_options.MakeBetURL, rateViewModel);
+
+        if (response.StatusCode == HttpStatusCode.OK)
+            return;
+
+        var errorMsg = await response.Content.ReadAsStringAsync();
+        if (response.StatusCode == HttpStatusCode.Conflict)
+            throw new CustomException(errorMsg);
+
+        if (response.StatusCode == HttpStatusCode.BadRequest)
+            throw new CustomException(errorMsg);
     }
 
     public string UpdateUserRate()

@@ -8,9 +8,9 @@
 <div class="main">
     <div class="filter">
         <h2>Filters</h2>
-        <br />
+        <br/>
         <div class="valuta">
-            @using (Html.BeginForm("Main", "Home", FormMethod.Get))
+            @using (Html.BeginForm("Main","Home", FormMethod.Get))
             {
                 <p>
                     Find by currency name: <input type="text" name="searchNameString" value="@ViewData["CurrentNameFilter"]" />
@@ -48,9 +48,10 @@
                     <p>@Html.Label(room.Date.ToString("MM/dd/yyyy HH:mm", CultureInfo.InvariantCulture))</p>
                 </div>
                 <div class="info_valut">
-                    <button class="stavka">
-                        <p>stavka</p>
-                    </button>
+                    <form asp-controller="Rate" asp-action="Index" asp-route-roomId="@room.Id" 
+                          asp-route-currencyName="@room.СurrencyName"  method="post">
+                        <button class="stavka" type="submit">Rate</button>
+                    </form>
                 </div>
             </div>
         }
