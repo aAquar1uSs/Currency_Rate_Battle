@@ -27,8 +27,13 @@ namespace CRBClient.Controllers
             _userService = userService;
         }
 
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index(int? page, string sortOrder)
         {
+            ViewBag.CurrentSortOrder = sortOrder;
+            ViewBag.BetNoSortParm = sortOrder == "bets_no" ? "bets_no_asc" : "bets_no";
+            ViewBag.WonBetNoSortParm = sortOrder == "won_bets_no" ? "won_bets_no_asc" : "won_bets_no";
+            ViewBag.ProfitPercSortParm = sortOrder == "profitperc" ? "profitperc_asc" : "profitperc";
+            ViewBag.WonBetsPercSortParm = sortOrder == "wonbetsperc" ? "wonbetsperc_acs" : "wonbetsperc";
             var pageSize = 10;
             var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
             ViewBag.Balance = await _userService.GetUserBalanceAsync();
@@ -36,6 +41,38 @@ namespace CRBClient.Controllers
             try
             {
                 var ratingInfo = await _ratingService.GetUserRatings();
+
+                switch (sortOrder)
+                {
+                    case "bets_no":
+                        ratingInfo = ratingInfo.OrderByDescending(s => s.BetsNo).ToList();
+                        break;
+                    case "bets_no_asc":
+                        ratingInfo = ratingInfo.OrderBy(s => s.BetsNo).ToList();
+                        break;
+                    case "won_bets_no":
+                        ratingInfo = ratingInfo.OrderByDescending(s => s.WonBetsNo).ToList();
+                        break;
+                    case "won_bets_no_asc":
+                        ratingInfo = ratingInfo.OrderBy(s => s.WonBetsNo).ToList();
+                        break;
+                    case "profitperc":
+                        ratingInfo = ratingInfo.OrderByDescending(s => s.ProfitPercentage).ToList();
+                        break;
+                    case "profitperc_asc":
+                        ratingInfo = ratingInfo.OrderBy(s => s.ProfitPercentage).ToList();
+                        break;
+                    case "wonbetsperc":
+                        ratingInfo = ratingInfo.OrderByDescending(s => s.WonBetsPercentage).ToList();
+                        break;
+                    case "wonbetsperc_asc":
+                        ratingInfo = ratingInfo.OrderBy(s => s.WonBetsPercentage).ToList();
+                        break;
+                    default:
+                        ratingInfo = ratingInfo.OrderByDescending(s => s.BetsNo).ToList();
+                        break;
+                }
+
                 var ratings = PagedListExtensions.ToPagedList(ratingInfo, pageIndex, pageSize);
                 return View(ratings);
             }
