@@ -14,21 +14,31 @@ namespace CurrencyRateBattleServer.Controllers;
 [Authorize]
 public class RateController : ControllerBase
 {
-    private readonly ILogger<RoomController> _logger;
+    private readonly ILogger<RateController> _logger;
 
     private readonly IRateService _rateService;
 
     private readonly IAccountService _accountService;
 
-    public RateController(ILogger<RoomController> logger,
+    private readonly ICurrencyStateService _currencyStateService;
+
+    private readonly IPaymentService _paymentService;
+
+    private readonly IRoomService _roomService;
+
+    public RateController(ILogger<RateController> logger,
         IRateService rateService,
-        IAccountService accountService)
+        IAccountService accountService,
+        ICurrencyStateService currencyStateService,
+        IRoomService roomService,
+        IPaymentService paymentService)
     {
         _logger = logger;
-
         _rateService = rateService;
-
         _accountService = accountService;
+        _currencyStateService = currencyStateService;
+        _roomService = roomService;
+        _paymentService = paymentService;
     }
 
     [HttpGet]
@@ -61,19 +71,43 @@ public class RateController : ControllerBase
     [HttpGet("get-users-rating")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<IActionResult> GetUsersRatingAsyn()
+    public async Task<IActionResult> GetUsersRatingAsynс()
     {
-        return Ok(await _rateService.GetUsersRatingAsyn());
+        return Ok(await _rateService.GetUsersRatingAsync());
     }
 
 
-    [HttpPost]
-    public async Task<IActionResult> CreateRateAsync([FromBody] Rate rateToCreate)
+    [HttpPost("make-bet")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType((int)HttpStatusCode.Conflict)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    public async Task<IActionResult> CreateRateAsync([FromBody] RateDto rateToCreate)
     {
         _logger.LogDebug("New rate creation is trigerred.");
         try
         {
-            var rate = await _rateService.CreateRateAsync(rateToCreate);
+            var room = await _roomService.GetRoomByIdAsync(rateToCreate.RoomId);
+            var userId = _accountService.GetGuidFromRequest(HttpContext);
+
+            if (userId is null)
+                return BadRequest("Incorrect data");
+
+            var account = await _accountService.GetAccountByUserIdAsync(userId);
+
+            if (account is null || room is null)
+                return BadRequest("Incorrect data");
+
+            if (!await _paymentService.WritingOffMoneyAsync(account.Id, rateToCreate.Amount))
+                return Conflict("Payment processing error");
+
+            var currencyId = await _currencyStateService.GetCurrencyIdByRoomId(room.Id);
+
+            if (currencyId == Guid.Empty)
+                return BadRequest("Incorrect data");
+
+            var rate = await _rateService.CreateRateAsync(rateToCreate, account.Id, currencyId, room);
+
             _logger.LogInformation($"Rate has been created successfully ({rate.Id})");
             return Ok(rate);
         }

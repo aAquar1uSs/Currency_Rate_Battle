@@ -112,7 +112,7 @@ public class UserService : IUserService
         var response = await _httpClient.GetAsync(_options.GetBalanceURL ?? "");
         if (response.StatusCode == HttpStatusCode.OK)
         {
-            if (decimal.TryParse(response.Content.ReadAsStringAsync().Result, out var bal))
+            if (decimal.TryParse(response.Content.ReadAsStringAsync().Result.Replace('.',','), out var bal))
             {
                 balance = "BALANCE: " + bal.ToString("C", new CultureInfo("uk-UA"));
             }

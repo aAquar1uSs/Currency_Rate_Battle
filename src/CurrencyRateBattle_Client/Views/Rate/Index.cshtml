@@ -1,0 +1,26 @@
+﻿@model RateViewModel
+
+@{
+    Layout = "~/Views/Shared/_BlackLayout.cshtml";
+}
+<div class="rate">
+    <p>UAH -> @ViewBag.CurrencyName</p>
+    <form asp-controller="Rate" asp-action="MakeBet" asp-route-roomId="@Model.RoomId" method="post">
+        <div class="form-group">
+            @Html.LabelFor(r => r.UserCurrencyExchange)
+            @Html.TextBoxFor(r => r.UserCurrencyExchange,
+                new { data_val_regex_pattern = @"^\d+,\d{{0,{0}}}$", data_val_regex = "Invalid data" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(r => r.Amount)
+            @Html.TextBoxFor(r => r.Amount,
+                new { data_val_regex_pattern = @"^\d+,\d{{0,{0}}}$", data_val_regex = "Invalid data" })
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn-make-bet">Make a bet</button>
+        </div>
+    </form>
+    <div style="color: red; font-size: 18px; text-align: center">
+        @ViewData["ErrorMsg"]
+    </div>
+</div>

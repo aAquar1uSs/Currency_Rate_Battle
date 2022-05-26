@@ -27,6 +27,18 @@ public class CurrencyStateService : ICurrencyStateService
         _rateStorage = new List<CurrencyStateDto>();
     }
 
+    public async Task<Guid> GetCurrencyIdByRoomId(Guid roomId)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        var currId = await dbContext.CurrencyStates
+            .Where(currState => currState.RoomId == roomId)
+            .Select(currState => currState.CurrencyId).FirstAsync();
+
+        return currId;
+    }
+
     public async Task PrepareUpdateCurrencyRateAsync()
     {
         using var scope = _scopeFactory.CreateScope();

@@ -28,4 +28,6 @@ public class WebServerOptions
     public string? UserProfileURL { get; set; }
 
     public string? AccountHistoryURL { get; set; }
+
+    public string? MakeBetURL { get; set; }
 }

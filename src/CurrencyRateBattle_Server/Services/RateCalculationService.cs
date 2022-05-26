@@ -49,7 +49,7 @@ public class RateCalculationService : IRateCalculationService
 
             foreach (var rate in updatedRate)
             {
-                await _paymentService.ApportionCashByRateAsync(rate.AccountId, rate.Payout);
+                await _paymentService.ApportionCashByRateAsync(roomId, rate.AccountId, rate.Payout);
                 await _rateService.UpdateRateByRoomIdAsync(roomId, rate);
             }
         }

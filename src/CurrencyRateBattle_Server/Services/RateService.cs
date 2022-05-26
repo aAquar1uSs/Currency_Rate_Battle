@@ -22,15 +22,26 @@ public class RateService : IRateService
         _scopeFactory = scopeFactory;
     }
 
-    public async Task<Rate> CreateRateAsync(Rate rate)
+    public async Task<Rate> CreateRateAsync(RateDto rate, Guid accountId, Guid currencyId, Room room)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-        Rate newRate;
+
+        var newRate = new Rate
+        {
+            RateCurrencyExchange = rate.UserCurrencyExchange,
+            Amount = rate.Amount,
+            SetDate = DateTime.UtcNow,
+            RoomId = room.Id,
+            SettleDate = room.Date,
+            AccountId = accountId,
+            CurrencyId = currencyId
+        };
+
         await _semaphoreSlim.WaitAsync();
         try
         {
-            newRate = db.Rates.Add(rate).Entity;
+            newRate = db.Rates.Add(newRate).Entity;
             _ = await db.SaveChangesAsync();
         }
         finally
@@ -129,55 +140,54 @@ public class RateService : IRateService
         try
         {
             var result = from rate in db.Rates
-                         join curr in db.Currencies on rate.CurrencyId equals curr.Id
-                         join room in db.Rooms on rate.RoomId equals room.Id
-                         where rate.AccountId == accountId
-                         select new
-                         {
-                             rate.Id,
-                             rate.Amount,
-                             rate.SettleDate,
-                             rate.SetDate,
-                             rate.IsWon,
-                             rate.IsClosed,
-                             rate.AccountId,
-                             rate.RateCurrencyExchange,
-                             rate.Payout,
-                             room.Date,
-                             rate.RoomId,
-                             curr.CurrencyName,
-                             rate.CurrencyId
-                         };
+                join curr in db.Currencies on rate.CurrencyId equals curr.Id
+                join room in db.Rooms on rate.RoomId equals room.Id
+                where rate.AccountId == accountId
+                select new
+                {
+                    rate.Id,
+                    rate.Amount,
+                    rate.SettleDate,
+                    rate.SetDate,
+                    rate.IsWon,
+                    rate.IsClosed,
+                    rate.AccountId,
+                    rate.RateCurrencyExchange,
+                    rate.Payout,
+                    room.Date,
+                    rate.RoomId,
+                    curr.CurrencyName,
+                    rate.CurrencyId
+                };
 
             var query = from res in result
-                        join currState in db.CurrencyStates
-                            on new { res.RoomId, res.CurrencyId } equals new { currState.RoomId, currState.CurrencyId }
-                            into gj
-                        from subCurr in gj.DefaultIfEmpty()
-                        select new
-                        {
-                            res.Id,
-                            res.Amount,
-                            res.SettleDate,
-                            res.SetDate,
-                            res.IsWon,
-                            res.IsClosed,
-                            res.AccountId,
-                            res.RateCurrencyExchange,
-                            res.Payout,
-                            res.Date,
-                            res.RoomId,
-                            res.CurrencyName,
-                            res.CurrencyId,
-                            CurrencyExchangeRate = subCurr == null ? 0 : subCurr.CurrencyExchangeRate
-                        };
+                join currState in db.CurrencyStates
+                    on new {res.RoomId, res.CurrencyId} equals new {currState.RoomId, currState.CurrencyId}
+                    into gj
+                from subCurr in gj.DefaultIfEmpty()
+                select new
+                {
+                    res.Id,
+                    res.Amount,
+                    res.SettleDate,
+                    res.SetDate,
+                    res.IsWon,
+                    res.IsClosed,
+                    res.AccountId,
+                    res.RateCurrencyExchange,
+                    res.Payout,
+                    res.Date,
+                    res.RoomId,
+                    res.CurrencyName,
+                    res.CurrencyId,
+                    CurrencyExchangeRate = subCurr == null ? 0 : subCurr.CurrencyExchangeRate
+                };
 
 
             foreach (var data in query)
             {
                 betDtoStorage.Add(new BetDto
                 {
-
                     Id = data.Id,
                     SetDate = data.SetDate,
                     BetAmount = data.Amount,
@@ -205,11 +215,10 @@ public class RateService : IRateService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        Rate rateToDelete;
         await _semaphoreSlim.WaitAsync();
         try
         {
-            rateToDelete = await db.Rates.FindAsync(id);
+            var rateToDelete = await db.Rates.FindAsync(id);
             db.Rates.Remove(rateToDelete);
             _ = await db.SaveChangesAsync();
         }
@@ -219,7 +228,7 @@ public class RateService : IRateService
         }
     }
 
-    public async Task<List<UserRatingDto>> GetUsersRatingAsyn()
+    public async Task<List<UserRatingDto>> GetUsersRatingAsync()
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -229,67 +238,67 @@ public class RateService : IRateService
         try
         {
             var query1 = from rate in db.Rates
-                         join acc in db.Accounts on rate.AccountId equals acc.Id
-                         join user in db.Users on acc.UserId equals user.Id
-                         where rate.IsClosed
-                         select new
-                         {
-                             user.Email,
-                             rate.AccountId,
-                             BetAmount = rate.Amount,
-                             rate.IsWon,
-                             rate.SetDate,
-                             rate.Payout
-                         };
+                join acc in db.Accounts on rate.AccountId equals acc.Id
+                join user in db.Users on acc.UserId equals user.Id
+                where rate.IsClosed
+                select new
+                {
+                    user.Email,
+                    rate.AccountId,
+                    BetAmount = rate.Amount,
+                    rate.IsWon,
+                    rate.SetDate,
+                    rate.Payout
+                };
 
             var totalQuery = from res in query1
-                             group res by new { res.AccountId, res.Email }
+                group res by new {res.AccountId, res.Email}
                 into grp
-                             select new
-                             {
-                                 AccountId = grp.Key.AccountId,
-                                 Email = grp.Key.Email,
-                                 LastBetDate = grp.Max(s => s.SetDate),
-                                 TotalBetAmount = grp.Sum(s => s.BetAmount),
-                                 TotalPayout = grp.Sum(s => s.Payout),
-                                 TotalBetCount = grp.Count()
-                             };
+                select new
+                {
+                    AccountId = grp.Key.AccountId,
+                    Email = grp.Key.Email,
+                    LastBetDate = grp.Max(s => s.SetDate),
+                    TotalBetAmount = grp.Sum(s => s.BetAmount),
+                    TotalPayout = grp.Sum(s => s.Payout),
+                    TotalBetCount = grp.Count()
+                };
 
             var wonQuery = from res in query1
-                           where res.IsWon
-                           group res by new { res.AccountId, res.Email }
+                where res.IsWon
+                group res by new {res.AccountId, res.Email}
                 into grp
-                           select new
-                           {
-                               AccountId = grp.Key.AccountId,
-                               Email = grp.Key.Email,
-                               WonBetAmount = grp.Sum(s => s.BetAmount),
-                               WonPayout = grp.Sum(s => s.Payout),
-                               WonBetCount = grp.Count()
-                           };
+                select new
+                {
+                    AccountId = grp.Key.AccountId,
+                    Email = grp.Key.Email,
+                    WonBetAmount = grp.Sum(s => s.BetAmount),
+                    WonPayout = grp.Sum(s => s.Payout),
+                    WonBetCount = grp.Count()
+                };
 
             var query = from totalQ in totalQuery
-                        from wonQ in wonQuery.DefaultIfEmpty()
-                        where totalQ.AccountId == wonQ.AccountId
-                        select new { totalQ, wonQ };
+                from wonQ in wonQuery.DefaultIfEmpty()
+                where totalQ.AccountId == wonQ.AccountId
+                select new {totalQ, wonQ};
 
-            //TODO - we should disply accounts that have only lose bets
+            //TODO - we should display accounts that have only lose bets
             var query21 = from totalQ in totalQuery
-                          join wonQ in wonQuery
-                              on totalQ.AccountId equals wonQ.AccountId
-                              into gj
-                          from subCurr in gj.DefaultIfEmpty()
-                          select new
-                          {
-                              totalQ.AccountId,
-                              totalQ.TotalPayout,
-                              totalQ.TotalBetAmount,
-                              totalQ.TotalBetCount,
-                              totalQ.LastBetDate,
-                              WonBetAmount = subCurr == null ? 0 : subCurr.WonBetAmount,
-                              WonPayout = subCurr == null ? 0 : subCurr.WonPayout,
-                              WonBetCount = subCurr == null ? int.MinValue : subCurr.WonBetCount
-                          };
+                join wonQ in wonQuery
+                    on totalQ.AccountId equals wonQ.AccountId
+                    into gj
+                from subCurr in gj.DefaultIfEmpty()
+                select new
+                {
+                    totalQ.AccountId,
+                    totalQ.TotalPayout,
+                    totalQ.TotalBetAmount,
+                    totalQ.TotalBetCount,
+                    totalQ.LastBetDate,
+                    WonBetAmount = subCurr == null ? 0 : subCurr.WonBetAmount,
+                    WonPayout = subCurr == null ? 0 : subCurr.WonPayout,
+                    WonBetCount = subCurr == null ? int.MinValue : subCurr.WonBetCount
+                };
 
             foreach (var data in query)
             {

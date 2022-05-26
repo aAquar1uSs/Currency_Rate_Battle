@@ -1,4 +1,4 @@
-
+@import url('https://fonts.googleapis.com/css2?family=Mukta&display=swap');
 * {
     margin: 0 auto;
     padding: 0;
@@ -222,6 +222,66 @@
     display: flex;
 }
 
+.rate {
+    width: 600px;
+    height: 300px;
+    background-color: rgb(32, 32, 32);
+    box-shadow: 0px 0px 21px 8px #000000;
+    justify-content: center;
+}
+.form-group{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: yellow;
+    font-family: 'Mukta', sans-serif;
+    font-size: 25px;
+    margin-top: 10px;
+}
+.form-group input{
+    height: 30px;
+}
+    
+
+.rate form{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.rate p{
+    color: wheat;
+    text-align: center;
+}
+
+.btn-make-bet{
+    text-decoration: none;
+    display: inline-block;
+    width: 200px;
+    height: 43px;
+    line-height: 39px;
+    border-radius: 45px;
+    margin: 30px 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 3px;
+    font-weight: 600;
+    color: #524f4e;
+    background: lightgrey;
+    box-shadow: 0 8px 15px rgb(0 0 0 / 10%);
+    transition: .3s;
+    border: none;
+}
+
+.btn-make-bet:hover {
+    background: rgba(251, 255, 0, 0.932);
+    box-shadow: 0 4px 20px rgba(251, 255, 0, 0.932);
+    color: black;
+    transform: translateY(-2px);
+}
+
 .filter {
     padding: 15px;
     height: 600px;
@@ -246,6 +306,12 @@
     flex-direction: column;
     gap: 20px;
     color: yellow;
+}
+
+.valuta form{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .valuta input[type="submit"]{
@@ -331,6 +397,10 @@
 }
 
 .pagination-class {
+    
+    display: flex;
+    align-items: center;
+    font-size: 25px;
     margin-top: 3%;
     margin-left: 33%;
     opacity: 0.96;
@@ -351,39 +421,10 @@
     background: #000000;
 }
 
-
 .disabled{
     pointer-events: none; 
     cursor: default; 
     color: #888;
-}
-
-.ul.pagination {
-    padding: 0;
-    margin: 0;
-}
-
-ul.pagination li {
-    display: inline;
-}
-
-ul.pagination li a {
-    float: left;
-    padding: 8px 16px;
-    border: 1px yellow;
-    text-decoration: none;
-    color: yellow;
-    font-size: 20px;
-    transition: background-color .3s;
-}
-
-ul.pagination li a.active {
-    background-color: #4CAF50;
-    color: white;
-}
-
-ul.pagination li a:hover:not(.active) {
-    background-color: #ddd;
 }
 
 .tableBody {
@@ -530,4 +571,10 @@ tr:hover {
     .card .card-body {
         padding: 10px 20px;
     }
+}
+.pagination-class a{
+    opacity: 0.4;
+}
+.active:hover{
+    opacity: 1;
 }
