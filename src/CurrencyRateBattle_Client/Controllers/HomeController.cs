@@ -46,6 +46,7 @@ namespace CRBClient.Controllers
             {
                 ViewBag.Balance = await _userService.GetUserBalanceAsync();
                 var currState = await _currencyStateService.GetCurrencyRatesAsync();
+
                 ViewBag.CurrencyRates = currState;
                 ViewBag.Title = "Main Page";
 
@@ -54,14 +55,19 @@ namespace CRBClient.Controllers
                 ViewData["CurrentEndDateFilter"] = searchEndDateString;
 
                 var filter = new FilterDto(searchNameString, searchStartDateString, searchEndDateString);
-                _roomStorage = filter.CheckFilter() ?
-                    await _roomService.GetFilteredCurrencyAsync(filter)
+                _roomStorage = filter.CheckFilter()
+                    ? await _roomService.GetFilteredCurrencyAsync(filter)
                     : await _roomService.GetRoomsAsync(false);
             }
             catch (CustomException)
             {
                 _logger.LogDebug("User unauthorized");
                 return Redirect("/Account/Authorization");
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex.Message);
+                return View("Error", new ErrorViewModel {RequestId = ex.Message});
             }
 
             var pageSize = 4;
@@ -82,6 +88,11 @@ namespace CRBClient.Controllers
             {
                 _logger.LogDebug("User unauthorized");
                 return Redirect("/Account/Authorization");
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex.Message);
+                return View("Error", new ErrorViewModel {RequestId = ex.Message});
             }
 
             return View(accountInfo);
