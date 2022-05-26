@@ -16,17 +16,18 @@
     <div  class="tableBody">
     <table style="background-color: rgba(145, 145, 145, 0.8);">
         <tr>
-            <th style="width:20; text-align:right">@Html.Label("Date")</th>
+            <th style="width:40px; text-align:right">@Html.Label("Date")</th>
             <th style="width:20%; text-align:right">@Html.Label("Amount")</th>
-            <th style="width:20; text-align:center">@Html.Label("Is Credit")</th>
+            <th style="width:20px; text-align:center">@Html.Label("Is Credit")</th>
         </tr>
 
    @for (int i = 0; i < Model.Count; i++)
    {
        <tr>
-           <td style="text-align:right">@Model[i].Date.ToLocalTime().ToString()</td>
+           <td style="text-align:right">@Model[i].Date.ToLocalTime().ToString("MM.dd.yyyy HH:mm")</td>
            <td style="text-align:right">@Model[i].Amount.ToString("C", new CultureInfo("uk-UA"))</td>
-           <td style="text-align:right">@Model[i].IsCredit</td>
+           <td style="text-align:center">@Html.Raw("<input type='checkbox' " + (((Model[i].IsCredit == true) ? "checked" : "") + " disabled='disabled' />"))
+           </td>
        </tr>
 
    }
