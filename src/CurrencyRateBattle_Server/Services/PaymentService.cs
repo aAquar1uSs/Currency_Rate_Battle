@@ -11,7 +11,7 @@ public class PaymentService : IPaymentService
     private readonly IServiceScopeFactory _scopeFactory;
 
     private readonly IAccountHistoryService _accountHistoryService;
-    
+
     private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
     public PaymentService(ILogger<PaymentService> logger,
@@ -32,10 +32,17 @@ public class PaymentService : IPaymentService
 
         if (account is null || payout is null)
             return;
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            account.Amount += (decimal)payout;
 
-        account.Amount += (decimal)payout;
-
-        _ = await db.SaveChangesAsync();
+            _ = await db.SaveChangesAsync();
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
 
         await _accountHistoryService.CreateHistoryByValuesAsync(roomId, accountId,
             DateTime.UtcNow, (decimal)payout, true);

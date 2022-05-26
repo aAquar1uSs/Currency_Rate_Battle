@@ -38,18 +38,28 @@ public class RateController : Controller
     {
         try
         {
+            if (rateViewModel.Amount == 0 || rateViewModel.UserCurrencyExchange == 0)
+            {
+                ViewData["ErrorMsg"] = "Invalid data";
+                ViewBag.Balance = await _userService.GetUserBalanceAsync();
+                return View("Index", rateViewModel);
+            }
+
             await _rateService.InsertUserRateAsync(rateViewModel);
         }
         catch (CustomException ex)
         {
             _logger.LogDebug(ex.Message);
             ViewData["ErrorMsg"] = ex.Message;
+            ViewBag.Balance = await _userService.GetUserBalanceAsync();
             return View("Index", rateViewModel);
         }
         catch (HttpRequestException ex)
         {
             _logger.LogInformation(ex.Message);
-            //ToDo Error page
+            ViewData["ErrorMsg"] = "The request could not be processed";
+            ViewBag.Balance = await _userService.GetUserBalanceAsync();
+            return View("Index", rateViewModel);
         }
 
         return Redirect("/Home/Main");
