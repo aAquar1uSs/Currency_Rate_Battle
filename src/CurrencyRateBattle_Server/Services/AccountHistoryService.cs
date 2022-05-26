@@ -36,7 +36,7 @@ public class AccountHistoryService : IAccountHistoryService
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _ = _semaphoreSlim.Release();
         }
 
         return histories;
@@ -65,20 +65,21 @@ public class AccountHistoryService : IAccountHistoryService
         await _semaphoreSlim.WaitAsync();
         try
         {
-            await dbContext.AccountHistory.AddAsync(history);
-            await dbContext.SaveChangesAsync();
+            _ = await dbContext.AccountHistory.AddAsync(history);
+            _ = await dbContext.SaveChangesAsync();
+            _logger.LogInformation("New history record is added to the database.");
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _ = _semaphoreSlim.Release();
         }
     }
 
-    public async Task CreateHistoryByValuesAsync(Guid? roomId, Guid accountId, DateTime date, decimal amount, bool isCredit)
+    public async Task CreateHistoryByValuesAsync(Guid? roomId, Guid accountId, DateTime recordDate, decimal amount, bool isCredit)
     {
         var history = new AccountHistory()
         {
-            Date = date,
+            Date = recordDate,
             Amount = amount,
             IsCredit = isCredit,
             RoomId = roomId,
@@ -91,12 +92,12 @@ public class AccountHistoryService : IAccountHistoryService
         await _semaphoreSlim.WaitAsync();
         try
         {
-            await dbContext.AccountHistory.AddAsync(history);
-            await dbContext.SaveChangesAsync();
+            _ = await dbContext.AccountHistory.AddAsync(history);
+            _ = await dbContext.SaveChangesAsync();
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _ = _semaphoreSlim.Release();
         }
     }
 }

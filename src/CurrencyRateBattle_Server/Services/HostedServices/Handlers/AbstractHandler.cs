@@ -1,5 +1,5 @@
 ﻿using CurrencyRateBattleServer.Models;
-using CurrencyRateBattleServer.Services.HostedServices.Handlers.Interface;
+using CurrencyRateBattleServer.Services.HostedServices.Handlers.Interfaces;
 
 namespace CurrencyRateBattleServer.Services.HostedServices.Handlers;
 
@@ -9,18 +9,13 @@ public abstract class AbstractHandler : IHandler
 
     public IHandler SetNext(IHandler handler)
     {
-        this._nextHandler = handler;
+        _nextHandler = handler;
 
         return handler;
     }
 
     public virtual Task<List<Rate>> Handle(List<Rate> rates)
     {
-        if (_nextHandler != null)
-        {
-            return _nextHandler.Handle(rates);
-        }
-
-        return null;
+        return _nextHandler?.Handle(rates);
     }
 }

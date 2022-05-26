@@ -27,6 +27,9 @@ public class WinnerHandler : AbstractHandler
                 rate.Payout = rate.Amount;
                 return rates;
             }
+
+            default:
+                break;
         }
 
         using var scope = _scopeFactory.CreateScope();
@@ -37,7 +40,7 @@ public class WinnerHandler : AbstractHandler
 
         foreach (var rate in rates)
         {
-            rate.IsWon = rate.RateCurrencyExchange == currState.CurrencyExchangeRate;
+            rate.IsWon = currState != null && rate.RateCurrencyExchange == currState.CurrencyExchangeRate;
             rate.IsClosed = true;
         }
 

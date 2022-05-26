@@ -13,7 +13,8 @@ public class CalculationHandler : AbstractHandler
         if (winnerCount == 1)
         {
             var rate = rates.FirstOrDefault(rate => rate.IsWon);
-            rate.Payout = rate.Amount + (0.5m * (commonBank - rate.Amount));
+            if (rate != null)
+                rate.Payout = rate.Amount + (0.5m * (commonBank - rate.Amount));
         }
         else
         {
@@ -25,10 +26,7 @@ public class CalculationHandler : AbstractHandler
 
             foreach (var rate in rates)
             {
-                if (rate.IsWon)
-                    rate.Payout = rate.Amount * kef;
-                else
-                    rate.Payout = 0;
+                rate.Payout = rate.IsWon ? rate.Amount * kef : 0;
             }
         }
 

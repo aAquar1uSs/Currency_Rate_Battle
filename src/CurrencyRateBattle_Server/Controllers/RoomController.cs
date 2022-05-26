@@ -35,7 +35,7 @@ public class RoomController : ControllerBase
 
     // GET api/rooms/{id}
     [HttpGet("{id}")]
-    public async Task<Room> GetRoomByIdAsync(Guid id)
+    public async Task<Room?> GetRoomByIdAsync(Guid id)
     {
         var room = await _roomService.GetRoomByIdAsync(id);
         return room;

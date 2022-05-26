@@ -5,8 +5,6 @@ using CurrencyRateBattleServer.Managers;
 using CurrencyRateBattleServer.Managers.Interfaces;
 using CurrencyRateBattleServer.Services;
 using CurrencyRateBattleServer.Services.HostedServices;
-using CurrencyRateBattleServer.Services.HostedServices.Handlers;
-using CurrencyRateBattleServer.Services.HostedServices.Handlers.Interface;
 using CurrencyRateBattleServer.Services.Interfaces;
 using CurrencyRateBattleServer.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,7 +20,7 @@ var services = builder.Services;
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen(opt =>
 {
-    opt.SwaggerDoc("v1", new OpenApiInfo {Title = "CBR API", Version = "v1"});
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "CBR API", Version = "v1" });
     opt.AddSecurityDefinition("Bearer",
         new OpenApiSecurityScheme
         {

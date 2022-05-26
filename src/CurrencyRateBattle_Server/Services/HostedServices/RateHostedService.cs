@@ -2,9 +2,9 @@
 
 namespace CurrencyRateBattleServer.Services.HostedServices;
 
-public class RateHostedService :  IHostedService, IDisposable
+public class RateHostedService : IHostedService, IDisposable
 {
-    private Timer _timer;
+    private Timer? _timer;
 
     private readonly ILogger<RateHostedService> _logger;
 
@@ -29,17 +29,20 @@ public class RateHostedService :  IHostedService, IDisposable
 
     private async void Callback(object? state)
     {
-       await _roomService.CheckRoomsStateAsync();
+        await _roomService.CheckRoomsStateAsync();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _timer.Change(Timeout.Infinite, 0);
+        if (_timer != null)
+            _ = _timer.Change(Timeout.Infinite, 0);
         return Task.CompletedTask;
     }
 
     public void Dispose()
     {
-        _timer.Dispose();
+        if (_timer != null)
+            _timer.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

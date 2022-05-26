@@ -1,6 +1,6 @@
 ﻿using CurrencyRateBattleServer.Models;
 
-namespace CurrencyRateBattleServer.Services.HostedServices.Handlers.Interface;
+namespace CurrencyRateBattleServer.Services.HostedServices.Handlers.Interfaces;
 
 public interface IHandler
 {

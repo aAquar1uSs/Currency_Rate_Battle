@@ -1,4 +1,5 @@
-﻿using CurrencyRateBattleServer.Data;
+﻿using System.Globalization;
+using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Models;
@@ -41,7 +42,7 @@ public class RoomService : IRoomService
 
     public async Task CreateRoomAsync(CurrencyRateBattleContext db, Currency curr)
     {
-        var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00"),
+        var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
             "MM.dd.yyyy HH:mm:ss", null);
 
         var currState = new CurrencyState
