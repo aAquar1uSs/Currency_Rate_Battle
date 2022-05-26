@@ -6,9 +6,9 @@ public class UserDto
 {
     [Required]
     [EmailAddress]
-    public string Email { get; set; }
+    public string Email { get; set; } = default!;
 
     [Required]
     [StringLength(30, MinimumLength = 6)]
-    public string Password { get; set; }
+    public string Password { get; set; } = default!;
 }

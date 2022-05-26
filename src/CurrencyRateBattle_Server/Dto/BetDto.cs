@@ -6,7 +6,7 @@ public class BetDto
 
     public DateTime? SettleDate { get; set; }
 
-    public string СurrencyName { get; set; }
+    public string СurrencyName { get; set; } = default!;
 
     public DateTime RoomDate { get; set; }
 

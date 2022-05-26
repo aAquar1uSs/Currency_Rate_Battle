@@ -6,7 +6,7 @@ using CRBClient.Services.Interfaces;
 
 namespace CRBClient.Services;
 
-public class CRBServerHttpClient : ICRBServerHttpClient
+public class CRBServerHttpClient : ICRBServerHttpClient, IDisposable
 {
     private readonly WebServerOptions _options;
     private readonly HttpClient _httpClient;
@@ -62,5 +62,14 @@ public class CRBServerHttpClient : ICRBServerHttpClient
     public void ClearHeader()
     {
         _httpClient.DefaultRequestHeaders.Clear();
+    }
+
+    public void Dispose()
+    {
+        if (_httpClient != null)
+        {
+            _httpClient.Dispose();
+        }
+        GC.SuppressFinalize(this);
     }
 }

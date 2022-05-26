@@ -3,8 +3,6 @@
 namespace CRBClient.Services.Interfaces;
 public interface IUserService
 {
-    string UpdateUserInfo();
-
     Task RegisterUserAsync(UserViewModel user);
 
     Task LoginUserAsync(UserViewModel user);
@@ -14,6 +12,8 @@ public interface IUserService
     Task<List<AccountHistoryViewModel>> GetAccountHistoryAsync();
 
     Task<string> GetUserBalanceAsync();
+
+    Task<decimal> GetUserBalanceDecimalAsync();
 
     public void Logout();
 }

@@ -119,25 +119,29 @@ public class CurrencyStateService : ICurrencyStateService
         var currencyName = (await db.Currencies
             .FirstOrDefaultAsync(curr => curr.Id == currencyState.CurrencyId))?.CurrencyName;
 
-        var currencyDto = _rateStorage.FirstOrDefault(curr => curr.Currency.Equals(currencyName,
-            StringComparison.Ordinal));
-
-        var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
-            "MM.dd.yyyy HH:mm:ss", null);
-
-        await _semaphoreSlim.WaitAsync();
-        try
+        if (_rateStorage != null)
         {
-            currencyState.Date = currentDate;
-            currencyState.CurrencyExchangeRate = Math.Round(currencyDto.Rate, 2);
+            var currencyDto = _rateStorage.FirstOrDefault(curr => curr.Currency == currencyName);
+            if (currencyDto != null)
+            {
+                var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
+                "MM.dd.yyyy HH:mm:ss", null);
 
-            _ = db.CurrencyStates.Update(currencyState);
+                await _semaphoreSlim.WaitAsync();
+                try
+                {
+                    currencyState.Date = currentDate;
+                    currencyState.CurrencyExchangeRate = Math.Round(currencyDto.Rate, 2);
 
-            await db.SaveChangesAsync();
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
+                    _ = db.CurrencyStates.Update(currencyState);
+
+                    _ = await db.SaveChangesAsync();
+                }
+                finally
+                {
+                    _ = _semaphoreSlim.Release();
+                }
+            }
         }
     }
 }

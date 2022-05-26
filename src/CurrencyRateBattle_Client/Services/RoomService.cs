@@ -42,7 +42,7 @@ public class RoomService : IRoomService
 
     public async Task<List<RoomViewModel>> GetFilteredCurrencyAsync(FilterDto filter)
     {
-        var responseTask = await _httpClient.PostAsync(_options.FilterURL, filter);
+        var responseTask = await _httpClient.PostAsync(_options.FilterURL ?? "", filter);
 
         if (responseTask.StatusCode == HttpStatusCode.OK)
         {

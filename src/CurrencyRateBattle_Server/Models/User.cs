@@ -10,10 +10,10 @@ public sealed class User
 
     [Required]
     [EmailAddress]
-    public string Email { get; set; }
+    public string Email { get; set; } = default!;
 
     [Required]
-    public string Password { get; set; }
+    public string Password { get; set; } = default!;
 
-    public Account Account { get; set; }
+    public Account Account { get; set; } = default!;
 }

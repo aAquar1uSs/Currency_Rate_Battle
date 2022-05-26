@@ -20,26 +20,18 @@ public class UserRateService : IUserRateService
         _logger = logger;
     }
 
-    public string DeleteUserRate()
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<List<BetViewModel>> GetUserRates()
     {
         var response = await _httpClient.GetAsync(_options.GetUserBetsURL ?? "");
-        if (response.StatusCode == HttpStatusCode.OK)
-        {
-            return await response.Content.ReadAsAsync<List<BetViewModel>>();
-        }
-
-        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : new List<BetViewModel>();
+        return response.StatusCode == HttpStatusCode.OK
+            ? await response.Content.ReadAsAsync<List<BetViewModel>>()
+            : response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : new List<BetViewModel>();
     }
 
 
     public async Task InsertUserRateAsync(RateViewModel rateViewModel)
     {
-        var response = await _httpClient.PostAsync(_options.MakeBetURL, rateViewModel);
+        var response = await _httpClient.PostAsync(_options.MakeBetURL ?? "", rateViewModel);
 
         if (response.StatusCode == HttpStatusCode.OK)
             return;
@@ -52,8 +44,4 @@ public class UserRateService : IUserRateService
             throw new CustomException(errorMsg);
     }
 
-    public string UpdateUserRate()
-    {
-        throw new NotImplementedException();
-    }
 }

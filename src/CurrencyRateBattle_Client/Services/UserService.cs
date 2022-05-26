@@ -69,11 +69,6 @@ public class UserService : IUserService
         }
     }
 
-    public string UpdateUserInfo()
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<AccountInfoViewModel> GetAccountInfoAsync()
     {
         var response = await _httpClient.GetAsync(_options.UserProfileURL ?? "");
@@ -82,12 +77,7 @@ public class UserService : IUserService
             return await response.Content.ReadAsAsync<AccountInfoViewModel>();
         }
 
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-        {
-            throw new CustomException();
-        }
-
-        return new AccountInfoViewModel();
+        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : new AccountInfoViewModel();
     }
 
     public async Task<List<AccountHistoryViewModel>> GetAccountHistoryAsync()
@@ -98,12 +88,7 @@ public class UserService : IUserService
             return await response.Content.ReadAsAsync<List<AccountHistoryViewModel>>();
         }
 
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-        {
-            throw new CustomException();
-        }
-
-        return new List<AccountHistoryViewModel>();
+        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : new List<AccountHistoryViewModel>();
     }
 
     public async Task<string> GetUserBalanceAsync()
@@ -112,9 +97,24 @@ public class UserService : IUserService
         var response = await _httpClient.GetAsync(_options.GetBalanceURL ?? "");
         if (response.StatusCode == HttpStatusCode.OK)
         {
-            if (decimal.TryParse(response.Content.ReadAsStringAsync().Result.Replace('.',','), out var bal))
+            if (decimal.TryParse(response.Content.ReadAsStringAsync().Result.ToString(), out var bal))
             {
                 balance = "BALANCE: " + bal.ToString("C", new CultureInfo("uk-UA"));
+            }
+        }
+
+        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : balance;
+    }
+
+    public async Task<decimal> GetUserBalanceDecimalAsync()
+    {
+        var balance = 0M;
+        var response = await _httpClient.GetAsync(_options.GetBalanceURL ?? "");
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            if (decimal.TryParse(response.Content.ReadAsStringAsync().Result, out var bal))
+            {
+                balance = bal;
             }
         }
 

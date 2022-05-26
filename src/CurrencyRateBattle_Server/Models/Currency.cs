@@ -11,13 +11,13 @@ public class Currency
 
     [Required]
     [Column(TypeName = "varchar(3)")]
-    public string CurrencyName { get; set; }
+    public string CurrencyName { get; set; } = default!;
 
     [Column(TypeName = "varchar(3)")]
-    public string CurrencySymbol { get; set; }
+    public string CurrencySymbol { get; set; } = default!;
 
     [Required]
     [Column(TypeName = "varchar(128)")]
-    public string Description { get; set; }
+    public string Description { get; set; } = default!;
 
 }

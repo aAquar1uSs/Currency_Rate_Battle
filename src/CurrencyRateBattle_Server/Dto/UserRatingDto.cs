@@ -19,7 +19,7 @@ public class UserRatingDto
     //Percentage of won bets
     public decimal WonBetsPercentage { get; set; }
 
-    public string Email { get; set; }
+    public string Email { get; set; } = default!;
 
     public DateTime LastBetDate { get; set; }
 

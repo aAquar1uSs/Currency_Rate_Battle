@@ -24,6 +24,7 @@ public class RateController : Controller
 
     public async Task<IActionResult> Index(Guid roomId, string currencyName)
     {
+        ViewBag.Title = "Main Page";
         ViewBag.Balance = await _userService.GetUserBalanceAsync();
         ViewBag.CurrencyName = currencyName;
         var rateModel = new RateViewModel
@@ -36,12 +37,19 @@ public class RateController : Controller
 
     public async Task<IActionResult> MakeBet(RateViewModel rateViewModel)
     {
+        ViewBag.Title = "Make Bet";
+        ViewBag.Balance = await _userService.GetUserBalanceAsync();
         try
         {
-            if (rateViewModel.Amount == 0 || rateViewModel.UserCurrencyExchange == 0)
+            ViewBag.BalanceDecimal = await _userService.GetUserBalanceDecimalAsync();
+            if (rateViewModel.Amount > ViewBag.BalanceDecimal)
+            {
+                ViewData["ErrorMsg"] = "You don't have enough funds on your account for making this bet.";
+                return View("Index", rateViewModel);
+            }
+            if (rateViewModel.Amount <= 0 || rateViewModel.UserCurrencyExchange <= 0)
             {
                 ViewData["ErrorMsg"] = "Invalid data";
-                ViewBag.Balance = await _userService.GetUserBalanceAsync();
                 return View("Index", rateViewModel);
             }
 

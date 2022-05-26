@@ -6,19 +6,19 @@ namespace CurrencyRateBattleServer.Data;
 
 public class CurrencyRateBattleContext : DbContext
 {
-    public DbSet<User> Users { get; set; }
+    public DbSet<User> Users { get; set; } = default!;
 
-    public DbSet<Account> Accounts { get; set; }
+    public DbSet<Account> Accounts { get; set; } = default!;
 
-    public DbSet<AccountHistory> AccountHistory { get; set; }
+    public DbSet<AccountHistory> AccountHistory { get; set; } = default!;
 
-    public DbSet<Rate> Rates { get; set; }
+    public DbSet<Rate> Rates { get; set; } = default!;
 
-    public DbSet<Room> Rooms { get; set; }
+    public DbSet<Room> Rooms { get; set; } = default!;
 
-    public DbSet<Currency> Currencies { get; set; }
+    public DbSet<Currency> Currencies { get; set; } = default!;
 
-    public DbSet<CurrencyState> CurrencyStates { get; set; }
+    public DbSet<CurrencyState> CurrencyStates { get; set; } = default!;
 
     public CurrencyRateBattleContext(DbContextOptions<CurrencyRateBattleContext> options)
     : base(options)

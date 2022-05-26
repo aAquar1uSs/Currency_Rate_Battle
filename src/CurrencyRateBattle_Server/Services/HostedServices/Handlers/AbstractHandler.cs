@@ -5,7 +5,7 @@ namespace CurrencyRateBattleServer.Services.HostedServices.Handlers;
 
 public abstract class AbstractHandler : IHandler
 {
-    private IHandler _nextHandler;
+    private IHandler? _nextHandler;
 
     public IHandler SetNext(IHandler handler)
     {
@@ -14,8 +14,8 @@ public abstract class AbstractHandler : IHandler
         return handler;
     }
 
-    public virtual Task<List<Rate>> Handle(List<Rate> rates)
+    public virtual Task<List<Rate>>? Handle(List<Rate> rate)
     {
-        return _nextHandler?.Handle(rates);
+        return _nextHandler?.Handle(rate);
     }
 }

@@ -3,6 +3,7 @@
 @{
     Layout = "~/Views/Shared/_BlackLayout.cshtml";
 }
+
 <div class="rate">
     <p>UAH -> @ViewBag.CurrencyName</p>
     <form asp-controller="Rate" asp-action="MakeBet" asp-route-roomId="@Model.RoomId" method="post">

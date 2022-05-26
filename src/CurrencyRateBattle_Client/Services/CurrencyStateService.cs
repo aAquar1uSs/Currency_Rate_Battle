@@ -26,7 +26,7 @@ public class CurrencyStateService : ICurrencyStateService
 
     public async Task<List<CurrencyStateDto>> GetCurrencyRatesAsync()
     {
-        var response = await _httpClient.GetAsync(_options.GetCurrencyRatesURL);
+        var response = await _httpClient.GetAsync(_options.GetCurrencyRatesURL ?? "");
 
         List<CurrencyStateDto>? currencyStates = null;
         if (response.StatusCode == HttpStatusCode.OK)
