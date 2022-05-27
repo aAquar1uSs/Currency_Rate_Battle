@@ -63,6 +63,7 @@ public class PaymentService : IPaymentService
 
         if (account.Amount == 0 || amount  > account.Amount)
             return false;
+
         await _semaphoreSlim.WaitAsync();
         try
         {

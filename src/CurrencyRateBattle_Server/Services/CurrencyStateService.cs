@@ -18,7 +18,9 @@ public class CurrencyStateService : ICurrencyStateService
 
     private readonly IServiceScopeFactory _scopeFactory;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new(2, 2);
+    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
+
+    private readonly SemaphoreSlim _semaphoreSlimHosted = new(1, 1);
 
     public CurrencyStateService(ILogger<CurrencyStateService> logger,
         IServiceScopeFactory scopeFactory)
@@ -144,7 +146,7 @@ public class CurrencyStateService : ICurrencyStateService
             DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
             "MM.dd.yyyy HH:mm:ss", null);
 
-        await _semaphoreSlim.WaitAsync();
+        await _semaphoreSlimHosted.WaitAsync();
         try
         {
             currencyState.Date = currentDate;
@@ -156,7 +158,7 @@ public class CurrencyStateService : ICurrencyStateService
         }
         finally
         {
-            _ = _semaphoreSlim.Release();
+            _ = _semaphoreSlimHosted.Release();
         }
     }
 }

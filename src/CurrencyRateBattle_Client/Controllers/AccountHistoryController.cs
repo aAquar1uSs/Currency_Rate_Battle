@@ -35,7 +35,7 @@ namespace CRBClient.Controllers
                 var accountHistories = PagedListExtensions.ToPagedList(accountHistoryInfo, pageIndex, pageSize);
                 return View(accountHistories);
             }
-            catch (CustomException)
+            catch (GeneralException)
             {
                 _logger.LogDebug("User unauthorized");
                 return Redirect("/Account/Authorization");

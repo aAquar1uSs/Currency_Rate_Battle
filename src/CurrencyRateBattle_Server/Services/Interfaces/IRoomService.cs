@@ -1,5 +1,4 @@
-﻿using CurrencyRateBattleServer.Data;
-using CurrencyRateBattleServer.Dto;
+﻿using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Models;
 
 namespace CurrencyRateBattleServer.Services.Interfaces;
@@ -8,7 +7,7 @@ public interface IRoomService
 {
     Task GenerateRoomsByCurrencyCountAsync();
 
-    Task CreateRoomAsync(CurrencyRateBattleContext db, Currency curr);
+    Task CreateRoomAsync(Currency curr);
 
     Task UpdateRoomAsync(Guid id, Room updatedRoom);
 

@@ -58,7 +58,7 @@ public class RateController : Controller
 
             await _rateService.InsertUserRateAsync(rateViewModel);
         }
-        catch (CustomException ex)
+        catch (GeneralException ex)
         {
             _logger.LogDebug(ex.Message);
             ViewData["ErrorMsg"] = ex.Message;

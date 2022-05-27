@@ -59,7 +59,7 @@ public class HomeController : Controller
                 ? await _roomService.GetFilteredCurrencyAsync(filter)
                 : await _roomService.GetRoomsAsync(false);
         }
-        catch (CustomException)
+        catch (GeneralException)
         {
             _logger.LogDebug("User unauthorized");
             return Redirect("/Account/Authorization");
@@ -84,7 +84,7 @@ public class HomeController : Controller
 
             accountInfo = await _userService.GetAccountInfoAsync();
         }
-        catch (CustomException)
+        catch (GeneralException)
         {
             _logger.LogDebug("User unauthorized");
             return Redirect("/Account/Authorization");
