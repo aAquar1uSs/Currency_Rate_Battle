@@ -18,7 +18,7 @@ public class CurrencyStateService : ICurrencyStateService
 
     private readonly IServiceScopeFactory _scopeFactory;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
+    private readonly SemaphoreSlim _semaphoreSlim = new(2, 2);
 
     public CurrencyStateService(ILogger<CurrencyStateService> logger,
         IServiceScopeFactory scopeFactory)
@@ -47,16 +47,28 @@ public class CurrencyStateService : ICurrencyStateService
 
         await GetCurrencyRatesFromNbuApiAsync();
 
-        //await UpdateEmptyCurrencyStateAsync();
-
-        foreach (var room in dbContext.Rooms.Where(room => room.Date.Date == DateTime.UtcNow.Date
-                                                           && room.Date.Hour == DateTime.UtcNow.Hour))
+        foreach (var room in dbContext.Rooms)
         {
-            var currencyState = await dbContext.CurrencyStates
-                .FirstOrDefaultAsync(currState => currState.RoomId == room.Id);
-            if (currencyState != null)
-                await UpdateCurrencyRateByIdAsync(currencyState);
+            if (room.Date.Date == DateTime.UtcNow.Date
+                && room.Date.Hour == DateTime.UtcNow.Hour)
+            {
+                var currencyState = await GetCurrencyStateByRoomIdAsync(room.Id);
+
+                if (currencyState != null)
+                    await UpdateCurrencyRateByIdAsync(currencyState);
+            }
         }
+    }
+
+    public async Task<CurrencyState?> GetCurrencyStateByRoomIdAsync(Guid roomId)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        var currencyState = await db.CurrencyStates
+            .FirstOrDefaultAsync(currState => currState.RoomId == roomId);
+
+        return currencyState;
     }
 
     public async Task<List<CurrencyStateDto>> GetCurrencyStateAsync()
@@ -67,6 +79,7 @@ public class CurrencyStateService : ICurrencyStateService
         List<CurrencyStateDto> currencyStates = new();
         if (_rateStorage is null)
             return currencyStates;
+
         await _semaphoreSlim.WaitAsync();
         try
         {
@@ -119,29 +132,31 @@ public class CurrencyStateService : ICurrencyStateService
         var currencyName = (await db.Currencies
             .FirstOrDefaultAsync(curr => curr.Id == currencyState.CurrencyId))?.CurrencyName;
 
-        if (_rateStorage != null)
+        if (_rateStorage is null)
+            return;
+
+        var currencyDto = _rateStorage.FirstOrDefault(curr => curr.Currency == currencyName);
+
+        if (currencyDto is null)
+            return;
+
+        var currentDate = DateTime.ParseExact(
+            DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
+            "MM.dd.yyyy HH:mm:ss", null);
+
+        await _semaphoreSlim.WaitAsync();
+        try
         {
-            var currencyDto = _rateStorage.FirstOrDefault(curr => curr.Currency == currencyName);
-            if (currencyDto != null)
-            {
-                var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
-                "MM.dd.yyyy HH:mm:ss", null);
+            currencyState.Date = currentDate;
+            currencyState.CurrencyExchangeRate = Math.Round(currencyDto.Rate, 2);
 
-                await _semaphoreSlim.WaitAsync();
-                try
-                {
-                    currencyState.Date = currentDate;
-                    currencyState.CurrencyExchangeRate = Math.Round(currencyDto.Rate, 2);
+            _ = db.CurrencyStates.Update(currencyState);
 
-                    _ = db.CurrencyStates.Update(currencyState);
-
-                    _ = await db.SaveChangesAsync();
-                }
-                finally
-                {
-                    _ = _semaphoreSlim.Release();
-                }
-            }
+            _ = await db.SaveChangesAsync();
+        }
+        finally
+        {
+            _ = _semaphoreSlim.Release();
         }
     }
 }

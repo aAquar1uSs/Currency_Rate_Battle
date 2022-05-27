@@ -58,7 +58,7 @@ public class AccountController : ControllerBase
 
             return Ok(tokens.Token);
         }
-        catch (CustomException ex)
+        catch (GeneralException ex)
         {
             // return error message if there was an exception
             return BadRequest(new {message = ex.Message});

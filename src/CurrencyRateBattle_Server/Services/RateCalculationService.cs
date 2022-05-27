@@ -40,7 +40,7 @@ public class RateCalculationService : IRateCalculationService
         var rates = await _rateService.GetRateByRoomIdAsync(roomId);
 
         if (rates.Count == 0)
-            return;
+            throw new GeneralException();
 
         try
         {
@@ -53,7 +53,7 @@ public class RateCalculationService : IRateCalculationService
                 await _rateService.UpdateRateByRoomIdAsync(roomId, rate);
             }
         }
-        catch (CustomException ex)
+        catch (GeneralException ex)
         {
             _logger.LogDebug(ex.Message);
         }

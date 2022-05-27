@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Net.Sockets;
 using CRBClient.Helpers;
 using CRBClient.Models;
 using CRBClient.Services.Interfaces;
@@ -43,6 +44,11 @@ public class AccountController : Controller
             _logger.LogError(ex.Message);
             return View("Error", new ErrorViewModel {RequestId = ex.Message});
         }
+        catch(SocketException ex)
+        {
+            _logger.LogError(ex.Message);
+            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+        }
 
         return Redirect("/Home/Main");
     }
@@ -61,6 +67,11 @@ public class AccountController : Controller
             return View("Authorization");
         }
         catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex.Message);
+            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+        }
+        catch(SocketException ex)
         {
             _logger.LogError(ex.Message);
             return View("Error", new ErrorViewModel {RequestId = ex.Message});

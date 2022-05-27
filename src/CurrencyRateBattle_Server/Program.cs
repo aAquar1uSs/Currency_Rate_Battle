@@ -110,8 +110,6 @@ host.ConfigureAppConfiguration(app =>
             .Configure<WebServerOptions>(builder.Configuration.GetSection(WebServerOptions.SectionName));
 
         _ = service.AddControllers();
-
-        //_ = service.AddScoped<CurrencyRateBattleContext>();
     });
 
 var app = builder.Build();

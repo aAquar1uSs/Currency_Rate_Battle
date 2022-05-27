@@ -16,7 +16,7 @@ public class RoomService : IRoomService
 
     private readonly IRateCalculationService _rateCalculationService;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
+    private readonly SemaphoreSlim _semaphoreSlim = new(2, 2);
 
     public RoomService(ILogger<RoomService> logger,
         IRateCalculationService rateCalculationService,
@@ -42,7 +42,8 @@ public class RoomService : IRoomService
 
     public async Task CreateRoomAsync(CurrencyRateBattleContext db, Currency curr)
     {
-        var currentDate = DateTime.ParseExact(DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
+        var currentDate = DateTime.ParseExact(
+            DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
             "MM.dd.yyyy HH:mm:ss", null);
 
         var currState = new CurrencyState
@@ -72,7 +73,7 @@ public class RoomService : IRoomService
 
         var roomExists = await db.Rooms.AnyAsync(r => r.Id == id);
         if (!roomExists)
-            throw new CustomException($"{nameof(Room)} with Id={id} is not found.");
+            throw new GeneralException($"{nameof(Room)} with Id={id} is not found.");
 
         _ = db.Rooms.Update(updatedRoom);
         _ = await db.SaveChangesAsync();
@@ -88,26 +89,46 @@ public class RoomService : IRoomService
         {
             foreach (var r in db.Rooms)
             {
-                if ((r.Date.Date == DateTime.Today
-                     && r.Date.Hour == DateTime.UtcNow.AddHours(1).Hour)
-                    || (r.Date.Date == DateTime.Today.AddDays(1))
-                    && (r.Date.Hour == 0 && DateTime.UtcNow.Hour == 23))
-                {
-                    r.IsClosed = true;
-                    await UpdateRoomAsync(r.Id, r);
-                }
-                else if (r.Date.Date == DateTime.Today
-                         && r.Date.Hour == DateTime.UtcNow.Hour
-                         && r.IsClosed)
-                {
-                    await _rateCalculationService.StartRateCalculationByRoomIdAsync(r.Id);
-                    await UpdateRoomAsync(r.Id, r);
-                }
+                await RoomClosureCheckAsync(r);
+                await CalculateRatesIfRoomClosed(r);
             }
         }
         finally
         {
             _ = _semaphoreSlim.Release();
+        }
+    }
+
+    private async Task RoomClosureCheckAsync(Room room)
+    {
+        if ((room.Date.Date == DateTime.Today
+             && room.Date.Hour == DateTime.UtcNow.AddHours(1).Hour)
+            || (room.Date.Date == DateTime.Today.AddDays(1))
+            && (room.Date.Hour == 0 && DateTime.UtcNow.Hour == 23)
+            || DateTime.UtcNow > room.Date)
+        {
+            room.IsClosed = true;
+            await UpdateRoomAsync(room.Id, room);
+        }
+    }
+
+    private async Task CalculateRatesIfRoomClosed(Room room)
+    {
+        if ((room.Date.Date == DateTime.Today
+            && room.Date.Hour == DateTime.UtcNow.Hour
+            && room.IsClosed)
+            || (DateTime.UtcNow > room.Date
+                && room.IsClosed))
+        {
+            try
+            {
+                await _rateCalculationService.StartRateCalculationByRoomIdAsync(room.Id);
+                await UpdateRoomAsync(room.Id, room);
+            }
+            catch (GeneralException)
+            {
+                await DeleteRoomByIdAsync(room.Id);
+            }
         }
     }
 
@@ -200,7 +221,8 @@ public class RoomService : IRoomService
                 };
 
             if (!string.IsNullOrWhiteSpace(filter.CurrencyName))
-                filteredRooms = filteredRooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant());
+                filteredRooms =
+                    filteredRooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant());
             if (filter.DateTryParse(filter.StartDate, out var startDate))
                 filteredRooms = filteredRooms.Where(room => room.Date >= startDate);
             if (filter.DateTryParse(filter.EndDate, out var endDate))
@@ -226,5 +248,27 @@ public class RoomService : IRoomService
         }
 
         return result;
+    }
+
+    public async Task DeleteRoomByIdAsync(Guid roomId)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            var room = await db.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
+
+            if (room is null)
+                return;
+
+            _ = db.Remove(room);
+            _ = await db.SaveChangesAsync();
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
 }

@@ -21,7 +21,7 @@ public class RateHostedService : IHostedService, IDisposable
     {
         _logger.LogInformation("Rate Hosted Service running.");
 
-        _timer = new Timer(Callback, null, TimeSpan.Zero,
+        _timer = new Timer(Callback, null, TimeSpan.FromMinutes(1),
             TimeSpan.FromHours(1));
 
         return Task.CompletedTask;
@@ -29,7 +29,9 @@ public class RateHostedService : IHostedService, IDisposable
 
     private async void Callback(object? state)
     {
+        _logger.LogInformation("CheckRoomsStateAsync has been invoked.");
         await _roomService.CheckRoomsStateAsync();
+        _logger.LogInformation("CheckRoomsStateAsync сompleted the execution.");
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

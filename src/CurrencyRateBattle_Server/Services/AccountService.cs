@@ -68,24 +68,15 @@ public class AccountService : IAccountService
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         if (await db.Users.AnyAsync(u => u.Email == userData.Email))
-            throw new CustomException("Email '" + user.Email + "' is already taken");
+            throw new GeneralException("Email '" + user.Email + "' is already taken");
 
         await _semaphoreSlim.WaitAsync();
         try
         {
             _ = await db.Users.AddAsync(user);
             _ = await db.SaveChangesAsync();
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
-        }
 
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-
-            _ = _accountHistoryService.CreateHistoryByValuesAsync(null, user.Account.Id, DateTime.UtcNow,
+            await _accountHistoryService.CreateHistoryByValuesAsync(null, user.Account.Id, DateTime.UtcNow,
                 _accountStartBalance, true);
 
             _ = await db.SaveChangesAsync();
