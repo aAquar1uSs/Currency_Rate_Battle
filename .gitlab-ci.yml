@@ -6,7 +6,7 @@ variables:
   # 2) Name of directory used for keeping restored dependencies.
   NUGET_PACKAGES_DIRECTORY: '.nuget'
   # 3) A relative path to the source code from project repository root.
-  SOURCE_CODE_PATH: '*/*/'
+  SOURCE_CODE_PATH: 'src/*/*/'
 
 cache:
   key: "$CI_JOB_STAGE-$CI_COMMIT_REF_SLUG"
