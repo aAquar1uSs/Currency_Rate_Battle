@@ -57,13 +57,20 @@ public class CalculationHandler : AbstractHandler
 
         var winners = rates.Where(rate => rate.IsWon);
         var winnerCount = winners.Count();
-        var loserBank = commonBank - winners.Sum(rate => rate.Amount);
+        var rateAmount = winners.First().Amount;
+
+        var loserBank = commonBank - (rateAmount * winnerCount);
         var step = 2 * loserBank / winnerCount * (winnerCount - 1);
 
-        //rates.ForEach((rate, index) =>
-        //{
+        var winningMoney = Enumerable
+            .Repeat(0m, winnerCount)
+            .Select((x, index) => (index * step) + rateAmount).ToList();
 
-        //});
+        var i = winnerCount - 1;
+        rates.ForEach(rate =>
+        {
+            rate.Payout = rate.IsWon ? winningMoney[i--] : 0m;
+        });
     }
 
     private bool CheckSameRates(List<Rate> rates)
