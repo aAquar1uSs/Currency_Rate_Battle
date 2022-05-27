@@ -33,7 +33,7 @@ public class AccountController : Controller
         {
             await _userService.LoginUserAsync(user);
         }
-        catch (CustomException ex)
+        catch (GeneralException ex)
         {
             _logger.LogDebug(ex.Message);
             ViewData["ErrorMessage"] = ex.Message;
@@ -60,7 +60,7 @@ public class AccountController : Controller
         {
             await _userService.RegisterUserAsync(user);
         }
-        catch (CustomException ex)
+        catch (GeneralException ex)
         {
             _logger.LogDebug(ex.Message);
             ViewData["ErrorMessage"] = ex.Message;

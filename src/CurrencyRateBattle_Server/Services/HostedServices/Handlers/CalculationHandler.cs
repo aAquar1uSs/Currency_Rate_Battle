@@ -30,6 +30,6 @@ public class CalculationHandler : AbstractHandler
             }
         }
 
-        return base.Handle(rates);
+        return Task.FromResult(rates);
     }
 }

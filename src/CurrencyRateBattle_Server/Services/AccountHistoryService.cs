@@ -77,7 +77,7 @@ public class AccountHistoryService : IAccountHistoryService
 
     public async Task CreateHistoryByValuesAsync(Guid? roomId, Guid accountId, DateTime recordDate, decimal amount, bool isCredit)
     {
-        var history = new AccountHistory()
+        var history = new AccountHistory
         {
             Date = recordDate,
             Amount = amount,

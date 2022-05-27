@@ -15,28 +15,19 @@ public class WinnerHandler : AbstractHandler
 
     public override async Task<List<Rate>> Handle(List<Rate> rates)
     {
-        switch (rates.Count)
+        if (rates.Count == 1)
         {
-            case 0:
-                return rates;
-
-            case 1:
-            {
-                var rate = rates.First();
-                rate.IsClosed = true;
-                rate.Payout = rate.Amount;
-                return rates;
-            }
-
-            default:
-                break;
+            var rate = rates.First();
+            rate.IsClosed = true;
+            rate.Payout = rate.Amount;
+            return rates;
         }
 
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         var currState = await db.CurrencyStates
-            .FirstOrDefaultAsync(currState => currState.CurrencyId == rates.First().CurrencyId);
+            .FirstOrDefaultAsync(curr => curr.RoomId == rates.First().RoomId);
 
         foreach (var rate in rates)
         {
