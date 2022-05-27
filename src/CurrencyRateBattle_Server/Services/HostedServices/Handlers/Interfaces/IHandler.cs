@@ -6,5 +6,5 @@ public interface IHandler
 {
     IHandler SetNext(IHandler handler);
 
-    Task<List<Rate>>? Handle(List<Rate> rate);
+    Task<List<Rate>>? Handle(List<Rate> rates);
 }

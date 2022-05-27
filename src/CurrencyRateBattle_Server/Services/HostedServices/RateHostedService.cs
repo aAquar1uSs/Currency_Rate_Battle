@@ -21,7 +21,7 @@ public class RateHostedService : IHostedService, IDisposable
     {
         _logger.LogInformation("Rate Hosted Service running.");
 
-        _timer = new Timer(Callback, null, TimeSpan.FromSeconds(20),
+        _timer = new Timer(Callback, null, TimeSpan.FromMinutes(1),
             TimeSpan.FromHours(1));
 
         return Task.CompletedTask;

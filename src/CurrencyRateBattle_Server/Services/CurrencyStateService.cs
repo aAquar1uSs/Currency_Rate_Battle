@@ -44,10 +44,10 @@ public class CurrencyStateService : ICurrencyStateService
 
     public async Task PrepareUpdateCurrencyRateAsync()
     {
+        await GetCurrencyRatesFromNbuApiAsync();
+
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
-        await GetCurrencyRatesFromNbuApiAsync();
 
         foreach (var room in dbContext.Rooms)
         {
@@ -57,7 +57,7 @@ public class CurrencyStateService : ICurrencyStateService
                 var currencyState = await GetCurrencyStateByRoomIdAsync(room.Id);
 
                 if (currencyState != null)
-                    await UpdateCurrencyRateByIdAsync(currencyState);
+                    await UpdateCurrencyRateAsync(currencyState);
             }
         }
     }
@@ -126,7 +126,7 @@ public class CurrencyStateService : ICurrencyStateService
         }
     }
 
-    public async Task UpdateCurrencyRateByIdAsync(CurrencyState currencyState)
+    public async Task UpdateCurrencyRateAsync(CurrencyState currencyState)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();

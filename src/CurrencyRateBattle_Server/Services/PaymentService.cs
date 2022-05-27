@@ -32,6 +32,7 @@ public class PaymentService : IPaymentService
 
         if (account is null || payout is null)
             return;
+
         await _semaphoreSlim.WaitAsync();
         try
         {

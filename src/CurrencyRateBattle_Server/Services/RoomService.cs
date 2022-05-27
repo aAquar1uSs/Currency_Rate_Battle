@@ -36,41 +36,36 @@ public class RoomService : IRoomService
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        foreach (var curr in dbContext.Currencies)
+        await _semaphoreSlimRoomHosted.WaitAsync();
+        try
         {
-            await CreateRoomAsync(curr);
-        }
+            foreach (var curr in dbContext.Currencies)
+            {
+                await dbContext.CurrencyStates.AddAsync(await CreateRoomWithCurrencyStateAsync(curr));
+            }
 
-        _ = await dbContext.SaveChangesAsync();
+            _ = await dbContext.SaveChangesAsync();
+        }
+        finally
+        {
+            _semaphoreSlimRoomHosted.Release();
+        }
     }
 
-    public async Task CreateRoomAsync(Currency curr)
+    public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(Currency curr)
     {
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
         var currentDate = DateTime.ParseExact(
             DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
             "MM.dd.yyyy HH:mm:ss", null);
 
-        var currState = new CurrencyState
+        return Task.FromResult(new CurrencyState
         {
             Date = currentDate,
             CurrencyExchangeRate = 0,
             Currency = curr,
             CurrencyId = curr.Id,
             Room = new Room {Date = currentDate.AddDays(1), IsClosed = false}
-        };
-
-        await _semaphoreSlimRoomHosted.WaitAsync();
-        try
-        {
-            await db.CurrencyStates.AddAsync(currState);
-        }
-        finally
-        {
-            _semaphoreSlimRoomHosted.Release();
-        }
+        });
     }
 
     public async Task UpdateRoomAsync(Guid id, Room updatedRoom)

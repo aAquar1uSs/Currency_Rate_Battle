@@ -7,7 +7,7 @@ public interface IRoomService
 {
     Task GenerateRoomsByCurrencyCountAsync();
 
-    Task CreateRoomAsync(Currency curr);
+    Task<CurrencyState> CreateRoomWithCurrencyStateAsync(Currency curr);
 
     Task UpdateRoomAsync(Guid id, Room updatedRoom);
 
