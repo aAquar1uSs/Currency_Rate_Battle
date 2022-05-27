@@ -5,11 +5,11 @@ VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CurrencyRateBattleServer", "CurrencyRateBattleServer", "{C410E5ED-BBE9-49D2-845D-33C898B7BFDA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyRateBattleServer", "CurrencyRateBattle_Server\CurrencyRateBattleServer.csproj", "{7B535209-3729-4FE8-806B-B5E077B0FDFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyRateBattleServer", "src\CurrencyRateBattle_Server\CurrencyRateBattleServer.csproj", "{7B535209-3729-4FE8-806B-B5E077B0FDFA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CurrencyRateBattleClient", "CurrencyRateBattleClient", "{5591FB5B-1E33-4190-AB53-16C1D320016D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRBClient", "CurrencyRateBattle_Client\CRBClient.csproj", "{53CB44F5-3037-41E6-8E57-7F4D71E30AD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRBClient", "src\CurrencyRateBattle_Client\CRBClient.csproj", "{53CB44F5-3037-41E6-8E57-7F4D71E30AD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
