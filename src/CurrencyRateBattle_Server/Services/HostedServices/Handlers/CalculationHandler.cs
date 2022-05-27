@@ -47,12 +47,6 @@ public class CalculationHandler : AbstractHandler
 
     private void UnusualCalculation(ref List<Rate> rates, decimal commonBank)
     {
-        rates.ForEach(rate =>
-        {
-            if (!rate.IsWon)
-                rate.Payout = 0;
-        });
-
         rates.Sort((x, y) => x.SetDate.CompareTo(y.SetDate));
 
         var winners = rates.Where(rate => rate.IsWon);
