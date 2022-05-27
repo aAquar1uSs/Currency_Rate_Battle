@@ -42,7 +42,7 @@
                     </p>
                 </div>
                 <div class="info_time">
-                    <p>@Html.Label(room.Date.ToString("MM/dd/yyyy HH:mm", CultureInfo.InvariantCulture))</p>
+                    <p>@Html.Label(room.Date.ToLocalTime().ToString("MM/dd/yyyy HH:mm", CultureInfo.InvariantCulture))</p>
                 </div>
                 <div class="info_valut">
                     <form asp-controller="Rate" asp-action="Index" asp-route-roomId="@room.Id"
