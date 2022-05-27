@@ -42,6 +42,9 @@ public class RateCalculationService : IRateCalculationService
         if (rates.Count == 0)
             throw new GeneralException();
 
+        if (rates.Any(r => r.IsClosed))
+            return;
+
         try
         {
             //Invoke chain
