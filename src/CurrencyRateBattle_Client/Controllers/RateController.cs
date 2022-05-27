@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Net.Sockets;
 using CRBClient.Helpers;
 using CRBClient.Models;
 using CRBClient.Services.Interfaces;
@@ -67,6 +68,11 @@ public class RateController : Controller
         catch (HttpRequestException ex)
         {
             _logger.LogInformation(ex.Message);
+            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+        }
+        catch(SocketException ex)
+        {
+            _logger.LogError(ex.Message);
             return View("Error", new ErrorViewModel {RequestId = ex.Message});
         }
 

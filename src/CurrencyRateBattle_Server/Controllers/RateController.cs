@@ -118,7 +118,7 @@ public class RateController : ControllerBase
             _logger.LogInformation($"Rate has been created successfully ({rate.Id})");
             return Ok(rate);
         }
-        catch (CustomException ex)
+        catch (GeneralException ex)
         {
             // return error message if there was an exception
             return BadRequest(new { message = ex.Message });
@@ -139,7 +139,7 @@ public class RateController : ControllerBase
             _logger.LogInformation($"Rate has been updated successfully ({id})");
             return Ok();
         }
-        catch (CustomException ex)
+        catch (GeneralException ex)
         {
             // return error message if there was an exception
             return BadRequest(new { message = ex.Message });
@@ -160,7 +160,7 @@ public class RateController : ControllerBase
             _logger.LogInformation($"Rate has been deleted successfully ({id})");
             return Ok();
         }
-        catch (CustomException ex)
+        catch (GeneralException ex)
         {
             // return error message if there was an exception
             return BadRequest(new { message = ex.Message });

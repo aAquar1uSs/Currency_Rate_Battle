@@ -1,6 +1,5 @@
 ﻿using CurrencyRateBattleServer.Services.Interfaces;
 
-
 namespace CurrencyRateBattleServer.Services.HostedServices;
 
 public class CurrencyHostedService : IHostedService, IDisposable
@@ -22,15 +21,17 @@ public class CurrencyHostedService : IHostedService, IDisposable
     {
         _logger.LogInformation("Currency Hosted Service running.");
 
-        _timer = new Timer(Callback, null, TimeSpan.FromSeconds(8),
-            TimeSpan.FromMinutes(10));
+        _timer = new Timer(Callback, null, TimeSpan.FromSeconds(0),
+            TimeSpan.FromMinutes(30));
 
         return Task.CompletedTask;
     }
 
     private async void Callback(object? state)
     {
+        _logger.LogInformation("PrepareUpdateCurrencyRateAsync has been invoked.");
         await _currencyStateService.PrepareUpdateCurrencyRateAsync();
+        _logger.LogInformation("PrepareUpdateCurrencyRateAsync сompleted the execution.");
     }
 
 

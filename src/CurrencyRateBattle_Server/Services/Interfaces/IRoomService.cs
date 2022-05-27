@@ -19,4 +19,6 @@ public interface IRoomService
     Task<Room?> GetRoomByIdAsync(Guid id);
 
     Task<List<RoomDto>?> GetActiveRoomsWithFilterAsync(Filter filter);
+
+    Task DeleteRoomByIdAsync(Guid roomId);
 }

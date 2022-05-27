@@ -113,6 +113,7 @@ public class UserService : IUserService
     {
         var balance = 0M;
         var response = await _httpClient.GetAsync(_options.GetBalanceURL ?? "");
+
         if (response.StatusCode == HttpStatusCode.OK)
         {
             if (decimal.TryParse(await response.Content.ReadAsStringAsync(),

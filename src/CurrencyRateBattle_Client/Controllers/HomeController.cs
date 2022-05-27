@@ -1,6 +1,7 @@
 ﻿using CRBClient.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Net.Sockets;
 using CRBClient.Services.Interfaces;
 using CRBClient.Helpers;
 using CRBClient.Dto;
@@ -63,6 +64,11 @@ public class HomeController : Controller
             _logger.LogDebug("User unauthorized");
             return Redirect("/Account/Authorization");
         }
+        catch(SocketException ex)
+        {
+            _logger.LogError(ex.Message);
+            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+        }
 
         var pageSize = 4;
         return View(await PaginationList<RoomViewModel>.CreateAsync(_roomStorage, page ?? 1, pageSize));
@@ -84,6 +90,11 @@ public class HomeController : Controller
             return Redirect("/Account/Authorization");
         }
         catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex.Message);
+            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+        }
+        catch(SocketException ex)
         {
             _logger.LogError(ex.Message);
             return View("Error", new ErrorViewModel {RequestId = ex.Message});

@@ -13,7 +13,7 @@ public class RateService : IRateService
 
     private readonly IServiceScopeFactory _scopeFactory;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
+    private readonly SemaphoreSlim _semaphoreSlim = new(2, 2);
 
     public RateService(ILogger<RateService> logger,
         IServiceScopeFactory scopeFactory)
@@ -48,7 +48,7 @@ public class RateService : IRateService
             _ = _semaphoreSlim.Release();
         }
 
-        return newRate ?? throw new CustomException($"{nameof(Rate)} can not be created.");
+        return newRate ?? throw new GeneralException($"{nameof(Rate)} can not be created.");
     }
 
     public async Task<List<Rate>> GetRateByRoomIdAsync(Guid roomId)
@@ -56,9 +56,18 @@ public class RateService : IRateService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        var rates = await db.Rates
-            .Where(rate => rate.RoomId == roomId)
-            .ToListAsync();
+        List<Rate> rates = new();
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            rates = await db.Rates
+                .Where(rate => rate.RoomId == roomId)
+                .ToListAsync();
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
 
         return rates;
     }
@@ -73,7 +82,7 @@ public class RateService : IRateService
         {
             var rateExists = await db.Rooms.AnyAsync(r => r.Id == id);
             if (!rateExists)
-                throw new CustomException($"{nameof(Rate)} with Id={id} is not found.");
+                throw new GeneralException($"{nameof(Rate)} with Id={id} is not found.");
 
             updatedRate.SettleDate = DateTime.UtcNow;
 
@@ -101,7 +110,7 @@ public class RateService : IRateService
                 var currency = await db.Currencies.FirstOrDefaultAsync(c => c.CurrencyName == currencyCode);
                 currencyId = currency is not null
                     ? currency.Id
-                    : throw new CustomException($"Rates can not be retrieved: currency is invalid.");
+                    : throw new GeneralException($"Rates can not be retrieved: currency is invalid.");
             }
             finally
             {
@@ -141,48 +150,48 @@ public class RateService : IRateService
         try
         {
             var result = from rate in db.Rates
-                         join curr in db.Currencies on rate.CurrencyId equals curr.Id
-                         join room in db.Rooms on rate.RoomId equals room.Id
-                         where rate.AccountId == accountId
-                         select new
-                         {
-                             rate.Id,
-                             rate.Amount,
-                             rate.SettleDate,
-                             rate.SetDate,
-                             rate.IsWon,
-                             rate.IsClosed,
-                             rate.AccountId,
-                             rate.RateCurrencyExchange,
-                             rate.Payout,
-                             room.Date,
-                             rate.RoomId,
-                             curr.CurrencyName,
-                             rate.CurrencyId
-                         };
+                join curr in db.Currencies on rate.CurrencyId equals curr.Id
+                join room in db.Rooms on rate.RoomId equals room.Id
+                where rate.AccountId == accountId
+                select new
+                {
+                    rate.Id,
+                    rate.Amount,
+                    rate.SettleDate,
+                    rate.SetDate,
+                    rate.IsWon,
+                    rate.IsClosed,
+                    rate.AccountId,
+                    rate.RateCurrencyExchange,
+                    rate.Payout,
+                    room.Date,
+                    rate.RoomId,
+                    curr.CurrencyName,
+                    rate.CurrencyId
+                };
 
             var query = from res in result
-                        join currState in db.CurrencyStates
-                        on new { res.RoomId, res.CurrencyId } equals new { currState.RoomId, currState.CurrencyId }
-                        into gj
-                        from subCurr in gj.DefaultIfEmpty()
-                        select new
-                        {
-                            res.Id,
-                            res.Amount,
-                            res.SettleDate,
-                            res.SetDate,
-                            res.IsWon,
-                            res.IsClosed,
-                            res.AccountId,
-                            res.RateCurrencyExchange,
-                            res.Payout,
-                            res.Date,
-                            res.RoomId,
-                            res.CurrencyName,
-                            res.CurrencyId,
-                            CurrencyExchangeRate = subCurr == null ? 0 : subCurr.CurrencyExchangeRate
-                        };
+                join currState in db.CurrencyStates
+                    on new {res.RoomId, res.CurrencyId} equals new {currState.RoomId, currState.CurrencyId}
+                    into gj
+                from subCurr in gj.DefaultIfEmpty()
+                select new
+                {
+                    res.Id,
+                    res.Amount,
+                    res.SettleDate,
+                    res.SetDate,
+                    res.IsWon,
+                    res.IsClosed,
+                    res.AccountId,
+                    res.RateCurrencyExchange,
+                    res.Payout,
+                    res.Date,
+                    res.RoomId,
+                    res.CurrencyName,
+                    res.CurrencyId,
+                    CurrencyExchangeRate = subCurr == null ? 0 : subCurr.CurrencyExchangeRate
+                };
 
 
             foreach (var data in query)
@@ -228,7 +237,7 @@ public class RateService : IRateService
             else
             {
                 _logger.LogDebug("No rate found to be deleted.");
-}
+            }
         }
         finally
         {
