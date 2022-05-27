@@ -1,13 +1,13 @@
 ﻿using System.Globalization;
 
 namespace CurrencyRateBattleServer.Helpers;
-public class CustomException : Exception
+public class GeneralException : Exception
 {
-    public CustomException() : base() { }
+    public GeneralException() : base() { }
 
-    public CustomException(string message) : base(message) { }
+    public GeneralException(string message) : base(message) { }
 
-    public CustomException(string message, params object[] args)
+    public GeneralException(string message, params object[] args)
         : base(string.Format(CultureInfo.CurrentCulture, message, args))
     {
     }

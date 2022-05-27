@@ -50,7 +50,7 @@ public class RoomController : ControllerBase
             _logger.LogInformation($"Room has been updated successfully ({id})");
             return Ok();
         }
-        catch (CustomException ex)
+        catch (GeneralException ex)
         {
             // return error message if there was an exception
             return BadRequest(new {message = ex.Message});

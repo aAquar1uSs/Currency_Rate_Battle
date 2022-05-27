@@ -5,6 +5,7 @@ using CRBClient.Services.Interfaces;
 using CRBClient.Helpers;
 using PagedListExtensions = X.PagedList.PagedListExtensions;
 using System.Globalization;
+using System.Net.Sockets;
 
 namespace CRBClient.Controllers
 {
@@ -43,6 +44,11 @@ namespace CRBClient.Controllers
                 return Redirect("/Account/Authorization");
             }
             catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex.Message);
+                return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            }
+            catch(SocketException ex)
             {
                 _logger.LogError(ex.Message);
                 return View("Error", new ErrorViewModel {RequestId = ex.Message});

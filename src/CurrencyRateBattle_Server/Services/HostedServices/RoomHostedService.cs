@@ -5,13 +5,13 @@ namespace CurrencyRateBattleServer.Services.HostedServices;
 
 public class RoomHostedService : IHostedService, IDisposable
 {
-    private readonly ILogger<CurrencyHostedService> _logger;
+    private readonly ILogger<RoomHostedService> _logger;
 
     private Timer? _timer;
 
     private readonly IRoomService _roomService;
 
-    public RoomHostedService(ILogger<CurrencyHostedService> logger,
+    public RoomHostedService(ILogger<RoomHostedService> logger,
         IRoomService roomService)
     {
         _logger = logger;
@@ -22,7 +22,7 @@ public class RoomHostedService : IHostedService, IDisposable
     {
         _logger.LogInformation("Room Hosted Service running.");
 
-        _timer = new Timer(Callback, null, TimeSpan.Zero, 
+        _timer = new Timer(Callback, null, TimeSpan.FromMinutes(2),
             TimeSpan.FromHours(4));
 
         return Task.CompletedTask;
@@ -30,7 +30,9 @@ public class RoomHostedService : IHostedService, IDisposable
 
     private async void Callback(object? state)
     {
+        _logger.LogInformation("GenerateRoomsByCurrencyCountAsync has been invoked.");
         await _roomService.GenerateRoomsByCurrencyCountAsync();
+        _logger.LogInformation("GenerateRoomsByCurrencyCountAsync сompleted the execution.");
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

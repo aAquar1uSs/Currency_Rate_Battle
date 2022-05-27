@@ -1,5 +1,4 @@
-﻿using CurrencyRateBattleServer.Models;
-
+﻿
 namespace CurrencyRateBattleServer.Services.Interfaces;
 
 public interface IRateCalculationService

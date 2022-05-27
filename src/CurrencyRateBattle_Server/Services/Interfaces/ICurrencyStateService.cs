@@ -7,6 +7,8 @@ public interface ICurrencyStateService
 {
     Task<Guid> GetCurrencyIdByRoomId(Guid roomId);
 
+    Task<CurrencyState?> GetCurrencyStateByRoomIdAsync(Guid roomId);
+
     Task PrepareUpdateCurrencyRateAsync();
 
     Task<List<CurrencyStateDto>> GetCurrencyStateAsync();
