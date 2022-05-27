@@ -66,10 +66,10 @@ public class CalculationHandler : AbstractHandler
             .Repeat(0m, winnerCount)
             .Select((x, index) => (index * step) + rateAmount).ToList();
 
-        var i = winnerCount - 1;
+        var index = winnerCount - 1;
         rates.ForEach(rate =>
         {
-            rate.Payout = rate.IsWon ? winningMoney[i--] : 0m;
+            rate.Payout = rate.IsWon ? winningMoney[index--] : 0m;
         });
     }
 
