@@ -97,7 +97,10 @@ public class UserService : IUserService
         var response = await _httpClient.GetAsync(_options.GetBalanceURL ?? "");
         if (response.StatusCode == HttpStatusCode.OK)
         {
-            if (decimal.TryParse(response.Content.ReadAsStringAsync().Result.ToString(), out var bal))
+            if (decimal.TryParse(await response.Content.ReadAsStringAsync(),
+                NumberStyles.AllowDecimalPoint,
+                CultureInfo.InvariantCulture,
+                out var bal))
             {
                 balance = "BALANCE: " + bal.ToString("C", new CultureInfo("uk-UA"));
             }
@@ -112,7 +115,10 @@ public class UserService : IUserService
         var response = await _httpClient.GetAsync(_options.GetBalanceURL ?? "");
         if (response.StatusCode == HttpStatusCode.OK)
         {
-            if (decimal.TryParse(response.Content.ReadAsStringAsync().Result, out var bal))
+            if (decimal.TryParse(await response.Content.ReadAsStringAsync(),
+                NumberStyles.AllowDecimalPoint,
+                CultureInfo.InvariantCulture,
+                out var bal))
             {
                 balance = bal;
             }
