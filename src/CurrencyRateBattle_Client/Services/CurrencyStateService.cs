@@ -36,7 +36,7 @@ public class CurrencyStateService : ICurrencyStateService
         }
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
-            throw new CustomException();
+            throw new GeneralException();
 
         if (currencyStates is null)
             currencyStates = new List<CurrencyStateDto>();

@@ -32,6 +32,7 @@ public class PaymentService : IPaymentService
 
         if (account is null || payout is null)
             return;
+
         await _semaphoreSlim.WaitAsync();
         try
         {
@@ -63,6 +64,7 @@ public class PaymentService : IPaymentService
 
         if (account.Amount == 0 || amount  > account.Amount)
             return false;
+
         await _semaphoreSlim.WaitAsync();
         try
         {

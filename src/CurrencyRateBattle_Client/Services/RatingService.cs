@@ -25,6 +25,6 @@ public class RatingService : IRatingService
         var response = await _httpClient.GetAsync(_options.GetUsersRatingURL ?? "");
         return response.StatusCode == HttpStatusCode.OK
             ? await response.Content.ReadAsAsync<List<RatingViewModel>>()
-            : response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : new List<RatingViewModel>();
+            : response.StatusCode == HttpStatusCode.Unauthorized ? throw new GeneralException() : new List<RatingViewModel>();
     }
 }

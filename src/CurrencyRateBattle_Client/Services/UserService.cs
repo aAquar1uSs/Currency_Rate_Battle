@@ -37,7 +37,7 @@ public class UserService : IUserService
 
         if (!user.Password.Equals(user.ConfirmPassword, StringComparison.Ordinal))
         {
-            throw new CustomException("Password is not confirmed.");
+            throw new GeneralException("Password is not confirmed.");
         }
 
         if (response.StatusCode == HttpStatusCode.OK)
@@ -48,7 +48,7 @@ public class UserService : IUserService
         else
         {
             var errorText = await response.Content.ReadAsStringAsync();
-            throw new CustomException(errorText);
+            throw new GeneralException(errorText);
         }
     }
 
@@ -65,7 +65,7 @@ public class UserService : IUserService
         else
         {
             var errorMsg = await response.Content.ReadAsStringAsync();
-            throw new CustomException(errorMsg);
+            throw new GeneralException(errorMsg);
         }
     }
 
@@ -77,7 +77,7 @@ public class UserService : IUserService
             return await response.Content.ReadAsAsync<AccountInfoViewModel>();
         }
 
-        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : new AccountInfoViewModel();
+        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new GeneralException() : new AccountInfoViewModel();
     }
 
     public async Task<List<AccountHistoryViewModel>> GetAccountHistoryAsync()
@@ -88,7 +88,7 @@ public class UserService : IUserService
             return await response.Content.ReadAsAsync<List<AccountHistoryViewModel>>();
         }
 
-        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : new List<AccountHistoryViewModel>();
+        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new GeneralException() : new List<AccountHistoryViewModel>();
     }
 
     public async Task<string> GetUserBalanceAsync()
@@ -106,7 +106,7 @@ public class UserService : IUserService
             }
         }
 
-        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : balance;
+        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new GeneralException() : balance;
     }
 
     public async Task<decimal> GetUserBalanceDecimalAsync()
@@ -125,7 +125,7 @@ public class UserService : IUserService
             }
         }
 
-        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : balance;
+        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new GeneralException() : balance;
     }
 
     public void Logout()

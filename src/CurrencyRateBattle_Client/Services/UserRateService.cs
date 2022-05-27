@@ -25,7 +25,7 @@ public class UserRateService : IUserRateService
         var response = await _httpClient.GetAsync(_options.GetUserBetsURL ?? "");
         return response.StatusCode == HttpStatusCode.OK
             ? await response.Content.ReadAsAsync<List<BetViewModel>>()
-            : response.StatusCode == HttpStatusCode.Unauthorized ? throw new CustomException() : new List<BetViewModel>();
+            : response.StatusCode == HttpStatusCode.Unauthorized ? throw new GeneralException() : new List<BetViewModel>();
     }
 
 
@@ -38,10 +38,10 @@ public class UserRateService : IUserRateService
 
         var errorMsg = await response.Content.ReadAsStringAsync();
         if (response.StatusCode == HttpStatusCode.Conflict)
-            throw new CustomException(errorMsg);
+            throw new GeneralException(errorMsg);
 
         if (response.StatusCode == HttpStatusCode.BadRequest)
-            throw new CustomException(errorMsg);
+            throw new GeneralException(errorMsg);
     }
 
 }

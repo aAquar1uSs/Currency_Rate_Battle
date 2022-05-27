@@ -15,5 +15,5 @@ public interface ICurrencyStateService
 
     Task GetCurrencyRatesFromNbuApiAsync();
 
-    Task UpdateCurrencyRateByIdAsync(CurrencyState currencyState);
+    Task UpdateCurrencyRateAsync(CurrencyState currencyState);
 }

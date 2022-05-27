@@ -38,7 +38,7 @@ namespace CRBClient.Controllers
                 var bets = PagedListExtensions.ToPagedList(betInfo, pageIndex, pageSize);
                 return View(bets);
             }
-            catch (CustomException)
+            catch (GeneralException)
             {
                 _logger.LogDebug("User is unauthorized");
                 return Redirect("/Account/Authorization");

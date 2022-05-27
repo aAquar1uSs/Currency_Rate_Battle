@@ -28,7 +28,7 @@ public class CalculationHandler : AbstractHandler
                 StandartCalculation(ref rates, commonBank);
         }
 
-        return base.Handle(rates);
+        return Task.FromResult(rates);
     }
 
     private void StandartCalculation(ref List<Rate> rates, decimal commonBank)

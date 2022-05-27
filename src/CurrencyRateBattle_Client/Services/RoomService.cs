@@ -32,11 +32,11 @@ public class RoomService : IRoomService
             var rooms = JsonSerializer.Deserialize<IEnumerable<RoomViewModel>>(result);
 
             _logger.LogInformation("Rooms are loaded successfully.");
-            return rooms == null ? throw new CustomException("No rooms are available.") : rooms.ToList();
+            return rooms == null ? throw new GeneralException("No rooms are available.") : rooms.ToList();
         }
 
         return responseTask.StatusCode == HttpStatusCode.Unauthorized
-            ? throw new CustomException("User unauthorized")
+            ? throw new GeneralException("User unauthorized")
             : new List<RoomViewModel>();
     }
 
@@ -50,11 +50,11 @@ public class RoomService : IRoomService
             var rooms = JsonSerializer.Deserialize<IEnumerable<RoomViewModel>>(result);
 
             _logger.LogInformation("Rooms are loaded successfully.");
-            return rooms == null ? throw new CustomException("No rooms are available.") : rooms.ToList();
+            return rooms == null ? throw new GeneralException("No rooms are available.") : rooms.ToList();
         }
 
         return responseTask.StatusCode == HttpStatusCode.Unauthorized
-            ? throw new CustomException("User unauthorized")
+            ? throw new GeneralException("User unauthorized")
             : new List<RoomViewModel>();
     }
 }
