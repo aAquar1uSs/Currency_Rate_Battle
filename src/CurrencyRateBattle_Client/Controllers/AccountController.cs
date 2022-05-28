@@ -56,6 +56,11 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<ActionResult> RegistrationAsync(UserViewModel user)
     {
+        if (!ModelState.IsValid)
+        {
+            return View("Authorization");
+        }
+
         try
         {
             await _userService.RegisterUserAsync(user);
