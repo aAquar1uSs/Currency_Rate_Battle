@@ -5,22 +5,8 @@ namespace CurrencyRateBattleServer.Services.Interfaces;
 
 public interface ICurrencyStateService
 {
-    /// <summary>
-    /// Looking for id currency by room id;
-    /// </summary>
-    /// <param name="roomId"><see cref="Room"/> id;</param>
-    /// <returns>
-    ///the task result contains <see cref="Guid"/> - <see cref="Currency"/> id;
-    /// </returns>
     Task<Guid> GetCurrencyIdByRoomIdAsync(Guid roomId);
 
-    /// <summary>
-    /// Search <see cref="CurrencyState"/> model by <see cref="Room"/> id;
-    /// </summary>
-    /// <param name="roomId"><see cref="Room"/> id;</param>
-    /// <returns>
-    /// the task result contains <see cref="CurrencyState"/>;
-    /// </returns>
     Task<CurrencyState?> GetCurrencyStateByRoomIdAsync(Guid roomId);
 
     /// <summary>
@@ -28,7 +14,7 @@ public interface ICurrencyStateService
     /// performs the currency update in this room;
     /// </summary>
     /// <remarks>
-    /// This method uses <see cref="HostedServices.CurrencyHostedService"/>
+    ///uses <see cref="HostedServices.CurrencyHostedService"/> uses this method;
     /// </remarks>
     /// <returns>
     ///A task that represents the asynchronous operation. <see cref="Task"/>;
@@ -36,7 +22,7 @@ public interface ICurrencyStateService
     Task PrepareUpdateCurrencyRateAsync();
 
     /// <summary>
-    /// Pulls out all currency state entries from the data base;
+    /// Pulls out all currency state entries from the database;
     /// </summary>
     /// <returns>
     ///the task result contains <see cref="List{T}"/> of <see cref="CurrencyStateDto"/>;

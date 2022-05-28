@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CurrencyRateBattleServer.Models;
 
-public sealed class Account
+public class Account
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
