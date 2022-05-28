@@ -108,7 +108,7 @@ public class CurrencyStateService : ICurrencyStateService
         using var client = new HttpClient();
         try
         {
-            client.BaseAddress = new Uri("https://localhost:7255");
+            client.BaseAddress = new Uri(NBU_API);
 
             var stream = await client.GetStreamAsync(NBU_API);
             _rateStorage = await JsonSerializer.DeserializeAsync<List<CurrencyStateDto>>(stream);
@@ -118,11 +118,11 @@ public class CurrencyStateService : ICurrencyStateService
         }
         catch (HttpRequestException httpRequestException)
         {
-            _logger.LogError(httpRequestException.StackTrace);
+            _logger.LogError("{Stack}", httpRequestException.StackTrace);
         }
         catch (ArgumentException ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Msg}", ex.Message);
         }
     }
 

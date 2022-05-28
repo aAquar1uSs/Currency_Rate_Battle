@@ -22,37 +22,35 @@ public class AccountHistoryController : Controller
         _userService = userService;
     }
 
-    public async Task<IActionResult> Index(int? page)
-    {
-        var pageSize = 10;
-        var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
-
-        ViewBag.Balance = await _userService.GetUserBalanceAsync();
-        ViewBag.Title = "Account History";
-
-        try
+        public async Task<IActionResult> Index(int? page)
         {
-            var accountHistoryInfo = await _userService.GetAccountHistoryAsync();
-            var accountHistories = PagedListExtensions.ToPagedList(accountHistoryInfo, pageIndex, pageSize);
-            _logger.LogInformation("Account history page");
-            return View(accountHistories);
+            var pageSize = 10;
+            var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
+            ViewBag.Balance = await _userService.GetUserBalanceAsync();
+            ViewBag.Title = "Account History";
+            try
+            {
+                var accountHistoryInfo = await _userService.GetAccountHistoryAsync();
+                //accountHistories = accountHistoryInfo.ToPagedList(pageIndex, pageSize);
+                var accountHistories = PagedListExtensions.ToPagedList(accountHistoryInfo, pageIndex, pageSize);
+                return View(accountHistories);
+            }
+            catch (GeneralException)
+            {
+                _logger.LogDebug("User unauthorized");
+                return Redirect("/Account/Authorization");
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError("{Msg}", ex.Message);
+                return View("Error", new ErrorViewModel { RequestId = ex.Message });
+            }
+            catch (SocketException ex)
+            {
+                _logger.LogError("{Msg}", ex.Message);
+                return View("Error", new ErrorViewModel { RequestId = ex.Message });
+            }
         }
-        catch (GeneralException)
-        {
-            _logger.LogDebug("User unauthorized");
-            return Redirect("/Account/Authorization");
-        }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
-        }
-        catch(SocketException ex)
-        {
-            _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
-        }
-    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

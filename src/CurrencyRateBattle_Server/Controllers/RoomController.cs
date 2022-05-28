@@ -26,14 +26,15 @@ public class RoomController : ControllerBase
 
     [HttpGet("get-rooms/{isClosed}")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<ActionResult<IEnumerable<Room>>> GetRoomsAsync([FromRoute] bool isClosed)
     {
         _logger.LogDebug("List of rooms are retrieving.");
         var rooms = await _roomService.GetRoomsAsync(isClosed);
+
         return Ok(rooms);
     }
 
-    // GET api/rooms/{id}
     [HttpGet("{id}")]
     public async Task<Room?> GetRoomByIdAsync(Guid id)
     {
@@ -41,7 +42,7 @@ public class RoomController : ControllerBase
         return room;
     }
 
-    [HttpPut("{id}")]
+    /*[HttpPut("{id}")]
     public async Task<IActionResult> UpdateRoomAsync(Guid id, [FromBody] Room updatedRoom)
     {
         try
@@ -52,7 +53,6 @@ public class RoomController : ControllerBase
         }
         catch (GeneralException ex)
         {
-            // return error message if there was an exception
             return BadRequest(new {message = ex.Message});
         }
         catch (DbUpdateException)
@@ -60,11 +60,12 @@ public class RoomController : ControllerBase
             _logger.LogDebug("An unexpected error occurred during the attempt to update the room in the DB.");
             return BadRequest("An unexpected error occurred. Please try again.");
         }
-    }
+    }*/
 
     [HttpPost("filter")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromBody] Filter filter)
     {
         _logger.LogDebug("Filtered room list.");

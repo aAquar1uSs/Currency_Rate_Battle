@@ -26,7 +26,7 @@ public class RateController : Controller
 
     public async Task<IActionResult> Index(Guid roomId, string currencyName)
     {
-        ViewBag.Title = "Rate Page";
+        ViewBag.Title = "Make Bet";
         ViewBag.Balance = await _userService.GetUserBalanceAsync();
         ViewBag.CurrencyName = currencyName;
 
@@ -66,19 +66,19 @@ public class RateController : Controller
         }
         catch (GeneralException ex)
         {
-            _logger.LogDebug(ex.Message);
+            _logger.LogDebug("{Msg}", ex.Message);
             ViewData["ErrorMsg"] = ex.Message;
             ViewBag.Balance = await _userService.GetUserBalanceAsync();
             return View("Index", rateViewModel);
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogInformation(ex.Message);
+            _logger.LogError("{Msg}", ex.Message);
             return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
         catch (SocketException ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Msg}", ex.Message);
             return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 

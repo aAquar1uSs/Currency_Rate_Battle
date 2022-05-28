@@ -24,20 +24,16 @@ public class RateController : ControllerBase
 
     private readonly IPaymentService _paymentService;
 
-    private readonly IRoomService _roomService;
-
     public RateController(ILogger<RateController> logger,
         IRateService rateService,
         IAccountService accountService,
         ICurrencyStateService currencyStateService,
-        IRoomService roomService,
         IPaymentService paymentService)
     {
         _logger = logger;
         _rateService = rateService;
         _accountService = accountService;
         _currencyStateService = currencyStateService;
-        _roomService = roomService;
         _paymentService = paymentService;
     }
 
@@ -115,7 +111,7 @@ public class RateController : ControllerBase
 
             var rate = await _rateService.CreateRateAsync(rateToCreate, account.Id, currencyId);
 
-            _logger.LogInformation($"Rate has been created successfully ({rate.Id})");
+            _logger.LogInformation("Rate has been created successfully ({Id})", rate.Id);
             return Ok(rate);
         }
         catch (GeneralException ex)
@@ -135,8 +131,8 @@ public class RateController : ControllerBase
     {
         try
         {
-            _rateService.UpdateRateByRoomIdAsync(id, updatedRate);
-            _logger.LogInformation($"Rate has been updated successfully ({id})");
+            await _rateService.UpdateRateByRoomIdAsync(id, updatedRate);
+            _logger.LogInformation("Rate has been updated successfully ({Id})", id);
             return Ok();
         }
         catch (GeneralException ex)
@@ -157,7 +153,7 @@ public class RateController : ControllerBase
         try
         {
             await _rateService.DeleteRateAsync(id);
-            _logger.LogInformation($"Rate has been deleted successfully ({id})");
+            _logger.LogInformation("Rate has been deleted successfully ({Id})", id);
             return Ok();
         }
         catch (GeneralException ex)

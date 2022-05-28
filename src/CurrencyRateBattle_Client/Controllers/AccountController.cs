@@ -35,18 +35,18 @@ public class AccountController : Controller
         }
         catch (GeneralException ex)
         {
-            _logger.LogDebug(ex.Message);
+            _logger.LogInformation("User {User}: {Msg}", user.Email, ex.Message);
             ViewData["ErrorMessage"] = ex.Message;
             return View("Authorization");
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("User {User}: {Msg}", user.Email, ex.Message);
             return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
         catch (SocketException ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("User {User}: {Msg}", user.Email, ex.Message);
             return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 
@@ -57,28 +57,32 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<ActionResult> RegistrationAsync(UserViewModel user)
     {
+        if (!ModelState.IsValid)
+        {
+            return View("Authorization");
+        }
+
         try
         {
             await _userService.RegisterUserAsync(user);
         }
         catch (GeneralException ex)
         {
-            _logger.LogDebug(ex.Message);
+            _logger.LogInformation("User {User}: {Msg}", user.Email, ex.Message);
             ViewData["ErrorMessage"] = ex.Message;
             return View("Authorization");
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("User {User}: {Msg}", user.Email, ex.Message);
             return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
         catch (SocketException ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("User {User}: {Msg}", user.Email, ex.Message);
             return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 
-        _logger.LogInformation($"User '{user.Email}' has successfully registered");
         return Redirect("/Home/Main");
     }
 

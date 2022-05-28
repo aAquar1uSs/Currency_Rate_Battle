@@ -43,11 +43,12 @@ public class UserRateService : IUserRateService
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
-            _logger.LogInformation("User rate are successfully added");
+            _logger.LogInformation("User rate is inserted.");
             return;
         }
 
         var errorMsg = await response.Content.ReadAsStringAsync();
+        _logger.LogError("Rate Insertion: {ErrorMsg}", errorMsg);
         if (response.StatusCode == HttpStatusCode.Conflict)
         {
             _logger.LogInformation(errorMsg);

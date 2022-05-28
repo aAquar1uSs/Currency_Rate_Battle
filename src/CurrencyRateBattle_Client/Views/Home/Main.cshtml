@@ -40,6 +40,9 @@
                     <p>
                         @Html.Label(room.СurrencyName)
                     </p>
+                    <p>
+                        Count rates: @Html.DisplayFor(r => room.CountRates)
+                    </p>
                 </div>
                 <div class="info_time">
                     <p>@Html.Label(room.Date.ToLocalTime().ToString("MM/dd/yyyy HH:mm", CultureInfo.InvariantCulture))</p>
@@ -55,7 +58,11 @@
     </div>
     <div class="currency-info">
         <h3>Latest Exchange Rates</h3>
-        @foreach (var curr in ViewBag.CurrencyRates as List<CurrencyStateDto>)
+        @{
+            List<CurrencyStateDto>? curRates = ViewBag.CurrencyRates as List<CurrencyStateDto>;
+        }
+        @if (curRates is not null)
+        foreach (var curr in curRates)
         {
             <p>@curr.Currency (@Math.Round(curr.Rate, 2) -- @curr.Date)</p>
         }

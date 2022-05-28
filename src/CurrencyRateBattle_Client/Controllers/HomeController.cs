@@ -69,12 +69,13 @@ public class HomeController : Controller
         }
         catch (SocketException ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Msg}", ex.Message);
             return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 
-        _logger.LogInformation("Home page with filtered rooms");
-        return View(await PaginationList<RoomViewModel>.CreateAsync(_roomStorage, page ?? 1, PageSize));
+        var pageSize = 4;
+        var roomViewModels = new PaginationList<RoomViewModel>();
+        return View(await roomViewModels.CreateAsync(_roomStorage, page ?? 1, pageSize));
     }
 
     public async Task<IActionResult> Profile()
@@ -94,12 +95,12 @@ public class HomeController : Controller
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Msg}", ex.Message);
             return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
         catch (SocketException ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Msg}", ex.Message);
             return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 

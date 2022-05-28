@@ -10,6 +10,9 @@ public class RoomDto
     [JsonPropertyName("updateRateTime")]
     public DateTime UpdateRateTime { get; set; }
 
+    [JsonPropertyName("countRates")]
+    public int CountRates { get; set; }
+
     [JsonPropertyName("currencyName")]
     public string СurrencyName { get; set; } = default!;
 

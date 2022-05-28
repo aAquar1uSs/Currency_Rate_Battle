@@ -136,7 +136,7 @@ await app.RunAsync();
 
 static void InitDatabase(IServiceProvider serviceProvider)
 {
-    using var serviceScope = serviceProvider.GetService<IServiceScopeFactory>().CreateScope();
+    using var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
     var context = serviceScope.ServiceProvider.GetService<CurrencyRateBattleContext>();
     if (context is not null)
         context.Database.Migrate();
