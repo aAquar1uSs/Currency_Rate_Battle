@@ -45,7 +45,6 @@ public class RateController : ControllerBase
         return Ok(rates);
     }
 
-    // GET api/rates/
     [HttpGet("get-user-bets")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
@@ -63,7 +62,6 @@ public class RateController : ControllerBase
         return Ok(bets);
     }
 
-    // GET api/rates/
     [HttpGet("get-users-rating")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
@@ -116,54 +114,11 @@ public class RateController : ControllerBase
         }
         catch (GeneralException ex)
         {
-            // return error message if there was an exception
             return BadRequest(new { message = ex.Message });
         }
         catch (DbUpdateException)
         {
             _logger.LogDebug("An unexpected error occurred during the attempt to create a rate in the DB.");
-            return BadRequest("An unexpected error occurred. Please try again.");
-        }
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateRateAsync(Guid id, [FromBody] Rate updatedRate)
-    {
-        try
-        {
-            _rateService.UpdateRateByRoomIdAsync(id, updatedRate);
-            _logger.LogInformation($"Rate has been updated successfully ({id})");
-            return Ok();
-        }
-        catch (GeneralException ex)
-        {
-            // return error message if there was an exception
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (DbUpdateException)
-        {
-            _logger.LogDebug("An unexpected error occurred during the attempt to update the rate in the DB.");
-            return BadRequest("An unexpected error occurred. Please try again.");
-        }
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteRateAsync(Guid id)
-    {
-        try
-        {
-            await _rateService.DeleteRateAsync(id);
-            _logger.LogInformation($"Rate has been deleted successfully ({id})");
-            return Ok();
-        }
-        catch (GeneralException ex)
-        {
-            // return error message if there was an exception
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (DbUpdateException)
-        {
-            _logger.LogDebug("An unexpected error occurred during the attempt to delete the rate in the DB.");
             return BadRequest("An unexpected error occurred. Please try again.");
         }
     }

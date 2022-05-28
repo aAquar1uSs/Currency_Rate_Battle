@@ -60,7 +60,6 @@ public class AccountController : ControllerBase
         }
         catch (GeneralException ex)
         {
-            // return error message if there was an exception
             return BadRequest(new {message = ex.Message});
         }
         catch (DbUpdateException)

@@ -60,8 +60,13 @@ public class AccountHistoryController : ControllerBase
             var userId = _accountService.GetGuidFromRequest(HttpContext);
             if (userId is null)
                 return BadRequest();
+
             Room? room = null;
             var account = await _accountService.GetAccountByUserIdAsync(userId);
+
+            if (account is null)
+                return BadRequest();
+
             if (historyDto.RoomId is not null)
                 room = await _roomService.GetRoomByIdAsync((Guid)historyDto.RoomId);
 
