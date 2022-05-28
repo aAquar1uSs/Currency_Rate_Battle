@@ -18,4 +18,6 @@ public interface IRateService
     Task<List<BetDto>> GetRatesByAccountIdAsync(Guid accountId);
 
     Task<List<UserRatingDto>> GetUsersRatingAsync();
+
+    Task<int> GetRateCountByRoomIdAsync(Guid roomId);
 }

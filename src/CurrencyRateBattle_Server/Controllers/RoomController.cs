@@ -26,10 +26,12 @@ public class RoomController : ControllerBase
 
     [HttpGet("get-rooms/{isClosed}")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<ActionResult<IEnumerable<Room>>> GetRoomsAsync([FromRoute] bool isClosed)
     {
         _logger.LogDebug("List of rooms are retrieving.");
         var rooms = await _roomService.GetRoomsAsync(isClosed);
+        
         return Ok(rooms);
     }
 
@@ -52,7 +54,6 @@ public class RoomController : ControllerBase
         }
         catch (GeneralException ex)
         {
-            // return error message if there was an exception
             return BadRequest(new {message = ex.Message});
         }
         catch (DbUpdateException)

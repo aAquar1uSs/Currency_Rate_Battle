@@ -13,7 +13,7 @@ public interface IRoomService
 
     Task CheckRoomsStateAsync();
 
-    Task<List<RoomDto>> GetRoomsAsync(bool? isActive);
+    Task<List<RoomDto>> GetRoomsAsync(bool? isClosed);
 
     Task<Room?> GetRoomByIdAsync(Guid id);
 

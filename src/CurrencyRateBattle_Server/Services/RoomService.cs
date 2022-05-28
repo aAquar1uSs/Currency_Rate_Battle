@@ -16,6 +16,8 @@ public class RoomService : IRoomService
 
     private readonly IRateCalculationService _rateCalculationService;
 
+    private readonly IRateService _rateService;
+
     private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
     private readonly SemaphoreSlim _semaphoreSlimRateHosted = new(1, 1);
@@ -24,11 +26,13 @@ public class RoomService : IRoomService
 
     public RoomService(ILogger<RoomService> logger,
         IRateCalculationService rateCalculationService,
-        IServiceScopeFactory scopeFactory)
+        IServiceScopeFactory scopeFactory,
+        IRateService rateService)
     {
         _logger = logger;
         _rateCalculationService = rateCalculationService;
         _scopeFactory = scopeFactory;
+        _rateService = rateService;
     }
 
     public async Task GenerateRoomsByCurrencyCountAsync()
@@ -135,7 +139,7 @@ public class RoomService : IRoomService
         }
     }
 
-    public async Task<List<RoomDto>> GetRoomsAsync(bool? isActive)
+    public async Task<List<RoomDto>> GetRoomsAsync(bool? isClosed)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -147,7 +151,7 @@ public class RoomService : IRoomService
             var result = from curr in db.Currencies
                 join currState in db.CurrencyStates on curr.Id equals currState.CurrencyId
                 join room in db.Rooms on currState.RoomId equals room.Id
-                where room.IsClosed == isActive
+                where room.IsClosed == isClosed
                 select new
                 {
                     room.Id,
@@ -167,7 +171,9 @@ public class RoomService : IRoomService
                     СurrencyName = data.CurrencyName,
                     Date = data.Date,
                     IsClosed = data.IsClosed,
-                    UpdateRateTime = data.RateDate
+                    UpdateRateTime = data.RateDate,
+                    //ToDo refactor
+                    CountRates = await _rateService.GetRateCountByRoomIdAsync(data.Id)
                 });
             }
         }
