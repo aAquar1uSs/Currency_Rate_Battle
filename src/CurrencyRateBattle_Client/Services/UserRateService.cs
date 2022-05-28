@@ -34,9 +34,13 @@ public class UserRateService : IUserRateService
         var response = await _httpClient.PostAsync(_options.MakeBetURL ?? "", rateViewModel);
 
         if (response.StatusCode == HttpStatusCode.OK)
+        {
+            _logger.LogInformation("User rate is inserted.");
             return;
+        }
 
         var errorMsg = await response.Content.ReadAsStringAsync();
+        _logger.LogError("Rate Insertion: {ErrorMsg}", errorMsg);
         if (response.StatusCode == HttpStatusCode.Conflict)
             throw new GeneralException(errorMsg);
 
