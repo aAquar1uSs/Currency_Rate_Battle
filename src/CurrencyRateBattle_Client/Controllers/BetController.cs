@@ -48,48 +48,17 @@ public class BetController : Controller
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
-        catch(SocketException ex)
+        catch (SocketException ex)
         {
             _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
     }
-        public async Task<IActionResult> Index(int? page)
-        {
-            var pageSize = 5;
-            var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
-            ViewBag.Balance = await _userService.GetUserBalanceAsync();
-            ViewBag.Title = "My Bets";
-            try
-            {
-                var betInfo = await _userRateService.GetUserRates();
-                var bets = PagedListExtensions.ToPagedList(betInfo, pageIndex, pageSize);
-                return View(bets);
-            }
-            catch (GeneralException)
-            {
-                _logger.LogDebug("User is unauthorized");
-                return Redirect("/Account/Authorization");
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError("{Msg}", ex.Message);
-                return View("Error", new ErrorViewModel { RequestId = ex.Message });
-            }
-            catch (SocketException ex)
-            {
-                _logger.LogError("{Msg}", ex.Message);
-                return View("Error", new ErrorViewModel { RequestId = ex.Message });
-            }
-        }
-
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }
