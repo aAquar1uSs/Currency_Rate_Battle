@@ -1,9 +1,12 @@
-﻿namespace CurrencyRateBattleServer.Dto;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CurrencyRateBattleServer.Dto;
 
 public class AccountHistoryDto
 {
     public Guid AccountHistoryId { get; set; }
 
+    [Required]
     public Guid? RoomId { get; set; }
 
     public DateTime Date { get; set; }

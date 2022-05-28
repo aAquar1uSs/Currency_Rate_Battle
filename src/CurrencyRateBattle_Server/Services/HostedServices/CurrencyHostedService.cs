@@ -21,7 +21,7 @@ public class CurrencyHostedService : IHostedService, IDisposable
     {
         _logger.LogInformation("Currency Hosted Service running.");
 
-        _timer = new Timer(Callback, null, TimeSpan.FromSeconds(0),
+        _timer = new Timer(Callback, null, TimeSpan.Zero,
             TimeSpan.FromMinutes(30));
 
         return Task.CompletedTask;

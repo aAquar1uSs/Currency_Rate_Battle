@@ -30,20 +30,26 @@ public class CurrencyStateService : ICurrencyStateService
         _rateStorage = new List<CurrencyStateDto>();
     }
 
-    public async Task<Guid> GetCurrencyIdByRoomId(Guid roomId)
+    public async Task<Guid> GetCurrencyIdByRoomIdAsync(Guid roomId)
     {
+        _logger.LogDebug($"{nameof(GetCurrencyIdByRoomIdAsync)}, was caused.");
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+
+        await _semaphoreSlim.WaitAsync();
 
         var currId = await dbContext.CurrencyStates
             .Where(currState => currState.RoomId == roomId)
             .Select(currState => currState.CurrencyId).FirstAsync();
+        _ = _semaphoreSlim.Release();
 
         return currId;
     }
 
     public async Task PrepareUpdateCurrencyRateAsync()
     {
+        _logger.LogDebug($"{nameof(PrepareUpdateCurrencyRateAsync)}, was caused.");
+
         await GetCurrencyRatesFromNbuApiAsync();
 
         using var scope = _scopeFactory.CreateScope();
@@ -64,25 +70,39 @@ public class CurrencyStateService : ICurrencyStateService
 
     public async Task<CurrencyState?> GetCurrencyStateByRoomIdAsync(Guid roomId)
     {
+        _logger.LogDebug($"{nameof(GetCurrencyStateByRoomIdAsync)}, was caused.");
+
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        var currencyState = await db.CurrencyStates
-            .FirstOrDefaultAsync(currState => currState.RoomId == roomId);
+        CurrencyState? currencyState;
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+             currencyState = await db.CurrencyStates
+                .FirstOrDefaultAsync(currState => currState.RoomId == roomId);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
 
         return currencyState;
     }
 
     public async Task<List<CurrencyStateDto>> GetCurrencyStateAsync()
     {
+        _logger.LogDebug($"{nameof(GetCurrencyStateAsync)} was caused");
+
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         List<CurrencyStateDto> currencyStates = new();
+
         if (_rateStorage is null)
             return currencyStates;
 
-        await _semaphoreSlim.WaitAsync();
+        await _semaphoreSlimHosted.WaitAsync();
         try
         {
             foreach (var curr in dbContext.Currencies)
@@ -97,7 +117,7 @@ public class CurrencyStateService : ICurrencyStateService
         }
         finally
         {
-            _ = _semaphoreSlim.Release();
+            _ = _semaphoreSlimHosted.Release();
         }
 
         return currencyStates;
@@ -105,7 +125,10 @@ public class CurrencyStateService : ICurrencyStateService
 
     public async Task GetCurrencyRatesFromNbuApiAsync()
     {
+        _logger.LogDebug($"{nameof(GetCurrencyRatesFromNbuApiAsync)} was caused");
+
         using var client = new HttpClient();
+        await _semaphoreSlimHosted.WaitAsync();
         try
         {
             client.BaseAddress = new Uri(NBU_API);
@@ -124,23 +147,18 @@ public class CurrencyStateService : ICurrencyStateService
         {
             _logger.LogError(ex.Message);
         }
+        finally
+        {
+            _semaphoreSlimHosted.Release();
+        }
     }
 
     public async Task UpdateCurrencyRateAsync(CurrencyState currencyState)
     {
+        _logger.LogDebug($"{nameof(UpdateCurrencyRateAsync)} was caused");
+
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
-        var currencyName = (await db.Currencies
-            .FirstOrDefaultAsync(curr => curr.Id == currencyState.CurrencyId))?.CurrencyName;
-
-        if (_rateStorage is null)
-            return;
-
-        var currencyDto = _rateStorage.FirstOrDefault(curr => curr.Currency == currencyName);
-
-        if (currencyDto is null)
-            return;
 
         var currentDate = DateTime.ParseExact(
             DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
@@ -149,6 +167,17 @@ public class CurrencyStateService : ICurrencyStateService
         await _semaphoreSlimHosted.WaitAsync();
         try
         {
+            var currencyName = (await db.Currencies
+                .FirstOrDefaultAsync(curr => curr.Id == currencyState.CurrencyId))?.CurrencyName;
+
+            if (_rateStorage is null)
+                return;
+
+            var currencyDto = _rateStorage.FirstOrDefault(curr => curr.Currency == currencyName);
+
+            if (currencyDto is null)
+                return;
+
             currencyState.Date = currentDate;
             currencyState.CurrencyExchangeRate = Math.Round(currencyDto.Rate, 2);
 

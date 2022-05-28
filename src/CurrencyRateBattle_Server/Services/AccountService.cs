@@ -46,16 +46,27 @@ public class AccountService : IAccountService
 
     public async Task<Tokens?> GetUserAsync(UserDto userData)
     {
+        _logger.LogDebug($"{nameof(GetUserAsync)} was caused.");
+
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        var user = await db.Users
-            .FirstOrDefaultAsync(x => x.Email == userData.Email && x.Password == _encoder.Encrypt(userData.Password));
+        User? user;
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            user = await db.Users
+                .FirstOrDefaultAsync(x => x.Email == userData.Email && x.Password == _encoder.Encrypt(userData.Password));
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
 
         return user is null ? null! : _jwtManager.Authenticate(user);
     }
 
-    public async Task<Tokens?> СreateUserAsync(UserDto userData)
+    public async Task<Tokens?> CreateUserAsync(UserDto userData)
     {
         var user = new User
         {
@@ -76,6 +87,8 @@ public class AccountService : IAccountService
             _ = await db.Users.AddAsync(user);
             _ = await db.SaveChangesAsync();
 
+            _logger.LogInformation("New user added to the database");
+
             await _accountHistoryService.CreateHistoryByValuesAsync(null, user.Account.Id, DateTime.UtcNow,
                 _accountStartBalance, true);
 
@@ -89,25 +102,38 @@ public class AccountService : IAccountService
         return _jwtManager.Authenticate(user);
     }
 
-    public async Task<AccountInfoDto?> GetAccountInfoAsync(Guid id)
+    public async Task<AccountInfoDto?> GetAccountInfoByUserIdAsync(Guid id)
     {
+        _logger.LogDebug($"{nameof(GetAccountInfoByUserIdAsync)} was caused.");
+
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        var account = await db.Accounts.FirstOrDefaultAsync(a => a.UserId == id);
+        AccountInfoDto accountInfoDto;
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            var account = await db.Accounts.FirstOrDefaultAsync(a => a.UserId == id);
 
-        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-        if (user is null || account is null)
-            return null;
+            if (user is null || account is null)
+                return null;
 
-        var resultDto = new AccountInfoDto {Email = user.Email, Amount = account.Amount};
+            accountInfoDto = new AccountInfoDto {Email = user.Email, Amount = account.Amount};
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
 
-        return resultDto;
+        return accountInfoDto;
     }
 
     public async Task<Account?> GetAccountByUserIdAsync(Guid? userId)
     {
+        _logger.LogDebug($"{nameof(GetAccountInfoByUserIdAsync)} was caused.");
+
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -128,6 +154,7 @@ public class AccountService : IAccountService
 
     public Guid? GetGuidFromRequest(HttpContext context)
     {
+        _logger.LogDebug($"{nameof(GetGuidFromRequest)} was caused.");
         var user = context.User;
 
         if (user.HasClaim(c => c.Type == "UserId"))

@@ -23,6 +23,8 @@ public class AccountHistoryService : IAccountHistoryService
 
     public async Task<List<AccountHistory>> GetAccountHistoryByAccountId(Guid? id)
     {
+        _logger.LogDebug($"{nameof(GetAccountHistoryByAccountId)} was caused.");
+
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -45,7 +47,9 @@ public class AccountHistoryService : IAccountHistoryService
     public async Task CreateHistoryAsync(Room? room, Account account,
         AccountHistoryDto accountHistoryDto)
     {
-        var history = new AccountHistory()
+        _logger.LogDebug($"{nameof(CreateHistoryAsync)} was caused.");
+
+        var history = new AccountHistory
         {
             Date = accountHistoryDto.Date,
             Amount = accountHistoryDto.Amount,
@@ -53,6 +57,7 @@ public class AccountHistoryService : IAccountHistoryService
             AccountId = account.Id,
             Account = account
         };
+
         if (room is not null)
         {
             history.Room = room;
@@ -67,7 +72,7 @@ public class AccountHistoryService : IAccountHistoryService
         {
             _ = await dbContext.AccountHistory.AddAsync(history);
             _ = await dbContext.SaveChangesAsync();
-            _logger.LogInformation("New history record is added to the database.");
+            _logger.LogInformation("New history record added to the database.");
         }
         finally
         {
@@ -75,7 +80,8 @@ public class AccountHistoryService : IAccountHistoryService
         }
     }
 
-    public async Task CreateHistoryByValuesAsync(Guid? roomId, Guid accountId, DateTime recordDate, decimal amount, bool isCredit)
+    public async Task CreateHistoryByValuesAsync(Guid? roomId, Guid accountId, DateTime recordDate,
+        decimal amount, bool isCredit)
     {
         var history = new AccountHistory
         {
@@ -94,6 +100,7 @@ public class AccountHistoryService : IAccountHistoryService
         {
             _ = await dbContext.AccountHistory.AddAsync(history);
             _ = await dbContext.SaveChangesAsync();
+            _logger.LogInformation("New history record added to the database.");
         }
         finally
         {
