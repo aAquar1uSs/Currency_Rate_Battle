@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Threading.Tasks.Dataflow;
 using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
@@ -135,7 +136,7 @@ public class RoomService : IRoomService
         }
     }
 
-    public async Task<List<RoomDto>> GetRoomsAsync(bool? isActive)
+    public async Task<List<RoomDto>> GetRoomsAsync(bool? isClosed)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -147,7 +148,7 @@ public class RoomService : IRoomService
             var result = from curr in db.Currencies
                 join currState in db.CurrencyStates on curr.Id equals currState.CurrencyId
                 join room in db.Rooms on currState.RoomId equals room.Id
-                where room.IsClosed == isActive
+                where room.IsClosed == isClosed
                 select new
                 {
                     room.Id,
@@ -155,7 +156,8 @@ public class RoomService : IRoomService
                     room.Date,
                     room.IsClosed,
                     currState.CurrencyExchangeRate,
-                    RateDate = currState.Date
+                    RateDate = currState.Date,
+                    RateCount = db.Rates.Count(r => r.RoomId == room.Id)
                 };
 
             foreach (var data in result)
@@ -167,7 +169,8 @@ public class RoomService : IRoomService
                     СurrencyName = data.CurrencyName,
                     Date = data.Date,
                     IsClosed = data.IsClosed,
-                    UpdateRateTime = data.RateDate
+                    UpdateRateTime = data.RateDate,
+                    CountRates = data.RateCount
                 });
             }
         }

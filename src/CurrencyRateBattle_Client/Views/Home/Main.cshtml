@@ -40,6 +40,9 @@
                     <p>
                         @Html.Label(room.СurrencyName)
                     </p>
+                    <p>
+                        Count rates: @Html.DisplayFor(r => room.CountRates)
+                    </p>
                 </div>
                 <div class="info_time">
                     <p>@Html.Label(room.Date.ToLocalTime().ToString("MM/dd/yyyy HH:mm", CultureInfo.InvariantCulture))</p>

@@ -24,20 +24,16 @@ public class RateController : ControllerBase
 
     private readonly IPaymentService _paymentService;
 
-    private readonly IRoomService _roomService;
-
     public RateController(ILogger<RateController> logger,
         IRateService rateService,
         IAccountService accountService,
         ICurrencyStateService currencyStateService,
-        IRoomService roomService,
         IPaymentService paymentService)
     {
         _logger = logger;
         _rateService = rateService;
         _accountService = accountService;
         _currencyStateService = currencyStateService;
-        _roomService = roomService;
         _paymentService = paymentService;
     }
 
