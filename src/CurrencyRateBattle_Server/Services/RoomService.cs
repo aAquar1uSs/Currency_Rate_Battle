@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Threading.Tasks.Dataflow;
 using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
@@ -155,7 +156,8 @@ public class RoomService : IRoomService
                     room.Date,
                     room.IsClosed,
                     currState.CurrencyExchangeRate,
-                    RateDate = currState.Date
+                    RateDate = currState.Date,
+                    RateCount = db.Rates.Count(r => r.RoomId == room.Id)
                 };
 
             foreach (var data in result)
@@ -168,8 +170,7 @@ public class RoomService : IRoomService
                     Date = data.Date,
                     IsClosed = data.IsClosed,
                     UpdateRateTime = data.RateDate,
-                    //ToDo refactor
-                    CountRates = db.Rates.Count(rate => rate.RoomId == data.Id)
+                    CountRates = data.RateCount
                 });
             }
         }
