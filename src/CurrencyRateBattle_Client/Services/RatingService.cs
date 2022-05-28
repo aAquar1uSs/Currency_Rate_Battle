@@ -23,12 +23,20 @@ public class RatingService : IRatingService
     public async Task<List<RatingViewModel>> GetUserRatings()
     {
         var response = await _httpClient.GetAsync(_options.GetUsersRatingURL ?? "");
-        return response.StatusCode == HttpStatusCode.OK
-            ? await response.Content.ReadAsAsync<List<RatingViewModel>>()
-            : response.StatusCode == HttpStatusCode.Unauthorized ? throw new GeneralException() : new List<RatingViewModel>();
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            _logger.LogInformation("User rating are loaded successfully");
+            return await response.Content.ReadAsAsync<List<RatingViewModel>>();
+        }
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            _logger.LogInformation("User rating not loaded, user is unauthorized");
+            throw new GeneralException();
+        }
+        return new List<RatingViewModel>();
     }
 
-    public void RatingListSorting(ref List<RatingViewModel>? ratingInfo, string sortOrder)
+    public void RatingListSorting(ref List<RatingViewModel> ratingInfo, string sortOrder)
     {
         switch (sortOrder)
         {

@@ -5,5 +5,5 @@ public interface IRatingService
 {
     Task<List<RatingViewModel>> GetUserRatings();
 
-    void RatingListSorting(ref List<RatingViewModel>? ratingInfo, string sortOrder);
+    void RatingListSorting(ref List<RatingViewModel> ratingInfo, string sortOrder);
 }

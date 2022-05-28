@@ -5,7 +5,7 @@ namespace CRBClient.Services.Interfaces;
 
 public interface IRoomService
 {
-    public Task<List<RoomViewModel>> GetRoomsAsync(bool isClosed);
+    Task<List<RoomViewModel>> GetRoomsAsync(bool isClosed);
 
-    public Task<List<RoomViewModel>> GetFilteredCurrencyAsync(FilterDto filter);
+    Task<List<RoomViewModel>> GetFilteredCurrencyAsync(FilterDto filter);
 }

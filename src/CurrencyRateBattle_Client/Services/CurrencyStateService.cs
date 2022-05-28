@@ -31,12 +31,16 @@ public class CurrencyStateService : ICurrencyStateService
         List<CurrencyStateDto>? currencyStates = null;
         if (response.StatusCode == HttpStatusCode.OK)
         {
-            var content = await  response.Content.ReadAsStringAsync();
+            _logger.LogInformation("Currency rate are loaded successfully");
+            var content = await response.Content.ReadAsStringAsync();
             currencyStates = JsonSerializer.Deserialize<List<CurrencyStateDto>>(content);
         }
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            _logger.LogInformation("Currency rate not loaded, user is unauthorized");
             throw new GeneralException();
+        }
 
         if (currencyStates is null)
             currencyStates = new List<CurrencyStateDto>();
