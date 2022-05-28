@@ -31,7 +31,7 @@ public class CurrencyStateService : ICurrencyStateService
         List<CurrencyStateDto>? currencyStates = null;
         if (response.StatusCode == HttpStatusCode.OK)
         {
-            var content = await  response.Content.ReadAsStringAsync();
+            var content = await response.Content.ReadAsStringAsync();
             currencyStates = JsonSerializer.Deserialize<List<CurrencyStateDto>>(content);
         }
 

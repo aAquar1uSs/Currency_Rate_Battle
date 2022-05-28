@@ -35,19 +35,19 @@ public class AccountController : Controller
         }
         catch (GeneralException ex)
         {
-            _logger.LogDebug(ex.Message);
+            _logger.LogInformation("User {User}: {Msg}", user.Email, ex.Message);
             ViewData["ErrorMessage"] = ex.Message;
             return View("Authorization");
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            _logger.LogError("User {User}: {Msg}", user.Email, ex.Message);
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
-        catch(SocketException ex)
+        catch (SocketException ex)
         {
-            _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            _logger.LogError("User {User}: {Msg}", user.Email, ex.Message);
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 
         return Redirect("/Home/Main");
@@ -62,19 +62,19 @@ public class AccountController : Controller
         }
         catch (GeneralException ex)
         {
-            _logger.LogDebug(ex.Message);
+            _logger.LogInformation("User {User}: {Msg}", user.Email, ex.Message);
             ViewData["ErrorMessage"] = ex.Message;
             return View("Authorization");
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            _logger.LogError("User {User}: {Msg}", user.Email, ex.Message);
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
-        catch(SocketException ex)
+        catch (SocketException ex)
         {
-            _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            _logger.LogError("User {User}: {Msg}", user.Email, ex.Message);
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 
         return Redirect("/Home/Main");
@@ -83,6 +83,6 @@ public class AccountController : Controller
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }

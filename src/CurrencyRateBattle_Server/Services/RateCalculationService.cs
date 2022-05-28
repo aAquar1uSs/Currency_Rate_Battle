@@ -58,7 +58,7 @@ public class RateCalculationService : IRateCalculationService
         }
         catch (GeneralException ex)
         {
-            _logger.LogDebug(ex.Message);
+            _logger.LogDebug("{Msg}", ex.Message);
         }
     }
 }

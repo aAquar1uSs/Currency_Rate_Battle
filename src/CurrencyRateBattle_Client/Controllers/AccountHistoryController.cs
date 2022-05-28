@@ -42,13 +42,13 @@ namespace CRBClient.Controllers
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex.Message);
-                return View("Error", new ErrorViewModel {RequestId = ex.Message});
+                _logger.LogError("{Msg}", ex.Message);
+                return View("Error", new ErrorViewModel { RequestId = ex.Message });
             }
-            catch(SocketException ex)
+            catch (SocketException ex)
             {
-                _logger.LogError(ex.Message);
-                return View("Error", new ErrorViewModel {RequestId = ex.Message});
+                _logger.LogError("{Msg}", ex.Message);
+                return View("Error", new ErrorViewModel { RequestId = ex.Message });
             }
         }
 

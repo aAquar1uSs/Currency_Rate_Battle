@@ -26,11 +26,6 @@ public class UserService : IUserService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public string GetUserInfo()
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task RegisterUserAsync(UserViewModel user)
     {
         var response = await _httpClient.PostAsync(_options.RegistrationAccURL ?? "", user);

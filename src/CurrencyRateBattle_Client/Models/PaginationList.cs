@@ -8,6 +8,11 @@ public class PaginationList<T> : List<T>
 
     public int TotalPages { get; private set; }
 
+    public PaginationList()
+    {
+        PageIndex = 0;
+        TotalPages = 0;
+    }
 
     public PaginationList(List<T> items, int count, int pageIndex, int pageSize)
     {
@@ -21,7 +26,7 @@ public class PaginationList<T> : List<T>
 
     public bool HasNextPage => PageIndex < TotalPages;
 
-    public static async Task<PaginationList<T>> CreateAsync(List<T> source, int pageIndex, int pageSize)
+    public async Task<PaginationList<T>> CreateAsync(List<T> source, int pageIndex, int pageSize)
     {
         var count = source.Count;
         var items = await source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();

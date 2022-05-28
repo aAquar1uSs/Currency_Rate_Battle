@@ -64,14 +64,15 @@ public class HomeController : Controller
             _logger.LogDebug("User unauthorized");
             return Redirect("/Account/Authorization");
         }
-        catch(SocketException ex)
+        catch (SocketException ex)
         {
-            _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            _logger.LogError("{Msg}", ex.Message);
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 
         var pageSize = 4;
-        return View(await PaginationList<RoomViewModel>.CreateAsync(_roomStorage, page ?? 1, pageSize));
+        var roomViewModels = new PaginationList<RoomViewModel>();
+        return View(await roomViewModels.CreateAsync(_roomStorage, page ?? 1, pageSize));
     }
 
     public async Task<IActionResult> Profile()
@@ -91,13 +92,13 @@ public class HomeController : Controller
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            _logger.LogError("{Msg}", ex.Message);
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
-        catch(SocketException ex)
+        catch (SocketException ex)
         {
-            _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            _logger.LogError("{Msg}", ex.Message);
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 
         return View(accountInfo);
