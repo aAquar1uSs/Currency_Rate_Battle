@@ -63,7 +63,7 @@ public class AccountService : IAccountService
         {
             Email = userData.Email,
             Password = _encoder.Encrypt(userData.Password),
-            Account = new Account {Amount = _accountStartBalance}
+            Account = new Account { Amount = _accountStartBalance }
         };
 
         using var scope = _scopeFactory.CreateScope();

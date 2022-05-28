@@ -13,7 +13,7 @@ public class UserService : IUserService
     private readonly WebServerOptions _options;
     private readonly ILogger<UserService> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private ISession Session => _httpContextAccessor.HttpContext.Session;
+    private ISession? Session => _httpContextAccessor.HttpContext?.Session;
 
     public UserService(ICRBServerHttpClient httpClient,
         IHttpContextAccessor httpContextAccessor,
@@ -30,15 +30,16 @@ public class UserService : IUserService
     {
         var response = await _httpClient.PostAsync(_options.RegistrationAccURL ?? "", user);
 
-        if (!user.Password.Equals(user.ConfirmPassword, StringComparison.Ordinal))
+        if (user.Password != user.ConfirmPassword)
         {
-            throw new GeneralException("Password is not confirmed.");
+            throw new GeneralException("Passwords do not match.");
         }
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
             var token = await response.Content.ReadAsStringAsync();
-            Session.SetString("token", token);
+            if (Session is not null)
+                Session.SetString("token", token);
         }
         else
         {
@@ -55,7 +56,8 @@ public class UserService : IUserService
         {
             var token = await response.Content.ReadAsStringAsync();
 
-            Session.SetString("token", token);
+            if (Session is not null)
+                Session.SetString("token", token);
         }
         else
         {
@@ -125,7 +127,8 @@ public class UserService : IUserService
 
     public void Logout()
     {
-        Session.Remove("token");
+        if (Session is not null)
+            Session.Remove("token");
         _httpClient.ClearHeader();
     }
 }
