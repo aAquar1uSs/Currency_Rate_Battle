@@ -23,9 +23,17 @@ public class UserRateService : IUserRateService
     public async Task<List<BetViewModel>> GetUserRates()
     {
         var response = await _httpClient.GetAsync(_options.GetUserBetsURL ?? "");
-        return response.StatusCode == HttpStatusCode.OK
-            ? await response.Content.ReadAsAsync<List<BetViewModel>>()
-            : response.StatusCode == HttpStatusCode.Unauthorized ? throw new GeneralException() : new List<BetViewModel>();
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            _logger.LogInformation("User rates are loaded successfully");
+            return await response.Content.ReadAsAsync<List<BetViewModel>>();
+        }
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            _logger.LogInformation("User rates not loaded, user is unauthorized");
+            throw new GeneralException();
+        }
+        return new List<BetViewModel>();
     }
 
 
@@ -42,10 +50,16 @@ public class UserRateService : IUserRateService
         var errorMsg = await response.Content.ReadAsStringAsync();
         _logger.LogError("Rate Insertion: {ErrorMsg}", errorMsg);
         if (response.StatusCode == HttpStatusCode.Conflict)
+        {
+            _logger.LogInformation(errorMsg);
             throw new GeneralException(errorMsg);
+        }
 
         if (response.StatusCode == HttpStatusCode.BadRequest)
+        {
+            _logger.LogInformation(errorMsg);
             throw new GeneralException(errorMsg);
+        }
     }
 
 }

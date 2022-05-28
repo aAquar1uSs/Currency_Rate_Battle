@@ -15,5 +15,5 @@ public interface IUserService
 
     Task<decimal> GetUserBalanceDecimalAsync();
 
-    public void Logout();
+    void Logout();
 }

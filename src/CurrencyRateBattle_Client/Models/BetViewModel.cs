@@ -1,9 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-
-namespace CRBClient.Models;
+﻿namespace CRBClient.Models;
 
 public class BetViewModel
 {

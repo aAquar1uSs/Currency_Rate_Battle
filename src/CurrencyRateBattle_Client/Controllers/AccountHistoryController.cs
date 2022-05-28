@@ -7,20 +7,20 @@ using PagedListExtensions = X.PagedList.PagedListExtensions;
 using System.Globalization;
 using System.Net.Sockets;
 
-namespace CRBClient.Controllers
+namespace CRBClient.Controllers;
+
+public class AccountHistoryController : Controller
 {
-    public class AccountHistoryController : Controller
+    private readonly ILogger<AccountHistoryController> _logger;
+
+    private readonly IUserService _userService;
+
+    public AccountHistoryController(ILogger<AccountHistoryController> logger,
+        IUserService userService)
     {
-        private readonly ILogger<AccountHistoryController> _logger;
-
-        private readonly IUserService _userService;
-
-        public AccountHistoryController(ILogger<AccountHistoryController> logger,
-            IUserService userService)
-        {
-            _logger = logger;
-            _userService = userService;
-        }
+        _logger = logger;
+        _userService = userService;
+    }
 
         public async Task<IActionResult> Index(int? page)
         {
@@ -52,10 +52,9 @@ namespace CRBClient.Controllers
             }
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }

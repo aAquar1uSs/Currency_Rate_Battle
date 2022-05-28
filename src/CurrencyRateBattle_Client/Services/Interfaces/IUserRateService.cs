@@ -5,5 +5,4 @@ public interface IUserRateService
 {
     Task<List<BetViewModel>> GetUserRates();
     Task InsertUserRateAsync(RateViewModel rateViewModel);
-
 }
