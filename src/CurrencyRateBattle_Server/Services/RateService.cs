@@ -217,6 +217,7 @@ public class RateService : IRateService
             _ = _semaphoreSlim.Release();
         }
 
+        betDtoStorage.Sort((bet1, bet2) => bet1.RoomDate.CompareTo(bet2.RoomDate));
         return betDtoStorage;
     }
 
