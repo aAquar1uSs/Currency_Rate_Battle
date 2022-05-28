@@ -7,55 +7,56 @@ using PagedListExtensions = X.PagedList.PagedListExtensions;
 using System.Globalization;
 using System.Net.Sockets;
 
-namespace CRBClient.Controllers
+namespace CRBClient.Controllers;
+
+public class AccountHistoryController : Controller
 {
-    public class AccountHistoryController : Controller
+    private readonly ILogger<AccountHistoryController> _logger;
+
+    private readonly IUserService _userService;
+
+    public AccountHistoryController(ILogger<AccountHistoryController> logger,
+        IUserService userService)
     {
-        private readonly ILogger<AccountHistoryController> _logger;
+        _logger = logger;
+        _userService = userService;
+    }
 
-        private readonly IUserService _userService;
+    public async Task<IActionResult> Index(int? page)
+    {
+        var pageSize = 10;
+        var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
 
-        public AccountHistoryController(ILogger<AccountHistoryController> logger,
-            IUserService userService)
+        ViewBag.Balance = await _userService.GetUserBalanceAsync();
+        ViewBag.Title = "Account History";
+
+        try
         {
-            _logger = logger;
-            _userService = userService;
+            var accountHistoryInfo = await _userService.GetAccountHistoryAsync();
+            var accountHistories = PagedListExtensions.ToPagedList(accountHistoryInfo, pageIndex, pageSize);
+            _logger.LogInformation("Account history page");
+            return View(accountHistories);
         }
-
-        public async Task<IActionResult> Index(int? page)
+        catch (GeneralException)
         {
-            var pageSize = 10;
-            var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
-            ViewBag.Balance = await _userService.GetUserBalanceAsync();
-            ViewBag.Title = "Account History";
-            try
-            {
-                var accountHistoryInfo = await _userService.GetAccountHistoryAsync();
-                //accountHistories = accountHistoryInfo.ToPagedList(pageIndex, pageSize);
-                var accountHistories = PagedListExtensions.ToPagedList(accountHistoryInfo, pageIndex, pageSize);
-                return View(accountHistories);
-            }
-            catch (GeneralException)
-            {
-                _logger.LogDebug("User unauthorized");
-                return Redirect("/Account/Authorization");
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex.Message);
-                return View("Error", new ErrorViewModel {RequestId = ex.Message});
-            }
-            catch(SocketException ex)
-            {
-                _logger.LogError(ex.Message);
-                return View("Error", new ErrorViewModel {RequestId = ex.Message});
-            }
+            _logger.LogDebug("User unauthorized");
+            return Redirect("/Account/Authorization");
         }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        catch (HttpRequestException ex)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            _logger.LogError(ex.Message);
+            return View("Error", new ErrorViewModel {RequestId = ex.Message});
         }
+        catch(SocketException ex)
+        {
+            _logger.LogError(ex.Message);
+            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+        }
+    }
+
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }

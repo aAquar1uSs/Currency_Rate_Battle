@@ -42,14 +42,15 @@ public class AccountController : Controller
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
-        catch(SocketException ex)
+        catch (SocketException ex)
         {
             _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 
+        _logger.LogInformation($"User '{user.Email}' has successfully logged in");
         return Redirect("/Home/Main");
     }
 
@@ -69,20 +70,21 @@ public class AccountController : Controller
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
-        catch(SocketException ex)
+        catch (SocketException ex)
         {
             _logger.LogError(ex.Message);
-            return View("Error", new ErrorViewModel {RequestId = ex.Message});
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 
+        _logger.LogInformation($"User '{user.Email}' has successfully registered");
         return Redirect("/Home/Main");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }
