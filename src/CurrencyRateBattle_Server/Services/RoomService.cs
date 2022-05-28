@@ -202,7 +202,8 @@ public class RoomService : IRoomService
                 currencyState.CurrencyId,
                 room.IsClosed,
                 curr.CurrencyName,
-                RateUpdateDate = currencyState.Date
+                RateUpdateDate = currencyState.Date,
+                RateCount = db.Rates.Count(r => r.RoomId == room.Id)
             };
 
         if (!string.IsNullOrWhiteSpace(filter.CurrencyName))
@@ -223,10 +224,10 @@ public class RoomService : IRoomService
                     Date = room.Date,
                     СurrencyName = room.CurrencyName,
                     UpdateRateTime = room.RateUpdateDate,
-                    IsClosed = room.IsClosed
+                    IsClosed = room.IsClosed,
+                    CountRates = room.RateCount
                 });
         }
-
 
         return Task.FromResult(result);
     }
