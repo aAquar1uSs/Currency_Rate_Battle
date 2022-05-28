@@ -35,6 +35,6 @@ public class WinnerHandler : AbstractHandler
             rate.IsClosed = true;
         }
 
-        return await base.Handle(rates);
+        return await Handle(rates);
     }
 }
