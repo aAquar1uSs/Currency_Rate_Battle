@@ -51,17 +51,8 @@ public class AccountService : IAccountService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        User? user;
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            user = await db.Users
-                .FirstOrDefaultAsync(x => x.Email == userData.Email && x.Password == _encoder.Encrypt(userData.Password));
-        }
-        finally
-        {
-            _semaphoreSlim.Release();
-        }
+        var user = await db.Users
+            .FirstOrDefaultAsync(x => x.Email == userData.Email && x.Password == _encoder.Encrypt(userData.Password));
 
         return user is null ? null! : _jwtManager.Authenticate(user);
     }
@@ -86,18 +77,18 @@ public class AccountService : IAccountService
         {
             _ = await db.Users.AddAsync(user);
             _ = await db.SaveChangesAsync();
-
-            _logger.LogInformation("New user added to the database");
-
-            await _accountHistoryService.CreateHistoryByValuesAsync(null, user.Account.Id, DateTime.UtcNow,
-                _accountStartBalance, true);
-
-            _ = await db.SaveChangesAsync();
         }
         finally
         {
-            _ = _semaphoreSlim.Release();
+            _semaphoreSlim.Release();
         }
+
+        _logger.LogInformation("New user added to the database");
+
+        await _accountHistoryService.CreateHistoryByValuesAsync(null, user.Account.Id, DateTime.UtcNow,
+            _accountStartBalance, true);
+
+        _ = await db.SaveChangesAsync();
 
         return _jwtManager.Authenticate(user);
     }
@@ -109,24 +100,14 @@ public class AccountService : IAccountService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        AccountInfoDto accountInfoDto;
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            var account = await db.Accounts.FirstOrDefaultAsync(a => a.UserId == id);
+        var account = await db.Accounts.FirstOrDefaultAsync(a => a.UserId == id);
 
-            var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
 
-            if (user is null || account is null)
-                return null;
+        if (user is null || account is null)
+            return null;
 
-            accountInfoDto = new AccountInfoDto {Email = user.Email, Amount = account.Amount};
-        }
-        finally
-        {
-            _semaphoreSlim.Release();
-        }
-
+        var accountInfoDto = new AccountInfoDto {Email = user.Email, Amount = account.Amount};
         return accountInfoDto;
     }
 
@@ -137,17 +118,8 @@ public class AccountService : IAccountService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        Account? account;
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            account = await db.Accounts
+        var account = await db.Accounts
                 .FirstOrDefaultAsync(acc => acc.UserId == userId);
-        }
-        finally
-        {
-            _semaphoreSlim.Release();
-        }
 
         return account;
     }

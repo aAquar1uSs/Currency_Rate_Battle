@@ -17,8 +17,6 @@ public class RoomService : IRoomService
 
     private readonly IRateCalculationService _rateCalculationService;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
-
     private readonly SemaphoreSlim _semaphoreSlimRateHosted = new(1, 1);
 
     private readonly SemaphoreSlim _semaphoreSlimRoomHosted = new(1, 1);
@@ -142,41 +140,33 @@ public class RoomService : IRoomService
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         List<RoomDto> roomDtoStorage = new();
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            var result = from curr in db.Currencies
-                join currState in db.CurrencyStates on curr.Id equals currState.CurrencyId
-                join room in db.Rooms on currState.RoomId equals room.Id
-                where room.IsClosed == isClosed
-                select new
-                {
-                    room.Id,
-                    curr.CurrencyName,
-                    room.Date,
-                    room.IsClosed,
-                    currState.CurrencyExchangeRate,
-                    RateDate = currState.Date,
-                    RateCount = db.Rates.Count(r => r.RoomId == room.Id)
-                };
-
-            foreach (var data in result)
+        var result = from curr in db.Currencies
+            join currState in db.CurrencyStates on curr.Id equals currState.CurrencyId
+            join room in db.Rooms on currState.RoomId equals room.Id
+            where room.IsClosed == isClosed
+            select new
             {
-                roomDtoStorage.Add(new RoomDto
-                {
-                    Id = data.Id,
-                    CurrencyExchangeRate = Math.Round(data.CurrencyExchangeRate, 2),
-                    СurrencyName = data.CurrencyName,
-                    Date = data.Date,
-                    IsClosed = data.IsClosed,
-                    UpdateRateTime = data.RateDate,
-                    CountRates = data.RateCount
-                });
-            }
-        }
-        finally
+                room.Id,
+                curr.CurrencyName,
+                room.Date,
+                room.IsClosed,
+                currState.CurrencyExchangeRate,
+                RateDate = currState.Date,
+                RateCount = db.Rates.Count(r => r.RoomId == room.Id)
+            };
+
+        foreach (var data in result)
         {
-            _ = _semaphoreSlim.Release();
+            roomDtoStorage.Add(new RoomDto
+            {
+                Id = data.Id,
+                CurrencyExchangeRate = Math.Round(data.CurrencyExchangeRate, 2),
+                СurrencyName = data.CurrencyName,
+                Date = data.Date,
+                IsClosed = data.IsClosed,
+                UpdateRateTime = data.RateDate,
+                CountRates = data.RateCount
+            });
         }
 
         return roomDtoStorage;
@@ -187,73 +177,58 @@ public class RoomService : IRoomService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        Room? result;
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            result = await db.Rooms.FirstOrDefaultAsync(r => r.Id == id);
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
-        }
+        var result = await db.Rooms.FirstOrDefaultAsync(r => r.Id == id);
 
         return result;
     }
 
-    public async Task<List<RoomDto>?> GetActiveRoomsWithFilterAsync(Filter filter)
+    public  Task<List<RoomDto>?> GetActiveRoomsWithFilterAsync(Filter filter)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         var result = new List<RoomDto>();
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            var filteredRooms =
-                from currencyState in db.CurrencyStates
-                join room in db.Rooms on currencyState.RoomId equals room.Id
-                join curr in db.Currencies on currencyState.CurrencyId equals curr.Id
-                where room.IsClosed == false
-                select new
-                {
-                    room.Id,
-                    room.Date,
-                    currencyState.CurrencyExchangeRate,
-                    currencyState.CurrencyId,
-                    room.IsClosed,
-                    curr.CurrencyName,
-                    RateUpdateDate = currencyState.Date
-                };
 
-            if (!string.IsNullOrWhiteSpace(filter.CurrencyName))
-                filteredRooms =
-                    filteredRooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant());
-            if (filter.DateTryParse(filter.StartDate, out var startDate))
-                filteredRooms = filteredRooms.Where(room => room.Date >= startDate);
-            if (filter.DateTryParse(filter.EndDate, out var endDate))
-                filteredRooms = filteredRooms.Where(room => room.Date <= endDate);
-
-            foreach (var room in filteredRooms)
+        var filteredRooms =
+            from currencyState in db.CurrencyStates
+            join room in db.Rooms on currencyState.RoomId equals room.Id
+            join curr in db.Currencies on currencyState.CurrencyId equals curr.Id
+            where room.IsClosed == false
+            select new
             {
-                result.Add(
-                    new RoomDto
-                    {
-                        Id = room.Id,
-                        CurrencyExchangeRate = room.CurrencyExchangeRate,
-                        Date = room.Date,
-                        СurrencyName = room.CurrencyName,
-                        UpdateRateTime = room.RateUpdateDate,
-                        IsClosed = room.IsClosed
-                    });
-            }
-        }
-        finally
+                room.Id,
+                room.Date,
+                currencyState.CurrencyExchangeRate,
+                currencyState.CurrencyId,
+                room.IsClosed,
+                curr.CurrencyName,
+                RateUpdateDate = currencyState.Date
+            };
+
+        if (!string.IsNullOrWhiteSpace(filter.CurrencyName))
+            filteredRooms =
+                filteredRooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant());
+        if (filter.DateTryParse(filter.StartDate, out var startDate))
+            filteredRooms = filteredRooms.Where(room => room.Date >= startDate);
+        if (filter.DateTryParse(filter.EndDate, out var endDate))
+            filteredRooms = filteredRooms.Where(room => room.Date <= endDate);
+
+        foreach (var room in filteredRooms)
         {
-            _ = _semaphoreSlim.Release();
+            result.Add(
+                new RoomDto
+                {
+                    Id = room.Id,
+                    CurrencyExchangeRate = room.CurrencyExchangeRate,
+                    Date = room.Date,
+                    СurrencyName = room.CurrencyName,
+                    UpdateRateTime = room.RateUpdateDate,
+                    IsClosed = room.IsClosed
+                });
         }
 
-        return result;
+
+        return Task.FromResult(result);
     }
 
     public async Task DeleteRoomByIdAsync(Guid roomId)

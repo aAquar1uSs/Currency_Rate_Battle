@@ -28,18 +28,9 @@ public class AccountHistoryService : IAccountHistoryService
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        List<AccountHistory> histories;
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            histories = await dbContext.AccountHistory
-                .Where(history => history.AccountId == id)
-                .ToListAsync();
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
-        }
+        var histories = await dbContext.AccountHistory
+            .Where(history => history.AccountId == id)
+            .ToListAsync();
 
         return histories;
     }
@@ -72,12 +63,13 @@ public class AccountHistoryService : IAccountHistoryService
         {
             _ = await dbContext.AccountHistory.AddAsync(history);
             _ = await dbContext.SaveChangesAsync();
-            _logger.LogInformation("New history record added to the database.");
         }
         finally
         {
-            _ = _semaphoreSlim.Release();
+            _semaphoreSlim.Release();
         }
+
+        _logger.LogInformation("New history record added to the database.");
     }
 
     public async Task CreateHistoryByValuesAsync(Guid? roomId, Guid accountId, DateTime recordDate,
@@ -100,11 +92,12 @@ public class AccountHistoryService : IAccountHistoryService
         {
             _ = await dbContext.AccountHistory.AddAsync(history);
             _ = await dbContext.SaveChangesAsync();
-            _logger.LogInformation("New history record added to the database.");
         }
         finally
         {
-            _ = _semaphoreSlim.Release();
+            _semaphoreSlim.Release();
         }
+
+        _logger.LogInformation("New history record added to the database.");
     }
 }

@@ -18,9 +18,9 @@ public class CurrencyStateService : ICurrencyStateService
 
     private readonly IServiceScopeFactory _scopeFactory;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
-
     private readonly SemaphoreSlim _semaphoreSlimHosted = new(1, 1);
+
+    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
     public CurrencyStateService(ILogger<CurrencyStateService> logger,
         IServiceScopeFactory scopeFactory)
@@ -36,12 +36,9 @@ public class CurrencyStateService : ICurrencyStateService
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        await _semaphoreSlim.WaitAsync();
-
         var currId = await dbContext.CurrencyStates
             .Where(currState => currState.RoomId == roomId)
             .Select(currState => currState.CurrencyId).FirstAsync();
-        _ = _semaphoreSlim.Release();
 
         return currId;
     }
@@ -75,17 +72,8 @@ public class CurrencyStateService : ICurrencyStateService
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        CurrencyState? currencyState;
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-             currencyState = await db.CurrencyStates
-                .FirstOrDefaultAsync(currState => currState.RoomId == roomId);
-        }
-        finally
-        {
-            _semaphoreSlim.Release();
-        }
+        var currencyState = await db.CurrencyStates
+            .FirstOrDefaultAsync(currState => currState.RoomId == roomId);
 
         return currencyState;
     }
@@ -102,7 +90,7 @@ public class CurrencyStateService : ICurrencyStateService
         if (_rateStorage is null)
             return currencyStates;
 
-        await _semaphoreSlimHosted.WaitAsync();
+        await _semaphoreSlim.WaitAsync();
         try
         {
             foreach (var curr in dbContext.Currencies)
@@ -117,10 +105,10 @@ public class CurrencyStateService : ICurrencyStateService
         }
         finally
         {
-            _ = _semaphoreSlimHosted.Release();
+            _ = _semaphoreSlim.Release();
         }
 
-        return currencyStates;
+        return await Task.FromResult(currencyStates);
     }
 
     public async Task GetCurrencyRatesFromNbuApiAsync()
