@@ -1,0 +1,42 @@
+version: '3.4'
+
+services:
+
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=111111
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=POSTGRES
+    ports:
+      - '5432:5432'
+    volumes: 
+      - dbvol:/var/lib/postgresql/data
+
+  currencyratebattleserver:
+    image: ${DOCKER_REGISTRY-}currencyratebattleserver
+    build:
+      context: .
+      dockerfile: src/CurrencyRateBattle_Server/Dockerfile
+    
+    ports:
+      - "5003:80"      
+      
+    volumes: 
+      - servervol:/var/lib/server
+      
+  currencyratebattleclient:
+    image: ${DOCKER_REGISTRY-}currencyratebattleclient
+    build:
+      context: .
+      dockerfile: src/CurrencyRateBattle_Client/Dockerfile
+      
+    ports:
+      - "5001:80"
+      
+volumes:
+  dbvol:
+    driver: local
+  servervol:
+    driver: local
