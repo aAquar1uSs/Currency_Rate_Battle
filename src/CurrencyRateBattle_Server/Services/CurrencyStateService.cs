@@ -55,7 +55,8 @@ public class CurrencyStateService : ICurrencyStateService
         foreach (var room in dbContext.Rooms)
         {
             if (room.Date.Date == DateTime.UtcNow.Date
-                && room.Date.Hour == DateTime.UtcNow.Hour)
+                && room.Date.Hour == DateTime.UtcNow.Hour
+                || DateTime.UtcNow.Date > room.Date.Date)
             {
                 var currencyState = await GetCurrencyStateByRoomIdAsync(room.Id);
 
