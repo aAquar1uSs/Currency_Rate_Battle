@@ -20,6 +20,9 @@ services:
       context: .
       dockerfile: src/CurrencyRateBattle_Server/Dockerfile
     
+    environment:
+      - ConnectionStrings__ConnectionDb=Host=db;Port=5432;Database=CRBdb;Username=postgres;Password=111111
+      
     ports:
       - "5003:80"      
       
@@ -31,7 +34,9 @@ services:
     build:
       context: .
       dockerfile: src/CurrencyRateBattle_Client/Dockerfile
-      
+    environment:
+      - WebServer__BaseURL=http://currencyratebattleserver:80
+    
     ports:
       - "5001:80"
       
