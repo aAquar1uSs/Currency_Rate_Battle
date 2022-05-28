@@ -141,11 +141,11 @@ public class CurrencyStateService : ICurrencyStateService
         }
         catch (HttpRequestException httpRequestException)
         {
-            _logger.LogError(httpRequestException.StackTrace);
+            _logger.LogError("{Stack}", httpRequestException.StackTrace);
         }
         catch (ArgumentException ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Msg}", ex.Message);
         }
         finally
         {

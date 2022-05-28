@@ -33,7 +33,7 @@ namespace CRBClient.Controllers
             ViewBag.WonBetNoSortParm = sortOrder == "won_bets_no" ? "won_bets_no_asc" : "won_bets_no";
             ViewBag.ProfitPercSortParm = sortOrder == "profitperc" ? "profitperc_asc" : "profitperc";
             ViewBag.WonBetsPercSortParm = sortOrder == "wonbetsperc" ? "wonbetsperc_acs" : "wonbetsperc";
-            var pageSize = 10;
+            var pageSize = 5;
             var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
             ViewBag.Balance = await _userService.GetUserBalanceAsync();
             ViewBag.Title = "Users Ratings";
@@ -90,20 +90,20 @@ namespace CRBClient.Controllers
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex.Message);
-                return View("Error", new ErrorViewModel {RequestId = ex.Message});
+                _logger.LogError("{Msg}", ex.Message);
+                return View("Error", new ErrorViewModel { RequestId = ex.Message });
             }
-            catch(SocketException ex)
+            catch (SocketException ex)
             {
-                _logger.LogError(ex.Message);
-                return View("Error", new ErrorViewModel {RequestId = ex.Message});
+                _logger.LogError("{Msg}", ex.Message);
+                return View("Error", new ErrorViewModel { RequestId = ex.Message });
             }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

@@ -43,7 +43,7 @@
                    @("--");
                } 
                else { 
-                   @(((decimal)Model[i].PayoutAmount).ToString("C", new CultureInfo("uk-UA"))); 
+                   @(((decimal)(Model[i].PayoutAmount ?? 0)).ToString("C", new CultureInfo("uk-UA"))); 
                }
            </td>
            <td style="text-align:right">@Model[i].СurrencyName</td>
@@ -54,7 +54,7 @@
                    @("--") ;
                } 
                else { 
-                   @(((decimal)Model[i].WonCurrencyExchange).ToString("C", new CultureInfo("uk-UA"))); 
+                   @(((decimal)(Model[i].WonCurrencyExchange ?? 0)).ToString("C", new CultureInfo("uk-UA"))); 
                }
 </td>
 </tr>

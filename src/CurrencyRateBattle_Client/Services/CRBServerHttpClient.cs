@@ -27,7 +27,7 @@ public class CRBServerHttpClient : ICRBServerHttpClient, IDisposable
 
     public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage)
     {
-        _logger.LogInformation($"Sending request to {requestMessage.RequestUri}...");
+        _logger.LogInformation("Sending request to {RequestMessage}...", requestMessage.RequestUri);
 
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", Session.GetString("token"));
@@ -39,7 +39,7 @@ public class CRBServerHttpClient : ICRBServerHttpClient, IDisposable
 
     public async Task<HttpResponseMessage> PostAsync<T>(string requestUrl, T content)
     {
-        _logger.LogInformation($"Sending request to {requestUrl}...");
+        _logger.LogInformation("Sending request to {RequestUrl}...", requestUrl);
 
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", Session.GetString("token"));
@@ -50,7 +50,7 @@ public class CRBServerHttpClient : ICRBServerHttpClient, IDisposable
 
     public async Task<HttpResponseMessage> GetAsync(string requestUrl)
     {
-        _logger.LogInformation($"Sending request to {requestUrl}...");
+        _logger.LogInformation("Sending request to {RequestUrl}...", requestUrl);
 
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", Session.GetString("token"));

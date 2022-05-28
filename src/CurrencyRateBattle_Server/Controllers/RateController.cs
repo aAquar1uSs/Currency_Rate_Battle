@@ -63,6 +63,7 @@ public class RateController : ControllerBase
         return Ok(bets);
     }
 
+    // GET api/rates/
     [HttpGet("get-users-rating")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
@@ -118,7 +119,7 @@ public class RateController : ControllerBase
 
             var rate = await _rateService.CreateRateAsync(rateToCreate, account.Id, currencyId);
 
-            _logger.LogInformation($"Rate has been created successfully ({rate.Id})");
+            _logger.LogInformation("Rate has been created successfully ({Id})", rate.Id);
             return Ok(rate);
         }
         catch (GeneralException ex)

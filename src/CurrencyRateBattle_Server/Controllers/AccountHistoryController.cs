@@ -77,11 +77,12 @@ public class AccountHistoryController : ControllerBase
             if (historyDto.RoomId is not null)
                 room = await _roomService.GetRoomByIdAsync((Guid)historyDto.RoomId);
 
-            await _historyService.CreateHistoryAsync(room, account, historyDto);
+            if (account != null)
+                await _historyService.CreateHistoryAsync(room, account, historyDto);
         }
         catch (DbUpdateException ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError("{Msg}", ex.Message);
             return BadRequest();
         }
 
