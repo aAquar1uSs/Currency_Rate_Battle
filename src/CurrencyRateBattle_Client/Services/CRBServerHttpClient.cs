@@ -13,7 +13,7 @@ public class CRBServerHttpClient : ICRBServerHttpClient, IDisposable
     private readonly ILogger<CRBServerHttpClient> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    private ISession Session => _httpContextAccessor.HttpContext.Session;
+    private ISession? Session => _httpContextAccessor.HttpContext?.Session;
 
     public CRBServerHttpClient(IOptions<WebServerOptions> options,
         IHttpContextAccessor httpContextAccessor,
@@ -29,8 +29,11 @@ public class CRBServerHttpClient : ICRBServerHttpClient, IDisposable
     {
         _logger.LogInformation("Sending request to {RequestMessage}...", requestMessage.RequestUri);
 
-        _httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", Session.GetString("token"));
+        if (Session is not null)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", Session.GetString("token"));
+        }
 
         var responseMessage = await _httpClient.SendAsync(requestMessage);
 
@@ -41,8 +44,11 @@ public class CRBServerHttpClient : ICRBServerHttpClient, IDisposable
     {
         _logger.LogInformation("Sending request to {RequestUrl}...", requestUrl);
 
-        _httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", Session.GetString("token"));
+        if (Session is not null)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", Session.GetString("token"));
+        }
 
         var response = await _httpClient.PostAsync(requestUrl, content, new JsonMediaTypeFormatter());
         return response;
@@ -52,8 +58,11 @@ public class CRBServerHttpClient : ICRBServerHttpClient, IDisposable
     {
         _logger.LogInformation("Sending request to {RequestUrl}...", requestUrl);
 
-        _httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", Session.GetString("token"));
+        if (Session is not null)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", Session.GetString("token"));
+        }
 
         var response = await _httpClient.GetAsync(requestUrl);
         return response;
