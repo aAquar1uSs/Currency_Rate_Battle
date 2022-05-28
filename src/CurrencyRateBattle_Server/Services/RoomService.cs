@@ -16,8 +16,6 @@ public class RoomService : IRoomService
 
     private readonly IRateCalculationService _rateCalculationService;
 
-    private readonly IRateService _rateService;
-
     private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
     private readonly SemaphoreSlim _semaphoreSlimRateHosted = new(1, 1);
@@ -26,13 +24,11 @@ public class RoomService : IRoomService
 
     public RoomService(ILogger<RoomService> logger,
         IRateCalculationService rateCalculationService,
-        IServiceScopeFactory scopeFactory,
-        IRateService rateService)
+        IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
         _rateCalculationService = rateCalculationService;
         _scopeFactory = scopeFactory;
-        _rateService = rateService;
     }
 
     public async Task GenerateRoomsByCurrencyCountAsync()
@@ -173,7 +169,7 @@ public class RoomService : IRoomService
                     IsClosed = data.IsClosed,
                     UpdateRateTime = data.RateDate,
                     //ToDo refactor
-                    CountRates = await _rateService.GetRateCountByRoomIdAsync(data.Id)
+                    CountRates = db.Rates.Count(rate => rate.RoomId == data.Id)
                 });
             }
         }

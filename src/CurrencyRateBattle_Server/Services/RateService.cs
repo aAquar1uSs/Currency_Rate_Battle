@@ -337,12 +337,4 @@ public class RateService : IRateService
 
         return userRatings;
     }
-
-    public async Task<int> GetRateCountByRoomIdAsync(Guid roomId)
-    {
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
-        return await db.Rates.CountAsync(rate => rate.RoomId == roomId);
-    }
 }
