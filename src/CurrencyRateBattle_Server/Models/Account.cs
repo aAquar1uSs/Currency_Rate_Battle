@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyRateBattleServer.Models;
 
+[Index(nameof(UserId), IsUnique = true)]
 public sealed class Account
 {
     [Key]

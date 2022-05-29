@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyRateBattleServer.Models;
 
+[Index(nameof(CurrencyName), IsUnique = true)]
 public class Currency
 {
     [Key]
