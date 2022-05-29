@@ -31,7 +31,21 @@ public class AccountController : Controller
     public async Task<ActionResult> LoginAsync(UserViewModel user)
     {
         ViewBag.ActiveTab = 1;
+        if (!ModelState.IsValid)
+        {
 
+            var errors = ModelState.Keys.Where(key => key != "ConfirmPassword").SelectMany(key => ModelState[key].Errors);
+            if (errors.Any())
+            {
+                var errMsg = string.Empty;
+                foreach (var error in errors)
+                {
+                    errMsg += error.ErrorMessage + " ";//br and \r\n do not work
+                }
+                ViewData["ErrorMessage"] = errMsg;
+                return View("Authorization");
+            }
+        }
         try
         {
             await _userService.LoginUserAsync(user);
@@ -65,13 +79,16 @@ public class AccountController : Controller
         if (!ModelState.IsValid)
         {
             var errors = ModelState.Keys.SelectMany(key => ModelState[key].Errors);
-            var errMsg = string.Empty;
-            foreach (var error in errors)
+            if (errors.Any())
             {
-                errMsg += error.ErrorMessage + " ";//br and \r\n do not work
+                var errMsg = string.Empty;
+                foreach (var error in errors)
+                {
+                    errMsg += error.ErrorMessage + " ";//br and \r\n do not work
+                }
+                ViewData["ErrorMessage"] = errMsg;
+                return View("Authorization");
             }
-            ViewData["ErrorMessage"] = errMsg;
-            return View("Authorization");
         }
 
         try
