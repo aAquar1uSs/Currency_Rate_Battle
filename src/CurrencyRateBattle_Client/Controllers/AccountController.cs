@@ -22,6 +22,7 @@ public class AccountController : Controller
 
     public ActionResult Authorization()
     {
+        ViewBag.ActiveTab = 1;
         ViewBag.Title = "Authorization - Currency Rate Battle";
         return View();
     }
@@ -29,6 +30,20 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<ActionResult> LoginAsync(UserViewModel user)
     {
+        ViewBag.ActiveTab = 1;
+        if (!ModelState.IsValid)
+        {
+
+            var errors = ModelState.Keys.SelectMany(key => ModelState[key].Errors);
+            var errMsg = string.Empty;
+            foreach (var error in errors)
+            {
+                errMsg += error.ErrorMessage + " ";//br and \r\n do not work
+            }
+            ViewData["ErrorMessage"] = errMsg;
+            return View("Authorization");
+        }
+
         try
         {
             await _userService.LoginUserAsync(user);
@@ -37,6 +52,7 @@ public class AccountController : Controller
         {
             _logger.LogInformation("User {User}: {Msg}", user.Email, ex.Message);
             ViewData["ErrorMessage"] = ex.Message;
+            ViewBag.ActiveTab = 1;
             return View("Authorization");
         }
         catch (HttpRequestException ex)
@@ -57,8 +73,16 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<ActionResult> RegistrationAsync(UserViewModel user)
     {
+        ViewBag.ActiveTab = 2;
         if (!ModelState.IsValid)
         {
+            var errors = ModelState.Keys.SelectMany(key => ModelState[key].Errors);
+            var errMsg = string.Empty;
+            foreach (var error in errors)
+            {
+                errMsg += error.ErrorMessage + " ";//br and \r\n do not work
+            }
+            ViewData["ErrorMessage"] = errMsg;
             return View("Authorization");
         }
 
@@ -70,6 +94,7 @@ public class AccountController : Controller
         {
             _logger.LogInformation("User {User}: {Msg}", user.Email, ex.Message);
             ViewData["ErrorMessage"] = ex.Message;
+            ViewBag.ActiveTab = 2;
             return View("Authorization");
         }
         catch (HttpRequestException ex)

@@ -77,5 +77,9 @@ public class CurrencyRateBattleContext : DbContext
                 Description = "Swiss Franc"
             });
 
+        //unique constraints
+        _ = modelBuilder.Entity<CurrencyState>()
+            .HasIndex(cs => new { cs.RoomId, cs.CurrencyId })
+            .IsUnique(true);
     }
 }
