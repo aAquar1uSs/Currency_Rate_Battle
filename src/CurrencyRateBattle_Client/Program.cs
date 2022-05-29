@@ -23,26 +23,24 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddSingleton<ICRBServerHttpClient, CRBServerHttpClient>();
+builder.Services.AddScoped<ICRBServerHttpClient, CRBServerHttpClient>();
 
-builder.Services.AddSingleton<IRoomService, RoomService>();
-builder.Services.AddSingleton<IRatingService, RatingService>();
-builder.Services.AddSingleton<IUserService, UserService>();
-builder.Services.AddSingleton<IUserRateService, UserRateService>();
-builder.Services.AddSingleton<ICurrencyStateService, CurrencyStateService>();
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IRatingService, RatingService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRateService, UserRateService>();
+builder.Services.AddScoped<ICurrencyStateService, CurrencyStateService>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    _ = app.UseExceptionHandler("/Home/Error");
+    _ = app.UseHsts();
 }
 
-app.UseSession(new SessionOptions() {Cookie = new CookieBuilder() {Name = ".AspNetCore.Session.CBR"}});
+app.UseSession(new SessionOptions() { Cookie = new CookieBuilder() { Name = ".AspNetCore.Session.CBR" } });
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

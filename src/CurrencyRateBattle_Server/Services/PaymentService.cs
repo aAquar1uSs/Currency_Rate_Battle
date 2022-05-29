@@ -25,24 +25,26 @@ public class PaymentService : IPaymentService
 
     public async Task ApportionCashByRateAsync(Guid roomId, Guid accountId, decimal? payout)
     {
+        _logger.LogInformation($"{nameof(ApportionCashByRateAsync)} was caused.");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
-        var account = await db.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId);
-
-        if (account is null || payout is null)
-            return;
 
         await _semaphoreSlim.WaitAsync();
         try
         {
+            var account = await db.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId);
+
+            if (account is null || payout is null)
+                return;
+
             account.Amount += (decimal)payout;
 
             _ = await db.SaveChangesAsync();
+            _logger.LogInformation("Successful payment");
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _ = _semaphoreSlim.Release();
         }
 
         await _accountHistoryService.CreateHistoryByValuesAsync(roomId, accountId,
@@ -51,30 +53,33 @@ public class PaymentService : IPaymentService
 
     public async Task<bool> WritingOffMoneyAsync(Guid accountId, decimal? amount)
     {
+        _logger.LogInformation($"{nameof(WritingOffMoneyAsync)} was caused.");
+
         if (amount is null)
             return false;
 
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        var account = await db.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId);
-
-        if (account is null)
-            return false;
-
-        if (account.Amount == 0 || amount  > account.Amount)
-            return false;
-
         await _semaphoreSlim.WaitAsync();
         try
         {
+            var account = await db.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId);
+
+            if (account is null)
+                return false;
+
+            if (account.Amount == 0 || amount > account.Amount)
+                return false;
+
             account.Amount -= (decimal)amount;
 
             _ = await db.SaveChangesAsync();
+            _logger.LogInformation("Successful withdrawal");
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _ = _semaphoreSlim.Release();
         }
 
         return true;

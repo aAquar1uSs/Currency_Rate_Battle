@@ -37,6 +37,8 @@ public class AccountHistoryController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> GetAccountHistoryAsync()
     {
+        _logger.LogDebug($"{nameof(GetAccountHistoryAsync)} was triggered.");
+
         var userId = _accountService.GetGuidFromRequest(HttpContext);
         if (userId is null)
             return BadRequest();
@@ -55,13 +57,23 @@ public class AccountHistoryController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> CreateNewAccountHistory([FromBody] AccountHistoryDto historyDto)
     {
+        _logger.LogDebug($"{nameof(CreateNewAccountHistory)}, was caused");
+
+        if (!ModelState.IsValid)
+            return BadRequest("Wrong data");
+
         try
         {
             var userId = _accountService.GetGuidFromRequest(HttpContext);
             if (userId is null)
                 return BadRequest();
+
             Room? room = null;
             var account = await _accountService.GetAccountByUserIdAsync(userId);
+
+            if (account is null)
+                return BadRequest();
+
             if (historyDto.RoomId is not null)
                 room = await _roomService.GetRoomByIdAsync((Guid)historyDto.RoomId);
 
@@ -74,6 +86,7 @@ public class AccountHistoryController : ControllerBase
             return BadRequest();
         }
 
+        _logger.LogDebug("Account history successfully added.");
         return Ok();
     }
 }

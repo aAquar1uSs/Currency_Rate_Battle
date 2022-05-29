@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Threading.Tasks.Dataflow;
 using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Helpers;
@@ -17,8 +16,6 @@ public class RoomService : IRoomService
 
     private readonly IRateCalculationService _rateCalculationService;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
-
     private readonly SemaphoreSlim _semaphoreSlimRateHosted = new(1, 1);
 
     private readonly SemaphoreSlim _semaphoreSlimRoomHosted = new(1, 1);
@@ -34,6 +31,7 @@ public class RoomService : IRoomService
 
     public async Task GenerateRoomsByCurrencyCountAsync()
     {
+        _logger.LogInformation($"{nameof(GenerateRoomsByCurrencyCountAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -42,19 +40,20 @@ public class RoomService : IRoomService
         {
             foreach (var curr in dbContext.Currencies)
             {
-                await dbContext.CurrencyStates.AddAsync(await CreateRoomWithCurrencyStateAsync(curr));
+                _ = await dbContext.CurrencyStates.AddAsync(await CreateRoomWithCurrencyStateAsync(curr));
             }
 
             _ = await dbContext.SaveChangesAsync();
         }
         finally
         {
-            _semaphoreSlimRoomHosted.Release();
+            _ = _semaphoreSlimRoomHosted.Release();
         }
     }
 
     public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(Currency curr)
     {
+        _logger.LogInformation($"{nameof(CreateRoomWithCurrencyStateAsync)} was caused");
         var currentDate = DateTime.ParseExact(
             DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
             "MM.dd.yyyy HH:mm:ss", null);
@@ -65,12 +64,13 @@ public class RoomService : IRoomService
             CurrencyExchangeRate = 0,
             Currency = curr,
             CurrencyId = curr.Id,
-            Room = new Room {Date = currentDate.AddDays(1), IsClosed = false}
+            Room = new Room { Date = currentDate.AddDays(1), IsClosed = false }
         });
     }
 
     public async Task UpdateRoomAsync(Guid id, Room updatedRoom)
     {
+        _logger.LogInformation($"{nameof(UpdateRoomAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -86,12 +86,13 @@ public class RoomService : IRoomService
         }
         finally
         {
-            _semaphoreSlimRateHosted.Release();
+            _ = _semaphoreSlimRateHosted.Release();
         }
     }
 
     public async Task CheckRoomsStateAsync()
     {
+        _logger.LogInformation($"{nameof(CheckRoomsStateAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -105,10 +106,11 @@ public class RoomService : IRoomService
 
     private async Task RoomClosureCheckAsync(Room room)
     {
+        _logger.LogInformation($"{nameof(RoomClosureCheckAsync)} was caused");
         if ((room.Date.Date == DateTime.Today
              && room.Date.Hour == DateTime.UtcNow.AddHours(1).Hour)
-            || (room.Date.Date == DateTime.Today.AddDays(1))
-            && (room.Date.Hour == 0 && DateTime.UtcNow.Hour == 23)
+            || ((room.Date.Date == DateTime.Today.AddDays(1))
+            && room.Date.Hour == 0 && DateTime.UtcNow.Hour == 23)
             || DateTime.UtcNow > room.Date)
         {
             room.IsClosed = true;
@@ -118,6 +120,7 @@ public class RoomService : IRoomService
 
     private async Task CalculateRatesIfRoomClosed(Room room)
     {
+        _logger.LogInformation($"{nameof(CalculateRatesIfRoomClosed)} was caused");
         if ((room.Date.Date == DateTime.Today
              && room.Date.Hour == DateTime.UtcNow.Hour
              && room.IsClosed)
@@ -136,128 +139,110 @@ public class RoomService : IRoomService
         }
     }
 
-    public async Task<List<RoomDto>> GetRoomsAsync(bool? isClosed)
+    public Task<List<RoomDto>> GetRoomsAsync(bool? isClosed)
     {
+        _logger.LogInformation($"{nameof(GetRoomsAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         List<RoomDto> roomDtoStorage = new();
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            var result = from curr in db.Currencies
-                join currState in db.CurrencyStates on curr.Id equals currState.CurrencyId
-                join room in db.Rooms on currState.RoomId equals room.Id
-                where room.IsClosed == isClosed
-                select new
-                {
-                    room.Id,
-                    curr.CurrencyName,
-                    room.Date,
-                    room.IsClosed,
-                    currState.CurrencyExchangeRate,
-                    RateDate = currState.Date,
-                    RateCount = db.Rates.Count(r => r.RoomId == room.Id)
-                };
+        var result = from curr in db.Currencies
+                     join currState in db.CurrencyStates on curr.Id equals currState.CurrencyId
+                     join room in db.Rooms on currState.RoomId equals room.Id
+                     where room.IsClosed == isClosed
+                     select new
+                     {
+                         room.Id,
+                         curr.CurrencyName,
+                         room.Date,
+                         room.IsClosed,
+                         currState.CurrencyExchangeRate,
+                         RateDate = currState.Date,
+                         RateCount = db.Rates.Count(r => r.RoomId == room.Id)
+                     };
 
-            foreach (var data in result)
+        foreach (var data in result)
+        {
+            roomDtoStorage.Add(new RoomDto
             {
-                roomDtoStorage.Add(new RoomDto
-                {
-                    Id = data.Id,
-                    CurrencyExchangeRate = Math.Round(data.CurrencyExchangeRate, 2),
-                    СurrencyName = data.CurrencyName,
-                    Date = data.Date,
-                    IsClosed = data.IsClosed,
-                    UpdateRateTime = data.RateDate,
-                    CountRates = data.RateCount
-                });
-            }
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
+                Id = data.Id,
+                CurrencyExchangeRate = Math.Round(data.CurrencyExchangeRate, 2),
+                СurrencyName = data.CurrencyName,
+                Date = data.Date,
+                IsClosed = data.IsClosed,
+                UpdateRateTime = data.RateDate,
+                CountRates = data.RateCount
+            });
         }
 
-        return roomDtoStorage;
+        return Task.FromResult(roomDtoStorage);
     }
 
     public async Task<Room?> GetRoomByIdAsync(Guid id)
     {
+        _logger.LogInformation($"{nameof(GetRoomByIdAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        Room? result;
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            result = await db.Rooms.FirstOrDefaultAsync(r => r.Id == id);
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
-        }
+        var result = await db.Rooms.FirstOrDefaultAsync(r => r.Id == id);
 
         return result;
     }
 
-    public async Task<List<RoomDto>?> GetActiveRoomsWithFilterAsync(Filter filter)
+    public Task<List<RoomDto>?> GetActiveRoomsWithFilterAsync(Filter filter)
     {
+        _logger.LogInformation($"{nameof(GetActiveRoomsWithFilterAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         var result = new List<RoomDto>();
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            var filteredRooms =
-                from currencyState in db.CurrencyStates
-                join room in db.Rooms on currencyState.RoomId equals room.Id
-                join curr in db.Currencies on currencyState.CurrencyId equals curr.Id
-                where room.IsClosed == false
-                select new
-                {
-                    room.Id,
-                    room.Date,
-                    currencyState.CurrencyExchangeRate,
-                    currencyState.CurrencyId,
-                    room.IsClosed,
-                    curr.CurrencyName,
-                    RateUpdateDate = currencyState.Date
-                };
 
-            if (!string.IsNullOrWhiteSpace(filter.CurrencyName))
-                filteredRooms =
-                    filteredRooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant());
-            if (filter.DateTryParse(filter.StartDate, out var startDate))
-                filteredRooms = filteredRooms.Where(room => room.Date >= startDate);
-            if (filter.DateTryParse(filter.EndDate, out var endDate))
-                filteredRooms = filteredRooms.Where(room => room.Date <= endDate);
-
-            foreach (var room in filteredRooms)
+        var filteredRooms =
+            from currencyState in db.CurrencyStates
+            join room in db.Rooms on currencyState.RoomId equals room.Id
+            join curr in db.Currencies on currencyState.CurrencyId equals curr.Id
+            where room.IsClosed == false
+            select new
             {
-                result.Add(
-                    new RoomDto
-                    {
-                        Id = room.Id,
-                        CurrencyExchangeRate = room.CurrencyExchangeRate,
-                        Date = room.Date,
-                        СurrencyName = room.CurrencyName,
-                        UpdateRateTime = room.RateUpdateDate,
-                        IsClosed = room.IsClosed
-                    });
-            }
-        }
-        finally
+                room.Id,
+                room.Date,
+                currencyState.CurrencyExchangeRate,
+                currencyState.CurrencyId,
+                room.IsClosed,
+                curr.CurrencyName,
+                RateUpdateDate = currencyState.Date,
+                RateCount = db.Rates.Count(r => r.RoomId == room.Id)
+            };
+
+        if (!string.IsNullOrWhiteSpace(filter.CurrencyName))
+            filteredRooms =
+                filteredRooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant());
+        if (filter.DateTryParse(filter.StartDate, out var startDate))
+            filteredRooms = filteredRooms.Where(room => room.Date >= startDate);
+        if (filter.DateTryParse(filter.EndDate, out var endDate))
+            filteredRooms = filteredRooms.Where(room => room.Date <= endDate);
+
+        foreach (var room in filteredRooms)
         {
-            _ = _semaphoreSlim.Release();
+            result.Add(
+                new RoomDto
+                {
+                    Id = room.Id,
+                    CurrencyExchangeRate = room.CurrencyExchangeRate,
+                    Date = room.Date,
+                    СurrencyName = room.CurrencyName,
+                    UpdateRateTime = room.RateUpdateDate,
+                    IsClosed = room.IsClosed,
+                    CountRates = room.RateCount
+                });
         }
 
-        return result;
+        return Task.FromResult(result);
     }
 
     public async Task DeleteRoomByIdAsync(Guid roomId)
     {
+        _logger.LogInformation($"{nameof(DeleteRoomByIdAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -274,7 +259,7 @@ public class RoomService : IRoomService
         }
         finally
         {
-            _semaphoreSlimRateHosted.Release();
+            _ = _semaphoreSlimRateHosted.Release();
         }
     }
 }

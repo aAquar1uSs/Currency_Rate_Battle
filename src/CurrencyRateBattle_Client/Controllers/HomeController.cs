@@ -18,6 +18,8 @@ public class HomeController : Controller
 
     private readonly ICurrencyStateService _currencyStateService;
 
+    private const int PageSize = 4;
+
     private List<RoomViewModel> _roomStorage = new();
 
     public HomeController(ILogger<HomeController> logger,
@@ -33,6 +35,7 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
+        _logger.LogInformation("Home page with all rooms");
         ViewBag.Balance = await _userService.GetUserBalanceAsync();
 
         return View();
@@ -101,6 +104,7 @@ public class HomeController : Controller
             return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 
+        _logger.LogInformation("User profile page");
         return View(accountInfo);
     }
 
@@ -108,18 +112,15 @@ public class HomeController : Controller
     {
         _userService.Logout();
         HttpContext.Session.Clear();
-        return Redirect("/Account/Authorization");
-    }
 
-    public IActionResult Privacy()
-    {
-        return View();
+        _logger.LogInformation("User logout");
+        return Redirect("/Account/Authorization");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }
 

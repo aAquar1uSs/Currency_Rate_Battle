@@ -1,10 +1,8 @@
 ﻿using System.Net;
-using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Models;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyRateBattleServer.Controllers;
 
@@ -34,33 +32,6 @@ public class RoomController : ControllerBase
 
         return Ok(rooms);
     }
-
-    [HttpGet("{id}")]
-    public async Task<Room?> GetRoomByIdAsync(Guid id)
-    {
-        var room = await _roomService.GetRoomByIdAsync(id);
-        return room;
-    }
-
-    /*[HttpPut("{id}")]
-    public async Task<IActionResult> UpdateRoomAsync(Guid id, [FromBody] Room updatedRoom)
-    {
-        try
-        {
-            await _roomService.UpdateRoomAsync(id, updatedRoom);
-            _logger.LogInformation($"Room has been updated successfully ({id})");
-            return Ok();
-        }
-        catch (GeneralException ex)
-        {
-            return BadRequest(new {message = ex.Message});
-        }
-        catch (DbUpdateException)
-        {
-            _logger.LogDebug("An unexpected error occurred during the attempt to update the room in the DB.");
-            return BadRequest("An unexpected error occurred. Please try again.");
-        }
-    }*/
 
     [HttpPost("filter")]
     [ProducesResponseType((int)HttpStatusCode.OK)]

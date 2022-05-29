@@ -45,12 +45,12 @@ public class RateController : ControllerBase
         return Ok(rates);
     }
 
-    // GET api/rates/
     [HttpGet("get-user-bets")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> GetUserBetsAsync()
     {
+        _logger.LogDebug($"{nameof(GetUserBetsAsync)},  was caused.");
         var userId = _accountService.GetGuidFromRequest(HttpContext);
         if (userId is null)
             return BadRequest();
@@ -67,8 +67,10 @@ public class RateController : ControllerBase
     [HttpGet("get-users-rating")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<IActionResult> GetUsersRatingAsynс()
+    public async Task<IActionResult> GetUsersRatingAsync()
     {
+        _logger.LogDebug($"{nameof(GetUsersRatingAsync)},  was caused.");
+
         return Ok(await _rateService.GetUsersRatingAsync());
     }
 
@@ -77,6 +79,8 @@ public class RateController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> GetCurrencyRates()
     {
+        _logger.LogDebug($"{nameof(GetCurrencyRates)},  was caused.");
+
         var currencyState = await _currencyStateService.GetCurrencyStateAsync();
         return Ok(currencyState);
     }
@@ -88,7 +92,11 @@ public class RateController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> CreateRateAsync([FromBody] RateDto rateToCreate)
     {
-        _logger.LogDebug("New rate creation is trigerred.");
+        _logger.LogDebug("New rate creation is triggerred.");
+
+        if (!ModelState.IsValid)
+            return BadRequest("Wrong data");
+
         try
         {
             var userId = _accountService.GetGuidFromRequest(HttpContext);
@@ -104,7 +112,7 @@ public class RateController : ControllerBase
             if (!await _paymentService.WritingOffMoneyAsync(account.Id, rateToCreate.Amount))
                 return Conflict("Payment processing error");
 
-            var currencyId = await _currencyStateService.GetCurrencyIdByRoomId(rateToCreate.RoomId);
+            var currencyId = await _currencyStateService.GetCurrencyIdByRoomIdAsync(rateToCreate.RoomId);
 
             if (currencyId == Guid.Empty)
                 return BadRequest("Incorrect data");
@@ -116,54 +124,11 @@ public class RateController : ControllerBase
         }
         catch (GeneralException ex)
         {
-            // return error message if there was an exception
-            return BadRequest(new { message = ex.Message });
+            return BadRequest(new {message = ex.Message});
         }
         catch (DbUpdateException)
         {
             _logger.LogDebug("An unexpected error occurred during the attempt to create a rate in the DB.");
-            return BadRequest("An unexpected error occurred. Please try again.");
-        }
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateRateAsync(Guid id, [FromBody] Rate updatedRate)
-    {
-        try
-        {
-            await _rateService.UpdateRateByRoomIdAsync(id, updatedRate);
-            _logger.LogInformation("Rate has been updated successfully ({Id})", id);
-            return Ok();
-        }
-        catch (GeneralException ex)
-        {
-            // return error message if there was an exception
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (DbUpdateException)
-        {
-            _logger.LogDebug("An unexpected error occurred during the attempt to update the rate in the DB.");
-            return BadRequest("An unexpected error occurred. Please try again.");
-        }
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteRateAsync(Guid id)
-    {
-        try
-        {
-            await _rateService.DeleteRateAsync(id);
-            _logger.LogInformation("Rate has been deleted successfully ({Id})", id);
-            return Ok();
-        }
-        catch (GeneralException ex)
-        {
-            // return error message if there was an exception
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (DbUpdateException)
-        {
-            _logger.LogDebug("An unexpected error occurred during the attempt to delete the rate in the DB.");
             return BadRequest("An unexpected error occurred. Please try again.");
         }
     }

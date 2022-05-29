@@ -32,17 +32,20 @@ public class UserService : IUserService
 
         if (user.Password != user.ConfirmPassword)
         {
-            throw new GeneralException("Passwords do not match.");
+            _logger.LogInformation("Password is not confirmed");
+            throw new GeneralException("Password is not confirmed.");
         }
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
+            _logger.LogInformation("User was successfully registered");
             var token = await response.Content.ReadAsStringAsync();
             if (Session is not null)
                 Session.SetString("token", token);
         }
         else
         {
+            _logger.LogInformation("User was not successfully registered");
             var errorText = await response.Content.ReadAsStringAsync();
             throw new GeneralException(errorText);
         }
@@ -54,6 +57,7 @@ public class UserService : IUserService
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
+            _logger.LogInformation("User was successfully login");
             var token = await response.Content.ReadAsStringAsync();
 
             if (Session is not null)
@@ -61,6 +65,7 @@ public class UserService : IUserService
         }
         else
         {
+            _logger.LogInformation("User was not successfully login");
             var errorMsg = await response.Content.ReadAsStringAsync();
             throw new GeneralException(errorMsg);
         }
@@ -71,21 +76,33 @@ public class UserService : IUserService
         var response = await _httpClient.GetAsync(_options.UserProfileURL ?? "");
         if (response.StatusCode == HttpStatusCode.OK)
         {
+            _logger.LogInformation("Account info are loaded successfully");
             return await response.Content.ReadAsAsync<AccountInfoViewModel>();
         }
 
-        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new GeneralException() : new AccountInfoViewModel();
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            _logger.LogInformation("Account info are not loaded, user is unauthorized");
+            throw new GeneralException();
+        }
+        return new AccountInfoViewModel();
     }
 
     public async Task<List<AccountHistoryViewModel>> GetAccountHistoryAsync()
     {
-        var response = await _httpClient.GetAsync("api/history");
+        var response = await _httpClient.GetAsync(_options.AccountHistoryURL ?? "");
         if (response.StatusCode == HttpStatusCode.OK)
         {
+            _logger.LogInformation("Account history are loaded successfully");
             return await response.Content.ReadAsAsync<List<AccountHistoryViewModel>>();
         }
 
-        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new GeneralException() : new List<AccountHistoryViewModel>();
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            _logger.LogInformation("Account history are not loaded, user is unauthorized");
+            throw new GeneralException();
+        }
+        return new List<AccountHistoryViewModel>();
     }
 
     public async Task<string> GetUserBalanceAsync()
@@ -94,6 +111,7 @@ public class UserService : IUserService
         var response = await _httpClient.GetAsync(_options.GetBalanceURL ?? "");
         if (response.StatusCode == HttpStatusCode.OK)
         {
+            _logger.LogInformation("User balance are loaded successfully");
             if (decimal.TryParse(await response.Content.ReadAsStringAsync(),
                 NumberStyles.AllowDecimalPoint,
                 CultureInfo.InvariantCulture,
@@ -103,7 +121,12 @@ public class UserService : IUserService
             }
         }
 
-        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new GeneralException() : balance;
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            _logger.LogInformation("User balance are not loaded, user is unauthorized");
+            throw new GeneralException();
+        }
+        return balance;
     }
 
     public async Task<decimal> GetUserBalanceDecimalAsync()
@@ -113,6 +136,7 @@ public class UserService : IUserService
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
+            _logger.LogInformation("User balance are loaded successfully");
             if (decimal.TryParse(await response.Content.ReadAsStringAsync(),
                 NumberStyles.AllowDecimalPoint,
                 CultureInfo.InvariantCulture,
@@ -122,7 +146,12 @@ public class UserService : IUserService
             }
         }
 
-        return response.StatusCode == HttpStatusCode.Unauthorized ? throw new GeneralException() : balance;
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            _logger.LogInformation("User balance are not loaded, user is unauthorized");
+            throw new GeneralException();
+        }
+        return balance;
     }
 
     public void Logout()

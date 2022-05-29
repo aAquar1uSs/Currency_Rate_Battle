@@ -8,6 +8,8 @@ public class CurrencyHostedService : IHostedService, IDisposable
 
     private Timer? _timer;
 
+    private static readonly object _sync = new();
+
     private readonly ICurrencyStateService _currencyStateService;
 
     public CurrencyHostedService(ILogger<CurrencyHostedService> logger,
@@ -21,10 +23,26 @@ public class CurrencyHostedService : IHostedService, IDisposable
     {
         _logger.LogInformation("Currency Hosted Service running.");
 
-        _timer = new Timer(Callback, null, TimeSpan.FromSeconds(0),
+        _timer = new Timer(SyncCallback, null, TimeSpan.Zero,
             TimeSpan.FromMinutes(30));
 
         return Task.CompletedTask;
+    }
+
+    private void SyncCallback(object? state)
+    {
+        try
+        {
+            if (!Monitor.TryEnter(_sync))
+                return;
+            else
+                Callback(state);
+        }
+        finally
+        {
+            if (Monitor.IsEntered(_sync))
+                Monitor.Exit(_sync);
+        }
     }
 
     private async void Callback(object? state)

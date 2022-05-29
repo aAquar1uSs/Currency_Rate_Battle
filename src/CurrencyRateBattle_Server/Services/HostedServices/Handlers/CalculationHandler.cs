@@ -41,7 +41,7 @@ public class CalculationHandler : AbstractHandler
 
         foreach (var rate in rates)
         {
-            rate.Payout = rate.IsWon ? rate.Amount * kef : 0;
+            rate.Payout = rate.IsWon ? Math.Round(rate.Amount * kef, 2) : 0;
         }
     }
 
@@ -54,7 +54,7 @@ public class CalculationHandler : AbstractHandler
         var rateAmount = winners.First().Amount;
 
         var loserBank = commonBank - (rateAmount * winnerCount);
-        var step = 2 * loserBank / winnerCount * (winnerCount - 1);
+        var step = 2 * loserBank / (winnerCount * (winnerCount - 1));
 
         var winningMoney = Enumerable
             .Repeat(0m, winnerCount)
@@ -63,7 +63,7 @@ public class CalculationHandler : AbstractHandler
         var index = winnerCount - 1;
         rates.ForEach(rate =>
         {
-            rate.Payout = rate.IsWon ? winningMoney[index--] : 0m;
+            rate.Payout = rate.IsWon ? Math.Round(winningMoney[index--], 2) : 0m;
         });
     }
 

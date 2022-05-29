@@ -32,11 +32,12 @@ public class RateCalculationService : IRateCalculationService
         _winnerHandler = new WinnerHandler(_scopeFactory);
         _calculationHandler = new CalculationHandler();
 
-        _winnerHandler.SetNext(_calculationHandler);
+        _ = _winnerHandler.SetNext(_calculationHandler);
     }
 
     public async Task StartRateCalculationByRoomIdAsync(Guid roomId)
     {
+        _logger.LogInformation($"{nameof(StartRateCalculationByRoomIdAsync)} was caused.");
         var rates = await _rateService.GetRateByRoomIdAsync(roomId);
 
         if (rates.Count == 0)

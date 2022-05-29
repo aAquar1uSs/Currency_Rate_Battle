@@ -30,7 +30,7 @@ public class AccountController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> LoginAsync([FromBody] UserDto userData)
     {
-        _logger.LogDebug("Authentication was triggered.");
+        _logger.LogDebug($"{nameof(LoginAsync)} was triggered.");
         if (!ModelState.IsValid)
             return BadRequest("Invalid data entered.");
 
@@ -50,8 +50,8 @@ public class AccountController : ControllerBase
 
         try
         {
-            _logger.LogDebug("Registration was triggered.");
-            var tokens = await _accountService.СreateUserAsync(userData);
+            _logger.LogDebug($"{nameof(CreateUserAsync)} was triggered.");
+            var tokens = await _accountService.CreateUserAsync(userData);
 
             if (tokens is null)
                 return NotFound();
@@ -60,7 +60,6 @@ public class AccountController : ControllerBase
         }
         catch (GeneralException ex)
         {
-            // return error message if there was an exception
             return BadRequest(new {message = ex.Message});
         }
         catch (DbUpdateException)
@@ -75,6 +74,8 @@ public class AccountController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> GetUserBalanceAsync()
     {
+        _logger.LogDebug($"{nameof(GetUserBalanceAsync)} was triggered.");
+
         var userId = _accountService.GetGuidFromRequest(HttpContext);
         if (userId is null)
             return BadRequest();
@@ -88,11 +89,13 @@ public class AccountController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> GetUserInfoAsync()
     {
+        _logger.LogDebug($"{nameof(GetUserInfoAsync)} was triggered.");
+
         var guidId = _accountService.GetGuidFromRequest(HttpContext);
         if (guidId is null)
             return BadRequest();
 
-        var result = await _accountService.GetAccountInfoAsync((Guid)guidId);
+        var result = await _accountService.GetAccountInfoByUserIdAsync((Guid)guidId);
         return Ok(result);
     }
 }

@@ -6,6 +6,8 @@ public class RateHostedService : IHostedService, IDisposable
 {
     private Timer? _timer;
 
+    private static readonly object _sync = new();
+
     private readonly ILogger<RateHostedService> _logger;
 
     private readonly IRoomService _roomService;
@@ -21,10 +23,24 @@ public class RateHostedService : IHostedService, IDisposable
     {
         _logger.LogInformation("Rate Hosted Service running.");
 
-        _timer = new Timer(Callback, null, TimeSpan.FromMinutes(1),
+        _timer = new Timer(SyncCallback, null, TimeSpan.FromMinutes(1),
             TimeSpan.FromHours(1));
 
         return Task.CompletedTask;
+    }
+
+    private void SyncCallback(object? state)
+    {
+        try
+        {
+            if (!Monitor.TryEnter(_sync)) return;
+            else Callback(state);
+        }
+        finally
+        {
+            if (Monitor.IsEntered(_sync))
+                Monitor.Exit(_sync);
+        }
     }
 
     private async void Callback(object? state)

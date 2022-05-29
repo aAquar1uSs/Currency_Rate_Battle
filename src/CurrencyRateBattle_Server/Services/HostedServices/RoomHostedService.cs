@@ -22,7 +22,7 @@ public class RoomHostedService : IHostedService, IDisposable
     {
         _logger.LogInformation("Room Hosted Service running.");
 
-        _timer = new Timer(Callback, null, TimeSpan.FromSeconds(40),
+        _timer = new Timer(Callback, null, TimeSpan.Zero,
             TimeSpan.FromHours(4));
 
         return Task.CompletedTask;

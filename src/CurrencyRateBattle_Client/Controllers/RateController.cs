@@ -29,6 +29,7 @@ public class RateController : Controller
         ViewBag.Title = "Make Bet";
         ViewBag.Balance = await _userService.GetUserBalanceAsync();
         ViewBag.CurrencyName = currencyName;
+
         var rateModel = new RateViewModel
         {
             RoomId = roomId
@@ -41,18 +42,23 @@ public class RateController : Controller
     {
         ViewBag.Title = "Make Bet";
         ViewBag.Balance = await _userService.GetUserBalanceAsync();
+
         try
         {
             ViewBag.CurrencyName = currencyName;
             ViewBag.BalanceDecimal = await _userService.GetUserBalanceDecimalAsync();
+
             if (rateViewModel.Amount > ViewBag.BalanceDecimal)
             {
                 ViewData["ErrorMsg"] = "You don't have enough funds on your account for making this bet.";
+                _logger.LogInformation("User does not have enough money on the account" +
+                    $" to make bet of {rateViewModel.Amount}UAH");
                 return View("Index", rateViewModel);
             }
             if (rateViewModel.Amount <= 0 || rateViewModel.UserCurrencyExchange <= 0)
             {
                 ViewData["ErrorMsg"] = "Invalid data";
+                _logger.LogInformation("Invalid rate data");
                 return View("Index", rateViewModel);
             }
 
@@ -76,6 +82,7 @@ public class RateController : Controller
             return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 
+        _logger.LogInformation($"User successfully placed a bet on {currencyName}: {rateViewModel.Amount}UAH");
         return Redirect("/Home/Main");
     }
 

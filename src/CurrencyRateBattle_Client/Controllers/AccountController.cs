@@ -66,6 +66,7 @@ public class AccountController : Controller
             return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
 
+        _logger.LogInformation($"User '{user.Email}' has successfully logged in");
         return Redirect("/Home/Main");
     }
 
