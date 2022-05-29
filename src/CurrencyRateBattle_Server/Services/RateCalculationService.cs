@@ -37,6 +37,7 @@ public class RateCalculationService : IRateCalculationService
 
     public async Task StartRateCalculationByRoomIdAsync(Guid roomId)
     {
+        _logger.LogInformation($"{nameof(StartRateCalculationByRoomIdAsync)} was caused.");
         var rates = await _rateService.GetRateByRoomIdAsync(roomId);
 
         if (rates.Count == 0)

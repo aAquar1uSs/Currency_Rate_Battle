@@ -53,6 +53,7 @@ public class RateService : IRateService
 
     public async Task<List<Rate>> GetRateByRoomIdAsync(Guid roomId)
     {
+        _logger.LogInformation($"{nameof(GetRateByRoomIdAsync)} was caused.");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -65,6 +66,7 @@ public class RateService : IRateService
 
     public async Task UpdateRateByRoomIdAsync(Guid id, Rate updatedRate)
     {
+        _logger.LogInformation($"{nameof(UpdateRateByRoomIdAsync)} was caused.");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -88,6 +90,8 @@ public class RateService : IRateService
 
     public async Task<List<Rate>> GetRatesAsync(bool? isActive, string? currencyCode)
     {
+        _logger.LogInformation($"{nameof(GetRatesAsync)} was caused.");
+
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -116,6 +120,8 @@ public class RateService : IRateService
 
     public Task<List<BetDto>> GetRatesByAccountIdAsync(Guid accountId)
     {
+        _logger.LogInformation($"{nameof(GetRatesByAccountIdAsync)} was caused.");
+
         List<BetDto> betDtoStorage = new();
 
         using var scope = _scopeFactory.CreateScope();
@@ -148,6 +154,8 @@ public class RateService : IRateService
 
     public async Task DeleteRateAsync(Guid id)
     {
+        _logger.LogInformation($"{nameof(DeleteRateAsync)} was caused.");
+
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -173,6 +181,8 @@ public class RateService : IRateService
 
     public Task<List<UserRatingDto>> GetUsersRatingAsync()
     {
+        _logger.LogInformation($"{nameof(GetUsersRatingAsync)} was caused.");
+
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
