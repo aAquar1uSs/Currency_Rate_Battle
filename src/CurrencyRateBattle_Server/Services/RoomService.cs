@@ -31,6 +31,7 @@ public class RoomService : IRoomService
 
     public async Task GenerateRoomsByCurrencyCountAsync()
     {
+        _logger.LogInformation($"{nameof(GenerateRoomsByCurrencyCountAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -52,6 +53,7 @@ public class RoomService : IRoomService
 
     public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(Currency curr)
     {
+        _logger.LogInformation($"{nameof(CreateRoomWithCurrencyStateAsync)} was caused");
         var currentDate = DateTime.ParseExact(
             DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
             "MM.dd.yyyy HH:mm:ss", null);
@@ -68,6 +70,7 @@ public class RoomService : IRoomService
 
     public async Task UpdateRoomAsync(Guid id, Room updatedRoom)
     {
+        _logger.LogInformation($"{nameof(UpdateRoomAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -89,6 +92,7 @@ public class RoomService : IRoomService
 
     public async Task CheckRoomsStateAsync()
     {
+        _logger.LogInformation($"{nameof(CheckRoomsStateAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -102,6 +106,7 @@ public class RoomService : IRoomService
 
     private async Task RoomClosureCheckAsync(Room room)
     {
+        _logger.LogInformation($"{nameof(RoomClosureCheckAsync)} was caused");
         if ((room.Date.Date == DateTime.Today
              && room.Date.Hour == DateTime.UtcNow.AddHours(1).Hour)
             || ((room.Date.Date == DateTime.Today.AddDays(1))
@@ -115,6 +120,7 @@ public class RoomService : IRoomService
 
     private async Task CalculateRatesIfRoomClosed(Room room)
     {
+        _logger.LogInformation($"{nameof(CalculateRatesIfRoomClosed)} was caused");
         if ((room.Date.Date == DateTime.Today
              && room.Date.Hour == DateTime.UtcNow.Hour
              && room.IsClosed)
@@ -135,6 +141,7 @@ public class RoomService : IRoomService
 
     public Task<List<RoomDto>> GetRoomsAsync(bool? isClosed)
     {
+        _logger.LogInformation($"{nameof(GetRoomsAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -173,6 +180,7 @@ public class RoomService : IRoomService
 
     public async Task<Room?> GetRoomByIdAsync(Guid id)
     {
+        _logger.LogInformation($"{nameof(GetRoomByIdAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -183,6 +191,7 @@ public class RoomService : IRoomService
 
     public Task<List<RoomDto>?> GetActiveRoomsWithFilterAsync(Filter filter)
     {
+        _logger.LogInformation($"{nameof(GetActiveRoomsWithFilterAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -233,6 +242,7 @@ public class RoomService : IRoomService
 
     public async Task DeleteRoomByIdAsync(Guid roomId)
     {
+        _logger.LogInformation($"{nameof(DeleteRoomByIdAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
