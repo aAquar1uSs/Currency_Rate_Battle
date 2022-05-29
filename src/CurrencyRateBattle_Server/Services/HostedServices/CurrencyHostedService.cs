@@ -33,8 +33,10 @@ public class CurrencyHostedService : IHostedService, IDisposable
     {
         try
         {
-            if (!Monitor.TryEnter(_sync)) return;
-            else Callback(state);
+            if (!Monitor.TryEnter(_sync))
+                return;
+            else
+                Callback(state);
         }
         finally
         {

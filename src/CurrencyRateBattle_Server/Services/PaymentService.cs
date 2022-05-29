@@ -44,7 +44,7 @@ public class PaymentService : IPaymentService
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _ = _semaphoreSlim.Release();
         }
 
         await _accountHistoryService.CreateHistoryByValuesAsync(roomId, accountId,
@@ -69,7 +69,7 @@ public class PaymentService : IPaymentService
             if (account is null)
                 return false;
 
-            if (account.Amount == 0 || amount  > account.Amount)
+            if (account.Amount == 0 || amount > account.Amount)
                 return false;
 
             account.Amount -= (decimal)amount;
@@ -79,7 +79,7 @@ public class PaymentService : IPaymentService
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _ = _semaphoreSlim.Release();
         }
 
         return true;

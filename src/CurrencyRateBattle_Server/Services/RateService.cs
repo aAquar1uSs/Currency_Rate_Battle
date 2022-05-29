@@ -114,7 +114,7 @@ public class RateService : IRateService
         return result;
     }
 
-    public async Task<List<BetDto>> GetRatesByAccountIdAsync(Guid accountId)
+    public Task<List<BetDto>> GetRatesByAccountIdAsync(Guid accountId)
     {
         List<BetDto> betDtoStorage = new();
 
@@ -143,7 +143,7 @@ public class RateService : IRateService
         }
 
         betDtoStorage.Sort((bet1, bet2) => bet1.RoomDate.CompareTo(bet2.RoomDate));
-        return betDtoStorage;
+        return Task.FromResult(betDtoStorage);
     }
 
     public async Task DeleteRateAsync(Guid id)
@@ -171,7 +171,7 @@ public class RateService : IRateService
         }
     }
 
-    public async Task<List<UserRatingDto>> GetUsersRatingAsync()
+    public Task<List<UserRatingDto>> GetUsersRatingAsync()
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -196,76 +196,76 @@ public class RateService : IRateService
             });
         }
 
-        return userRatings;
+        return Task.FromResult(userRatings);
     }
 
     private static IQueryable<BetData> GetBetData(CurrencyRateBattleContext db, Guid accountId)
     {
         var result = from rate in db.Rates
-            join curr in db.Currencies on rate.CurrencyId equals curr.Id
-            join room in db.Rooms on rate.RoomId equals room.Id
-            where rate.AccountId == accountId
-            select new BetData
-            {
-                RateId = rate.Id,
-                Amount = rate.Amount,
-                RateSettleDate = rate.SettleDate,
-                RateSetDate = rate.SetDate,
-                IsWon = rate.IsWon,
-                IsClosed = rate.IsClosed,
-                AccountId = rate.AccountId,
-                RateCurrencyExchange = rate.RateCurrencyExchange,
-                Payout = rate.Payout,
-                RoomDate = room.Date,
-                RoomId = rate.RoomId,
-                CurrencyName = curr.CurrencyName,
-                CurrencyId = rate.CurrencyId
-            };
+                     join curr in db.Currencies on rate.CurrencyId equals curr.Id
+                     join room in db.Rooms on rate.RoomId equals room.Id
+                     where rate.AccountId == accountId
+                     select new BetData
+                     {
+                         RateId = rate.Id,
+                         Amount = rate.Amount,
+                         RateSettleDate = rate.SettleDate,
+                         RateSetDate = rate.SetDate,
+                         IsWon = rate.IsWon,
+                         IsClosed = rate.IsClosed,
+                         AccountId = rate.AccountId,
+                         RateCurrencyExchange = rate.RateCurrencyExchange,
+                         Payout = rate.Payout,
+                         RoomDate = room.Date,
+                         RoomId = rate.RoomId,
+                         CurrencyName = curr.CurrencyName,
+                         CurrencyId = rate.CurrencyId
+                     };
         return result;
     }
 
     private static IQueryable<BetData> GetBetSubQuery(CurrencyRateBattleContext db, IQueryable<BetData> data)
     {
         var query = from res in data
-            join currState in db.CurrencyStates
-                on new {res.RoomId, res.CurrencyId} equals new {currState.RoomId, currState.CurrencyId}
+                    join currState in db.CurrencyStates
+                on new { res.RoomId, res.CurrencyId } equals new { currState.RoomId, currState.CurrencyId }
                 into gj
-            from subCurr in gj.DefaultIfEmpty()
-            select new BetData
-            {
-                RateId = res.RateId,
-                Amount = res.Amount,
-                RateSettleDate = res.RateSettleDate,
-                RateSetDate = res.RateSetDate,
-                IsWon = res.IsWon,
-                IsClosed = res.IsClosed,
-                AccountId = res.AccountId,
-                RateCurrencyExchange = res.RateCurrencyExchange,
-                Payout = res.Payout,
-                RoomDate = res.RoomDate,
-                RoomId = res.RoomId,
-                CurrencyName = res.CurrencyName,
-                CurrencyId = res.CurrencyId,
-                CurrencyExchangeRate = subCurr == null ? 0 : subCurr.CurrencyExchangeRate
-            };
+                    from subCurr in gj.DefaultIfEmpty()
+                    select new BetData
+                    {
+                        RateId = res.RateId,
+                        Amount = res.Amount,
+                        RateSettleDate = res.RateSettleDate,
+                        RateSetDate = res.RateSetDate,
+                        IsWon = res.IsWon,
+                        IsClosed = res.IsClosed,
+                        AccountId = res.AccountId,
+                        RateCurrencyExchange = res.RateCurrencyExchange,
+                        Payout = res.Payout,
+                        RoomDate = res.RoomDate,
+                        RoomId = res.RoomId,
+                        CurrencyName = res.CurrencyName,
+                        CurrencyId = res.CurrencyId,
+                        CurrencyExchangeRate = subCurr == null ? 0 : subCurr.CurrencyExchangeRate
+                    };
         return query;
     }
 
     private static IQueryable<UserRatingData> GetUserRatingDataFirstQuery(CurrencyRateBattleContext db)
     {
         var query1 = from rate in db.Rates
-            join acc in db.Accounts on rate.AccountId equals acc.Id
-            join user in db.Users on acc.UserId equals user.Id
-            where rate.IsClosed
-            select new UserRatingData
-            {
-                UserEmail = user.Email,
-                AccountId = rate.AccountId,
-                BetAmount = rate.Amount,
-                IsWon = rate.IsWon,
-                RateSetDate = rate.SetDate,
-                RatePayout = rate.Payout
-            };
+                     join acc in db.Accounts on rate.AccountId equals acc.Id
+                     join user in db.Users on acc.UserId equals user.Id
+                     where rate.IsClosed
+                     select new UserRatingData
+                     {
+                         UserEmail = user.Email,
+                         AccountId = rate.AccountId,
+                         BetAmount = rate.Amount,
+                         IsWon = rate.IsWon,
+                         RateSetDate = rate.SetDate,
+                         RatePayout = rate.Payout
+                     };
 
         return query1;
     }
@@ -273,17 +273,17 @@ public class RateService : IRateService
     private static IQueryable<UserRatingData> GetUserRatingDataTotalQuery(IQueryable<UserRatingData> data)
     {
         var totalQuery = from res in data
-            group res by new {res.AccountId, res.UserEmail}
-            into grp
-            select new UserRatingData
-            {
-                AccountId = grp.Key.AccountId,
-                UserEmail  = grp.Key.UserEmail,
-                LastBetDate = grp.Max(s => s.RateSetDate),
-                TotalBetAmount = grp.Sum(s => s.BetAmount),
-                TotalPayout = grp.Sum(s => s.RatePayout),
-                TotalBetCount = grp.Count()
-            };
+                         group res by new { res.AccountId, res.UserEmail }
+                         into grp
+                         select new UserRatingData
+                         {
+                             AccountId = grp.Key.AccountId,
+                             UserEmail = grp.Key.UserEmail,
+                             LastBetDate = grp.Max(s => s.RateSetDate),
+                             TotalBetAmount = grp.Sum(s => s.BetAmount),
+                             TotalPayout = grp.Sum(s => s.RatePayout),
+                             TotalBetCount = grp.Count()
+                         };
 
         return totalQuery;
     }
@@ -291,17 +291,17 @@ public class RateService : IRateService
     private static IQueryable<UserRatingData> GetUserRatingDataWonQuery(IQueryable<UserRatingData> data)
     {
         var wonQuery = from res in data
-            where res.IsWon
-            group res by new {res.AccountId, res.UserEmail}
-            into grp
-            select new UserRatingData()
-            {
-                AccountId = grp.Key.AccountId,
-                UserEmail = grp.Key.UserEmail,
-                WonBetAmount = grp.Sum(s => s.BetAmount),
-                WonPayout = grp.Sum(s => s.RatePayout),
-                WonBetCount = grp.Count()
-            };
+                       where res.IsWon
+                       group res by new { res.AccountId, res.UserEmail }
+                       into grp
+                       select new UserRatingData()
+                       {
+                           AccountId = grp.Key.AccountId,
+                           UserEmail = grp.Key.UserEmail,
+                           WonBetAmount = grp.Sum(s => s.BetAmount),
+                           WonPayout = grp.Sum(s => s.RatePayout),
+                           WonBetCount = grp.Count()
+                       };
         return wonQuery;
     }
 
@@ -309,13 +309,13 @@ public class RateService : IRateService
         IQueryable<UserRatingData> wonQuery)
     {
         var query = from totalQ in data
-            from wonQ in wonQuery.DefaultIfEmpty()
-            where totalQ.AccountId == wonQ.AccountId
-            select new ResultUserRatingData
-            {
-                TotalQ = totalQ,
-                WonQ = wonQ
-            };
+                    from wonQ in wonQuery.DefaultIfEmpty()
+                    where totalQ.AccountId == wonQ.AccountId
+                    select new ResultUserRatingData
+                    {
+                        TotalQ = totalQ,
+                        WonQ = wonQ
+                    };
 
         return query;
     }

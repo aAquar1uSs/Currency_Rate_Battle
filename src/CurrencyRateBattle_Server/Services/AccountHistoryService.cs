@@ -66,7 +66,7 @@ public class AccountHistoryService : IAccountHistoryService
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _ = _semaphoreSlim.Release();
         }
 
         _logger.LogInformation("New history record added to the database.");
@@ -95,7 +95,7 @@ public class AccountHistoryService : IAccountHistoryService
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _ = _semaphoreSlim.Release();
         }
 
         _logger.LogInformation("New history record added to the database.");

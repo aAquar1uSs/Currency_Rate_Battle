@@ -80,7 +80,7 @@ public class AccountService : IAccountService
         }
         finally
         {
-            _semaphoreSlim.Release();
+            _ = _semaphoreSlim.Release();
         }
 
         _logger.LogInformation("New user added to the database");
@@ -107,7 +107,7 @@ public class AccountService : IAccountService
         if (user is null || account is null)
             return null;
 
-        var accountInfoDto = new AccountInfoDto {Email = user.Email, Amount = account.Amount};
+        var accountInfoDto = new AccountInfoDto { Email = user.Email, Amount = account.Amount };
         return accountInfoDto;
     }
 
