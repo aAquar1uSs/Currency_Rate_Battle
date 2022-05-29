@@ -31,18 +31,6 @@ public class AccountController : Controller
     public async Task<ActionResult> LoginAsync(UserViewModel user)
     {
         ViewBag.ActiveTab = 1;
-        if (!ModelState.IsValid)
-        {
-
-            var errors = ModelState.Keys.SelectMany(key => ModelState[key].Errors);
-            var errMsg = string.Empty;
-            foreach (var error in errors)
-            {
-                errMsg += error.ErrorMessage + " ";//br and \r\n do not work
-            }
-            ViewData["ErrorMessage"] = errMsg;
-            return View("Authorization");
-        }
 
         try
         {
