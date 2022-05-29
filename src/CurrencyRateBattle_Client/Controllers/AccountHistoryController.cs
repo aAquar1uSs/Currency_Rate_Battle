@@ -15,6 +15,8 @@ public class AccountHistoryController : Controller
 
     private readonly IUserService _userService;
 
+    private const int PageSize = 10;
+
     public AccountHistoryController(ILogger<AccountHistoryController> logger,
         IUserService userService)
     {
@@ -22,35 +24,33 @@ public class AccountHistoryController : Controller
         _userService = userService;
     }
 
-        public async Task<IActionResult> Index(int? page)
+    public async Task<IActionResult> Index(int? page)
+    {
+        var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
+        ViewBag.Balance = await _userService.GetUserBalanceAsync();
+        ViewBag.Title = "Account History";
+        try
         {
-            var pageSize = 10;
-            var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
-            ViewBag.Balance = await _userService.GetUserBalanceAsync();
-            ViewBag.Title = "Account History";
-            try
-            {
-                var accountHistoryInfo = await _userService.GetAccountHistoryAsync();
-                //accountHistories = accountHistoryInfo.ToPagedList(pageIndex, pageSize);
-                var accountHistories = PagedListExtensions.ToPagedList(accountHistoryInfo, pageIndex, pageSize);
-                return View(accountHistories);
-            }
-            catch (GeneralException)
-            {
-                _logger.LogDebug("User unauthorized");
-                return Redirect("/Account/Authorization");
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError("{Msg}", ex.Message);
-                return View("Error", new ErrorViewModel { RequestId = ex.Message });
-            }
-            catch (SocketException ex)
-            {
-                _logger.LogError("{Msg}", ex.Message);
-                return View("Error", new ErrorViewModel { RequestId = ex.Message });
-            }
+            var accountHistoryInfo = await _userService.GetAccountHistoryAsync();
+            var accountHistories = PagedListExtensions.ToPagedList(accountHistoryInfo, pageIndex, PageSize);
+            return View(accountHistories);
         }
+        catch (GeneralException)
+        {
+            _logger.LogDebug("User unauthorized");
+            return Redirect("/Account/Authorization");
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError("{Msg}", ex.Message);
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
+        }
+        catch (SocketException ex)
+        {
+            _logger.LogError("{Msg}", ex.Message);
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
+        }
+    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
