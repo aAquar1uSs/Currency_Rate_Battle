@@ -54,7 +54,7 @@ public class CalculationHandler : AbstractHandler
         var rateAmount = winners.First().Amount;
 
         var loserBank = commonBank - (rateAmount * winnerCount);
-        var step = 2 * loserBank / winnerCount * (winnerCount - 1);
+        var step = 2 * loserBank / (winnerCount * (winnerCount - 1));
 
         var winningMoney = Enumerable
             .Repeat(0m, winnerCount)
