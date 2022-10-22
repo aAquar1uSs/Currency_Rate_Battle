@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
 using System.Text.Json.Serialization;
 
-namespace CurrencyRateBattleServer.Domain.Entities;
+namespace CurrencyRateBattleServer.ApplicationServices.Dto;
 
-public class Filter
+public class FilterDto
 {
     [JsonPropertyName("currencyName")]
     public string CurrencyName { get; set; }
@@ -21,7 +21,7 @@ public class Filter
     private static readonly TimeSpan _timeDifference = DateTime.UtcNow - DateTime.Now;
 
     [JsonConstructor]
-    public Filter(string currencyName, string startDate, string endDate)
+    public FilterDto(string currencyName, string startDate, string endDate)
     {
         CurrencyName = currencyName;
         StartDate = startDate;

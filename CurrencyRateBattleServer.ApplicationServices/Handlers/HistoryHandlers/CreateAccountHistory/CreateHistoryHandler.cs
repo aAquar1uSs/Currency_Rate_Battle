@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Services.Interfaces;
 using MediatR;
@@ -24,14 +25,14 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
         _roomService = roomService ?? throw new ArgumentNullException(nameof(roomService));
         _accountHistoryService = accountHistoryService ?? throw new ArgumentNullException(nameof(accountHistoryService));
     }
-    
+
     public async Task<Result<CreateHistoryResponse>> Handle(CreateHistoryCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId is null)
             return Result.Failure<CreateHistoryResponse>("Incorrect data.");
 
         var account = await _accountService.GetAccountByUserIdAsync(request.UserId);
-        
+
         if (account is null)
             return Result.Failure<CreateHistoryResponse>("Account didn't found.");
 
@@ -39,7 +40,11 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
 
         if (room is null)
             return Result.Failure<CreateHistoryResponse>("Room didn't found.");
-        
-        await _accountHistoryService.CreateHistoryAsync(room, account,)
+
+        var accountHistory = request.AccountHistory.ToDomain();
+
+        await _accountHistoryService.CreateHistoryAsync(room, account, accountHistory);
+
+        return new CreateHistoryResponse();
     }
 }

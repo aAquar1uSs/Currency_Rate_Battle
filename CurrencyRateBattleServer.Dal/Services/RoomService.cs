@@ -1,12 +1,11 @@
 ﻿using System.Globalization;
 using CurrencyRateBattleServer.Dal;
 using CurrencyRateBattleServer.Dal.Entities;
-using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Dto;
-using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Services;
 
@@ -141,7 +140,7 @@ public class RoomService : IRoomService
         }
     }
 
-    public Task<List<RoomDto>> GetRoomsAsync(bool? isClosed)
+    public Task<Room[]> GetRoomsAsync(bool? isClosed)
     {
         _logger.LogInformation($"{nameof(GetRoomsAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();

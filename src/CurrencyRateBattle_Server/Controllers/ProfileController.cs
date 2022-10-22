@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.ProfileHandlers.GetProfile;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.ProfileHandlers.GetUserBalance;
 using CurrencyRateBattleServer.Infrastructure;
@@ -34,12 +35,12 @@ public class ProfileController : ControllerBase
 
         var command = new GetUserBalanceCommand { UserId = userId };
 
-        var response = await _mediator.Send(command);
+        var (_, isFailure, value, error) = await _mediator.Send(command);
 
-        if (response.IsFailure)
-            return BadRequest(response.Error);
+        if (isFailure)
+            return BadRequest(error);
 
-        return Ok(response.Value.Amount);
+        return Ok(value.Amount);
     }
 
     [HttpGet]
@@ -53,11 +54,11 @@ public class ProfileController : ControllerBase
 
         var command = new GetProfileCommand { UserId = guidId };
 
-        var response = await _mediator.Send(command);
+        var (_, isFailure, value, error) = await _mediator.Send(command);
 
-        if (response.IsFailure)
-            return BadRequest(response.Error);
-        
-        return Ok(response.Value.AccountInfo);
+        if (isFailure)
+            return BadRequest(error);
+
+        return Ok(value.AccountInfo);
     }
 }

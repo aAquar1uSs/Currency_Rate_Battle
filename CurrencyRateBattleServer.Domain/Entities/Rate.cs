@@ -25,13 +25,13 @@ public class Rate
     /// </summary>
 
     public bool IsWon { get; set; }
-    
 
-    public virtual Room Room { get; set; } = default!;
-    
 
-    public virtual Currency Currency { get; set; } = default!;
-    
+    public  Room Room { get; set; } = default!;
 
-    public virtual Account Account { get; set; } = default!;
+
+    public  Currency Currency { get; set; } = default!;
+
+
+    public  Account Account { get; set; } = default!;
 }

@@ -11,7 +11,7 @@ public class AccountService : IAccountService
     private readonly ILogger<IAccountService> _logger;
 
     private readonly CurrencyRateBattleContext _dbContext;
-    
+
     public AccountService(ILogger<AccountService> logger, CurrencyRateBattleContext dbContext)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -24,7 +24,7 @@ public class AccountService : IAccountService
 
         var userDal = await _dbContext.Users
             .FirstOrDefaultAsync(dal => dal.Email == userData.Email && dal.Password == userData.Password);
-        
+
         return userDal?.ToDomain();
     }
 
@@ -35,7 +35,7 @@ public class AccountService : IAccountService
 
         await _dbContext.Accounts.AddAsync(accountDal);
         await _dbContext.SaveChangesAsync();
-        
+
         _logger.LogInformation($"{nameof(CreateAccountAsync)} successfully added new account");
     }
 

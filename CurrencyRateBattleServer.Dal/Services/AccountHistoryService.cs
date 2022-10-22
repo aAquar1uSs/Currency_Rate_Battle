@@ -29,7 +29,7 @@ public class AccountHistoryService : IAccountHistoryService
         var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         var histories = await dbContext.AccountHistory
-            .Where(history => history.AccountId == id)
+            .Where(history => history.Account.Id == id)
             .ToListAsync();
 
         return histories;

@@ -49,8 +49,9 @@ host.ConfigureAppConfiguration(app =>
         {
             options.SuppressModelStateInvalidFilter = true;
         });
-        
+
         service.ConfigureServices();
+
         //ToDo Migrate to custom method
         _ = service.AddHostedService<CurrencyHostedService>()
             .AddHostedService<RoomHostedService>()

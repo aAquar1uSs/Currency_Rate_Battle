@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.AccountHandlers.Login;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.AccountHandlers.Registration;
@@ -13,7 +14,7 @@ namespace CurrencyRateBattleServer.Controllers;
 public class AccountController : ControllerBase
 {
     private readonly IMediator _mediator;
-    
+
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(IMediator mediator, ILogger<AccountController> logger)
@@ -29,15 +30,15 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> LoginAsync([FromBody] UserDto userData)
     {
         _logger.LogDebug($"{nameof(LoginAsync)} was triggered.");
-        
+
         var command = new LoginCommand { UserDto = userData };
 
-        var response = await _mediator.Send(command);
+        var (_, isFailure, value, error) = await _mediator.Send(command);
 
-        if (response.IsFailure)
-            Unauthorized(response.Error);
+        if (isFailure)
+            Unauthorized(error);
 
-        return Ok(response.Value.Tokens);
+        return Ok(value.Tokens);
     }
 
     [HttpPost("registration")]
@@ -47,14 +48,14 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> CreateUserAsync([FromBody] UserDto userData)
     {
         _logger.LogDebug($"{nameof(CreateUserAsync)} was triggered.");
-        
+
         var command = new RegistrationCommand { UserDto = userData };
 
-        var response = await _mediator.Send(command);
+        var (_, isFailure, value, error) = await _mediator.Send(command);
 
-        if (response.IsFailure)
-            return BadRequest(response.Error);
+        if (isFailure)
+            return BadRequest(error);
 
-        return Ok(response.Value.Tokens);
+        return Ok(value.Tokens);
     }
 }

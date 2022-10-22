@@ -7,17 +7,17 @@ namespace CurrencyRateBattleServer.Domain.Entities;
 public sealed class User
 {
     public Guid Id { get; set; }
-    
+
     public string Email { get; set; } = default!;
-    
+
     public string Password { get; set; } = default!;
-    
+
     public Account Account { get; set; }
 
     public static Result<User> Create(string email, string password, Account account = null!)
     {
         var validateResult = Validate(email, password);
-        
+
         if (validateResult.IsFailure)
             return Result.Failure<User>("Invalid data. Please try again.");
 
@@ -30,20 +30,20 @@ public sealed class User
     {
         if (!IsValidEmail(email) || !IsValidPassword(password))
             return Result.Failure("Invalid data. Please try again.");
-        
+
         return Result.Success();
     }
-    
+
     private static bool IsValidEmail(string email)
     {
         var trimmedEmail = email.Trim();
 
         if (trimmedEmail.EndsWith("."))
             return false;
-        
+
         if (trimmedEmail.Length is > 30 or < 6)
             return false;
-        
+
         try {
             var addr = new MailAddress(email);
             return addr.Address == trimmedEmail;

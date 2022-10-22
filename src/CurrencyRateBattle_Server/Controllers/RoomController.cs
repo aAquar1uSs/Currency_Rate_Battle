@@ -1,6 +1,10 @@
 ﻿using System.Net;
+using CSharpFunctionalExtensions;
+using CurrencyRateBattleServer.ApplicationServices.Dto;
+using CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.GetFilteredRoom;
+using CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.GetRoom;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Services.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,13 +17,12 @@ public class RoomController : ControllerBase
 {
     private readonly ILogger<RoomController> _logger;
 
-    private readonly IRoomService _roomService;
+    private readonly IMediator _mediator;
 
-    public RoomController(ILogger<RoomController> logger,
-        IRoomService roomService)
+    public RoomController(ILogger<RoomController> logger, IMediator mediator)
     {
         _logger = logger;
-        _roomService = roomService;
+        _mediator = mediator;
     }
 
     [HttpGet("get-rooms/{isClosed}")]
@@ -28,21 +31,28 @@ public class RoomController : ControllerBase
     public async Task<ActionResult<IEnumerable<Room>>> GetRoomsAsync([FromRoute] bool isClosed)
     {
         _logger.LogDebug("List of rooms are retrieving.");
-        var rooms = await _roomService.GetRoomsAsync(isClosed);
+        var command = new GetRoomCommand {IsClosed = isClosed};
 
-        return Ok(rooms);
+        var response = await _mediator.Send(command);
+
+        return Ok(response.Value.Rooms);
     }
 
     [HttpPost("filter")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromBody] Filter filter)
+    public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromBody] FilterDto filter)
     {
         _logger.LogDebug("Filtered room list.");
 
-        var rooms = await _roomService.GetActiveRoomsWithFilterAsync(filter);
+        var command = new GetFilteredRoomCommand { Filter = filter };
 
-        return rooms is null ? BadRequest() : Ok(rooms);
+        var (_, isFailure, value) = await _mediator.Send(command);
+
+        if (isFailure)
+            return BadRequest();
+
+        return Ok(value.Rooms);
     }
 }

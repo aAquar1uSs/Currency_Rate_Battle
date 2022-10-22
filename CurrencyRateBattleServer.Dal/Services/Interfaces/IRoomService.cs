@@ -1,6 +1,5 @@
 ﻿using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Dto;
 
 namespace CurrencyRateBattleServer.Services.Interfaces;
 
@@ -14,11 +13,11 @@ public interface IRoomService
 
     Task CheckRoomsStateAsync();
 
-    Task<List<RoomDto>> GetRoomsAsync(bool? isClosed);
+    Task<Room[]> GetRoomsAsync(bool? isClosed);
 
     Task<RoomDal?> GetRoomByIdAsync(Guid id);
 
-    Task<List<RoomDto>?> GetActiveRoomsWithFilterAsync(Filter filter);
+    Task<Room?[]> GetActiveRoomsWithFilterAsync(FilterDto filter);
 
     Task DeleteRoomByIdAsync(Guid roomId);
 }

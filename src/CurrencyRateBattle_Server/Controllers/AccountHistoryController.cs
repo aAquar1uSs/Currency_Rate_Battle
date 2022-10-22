@@ -1,12 +1,12 @@
 ﻿using System.Net;
+using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Dto;
+using CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.CreateAccountHistory;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.GetAccountHistory;
-using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyRateBattleServer.Controllers;
 
@@ -34,12 +34,12 @@ public class AccountHistoryController : ControllerBase
 
         var command = new GetAccountHistoryCommand { UserId = GuidHelper.GetGuidFromRequest(HttpContext) };
 
-        var response = await _mediator.Send(command);
+        var (_, isFailure, value, error) = await _mediator.Send(command);
 
-        if (response.IsFailure)
-            return BadRequest(response.Error);
+        if (isFailure)
+            return BadRequest(error);
 
-        return Ok(response.Value.AccountHistories);
+        return Ok(value.AccountHistories);
     }
 
     [HttpPost]
@@ -49,32 +49,16 @@ public class AccountHistoryController : ControllerBase
     {
         _logger.LogDebug($"{nameof(CreateNewAccountHistory)}, was caused");
 
-        if (!ModelState.IsValid)
-            return BadRequest("Wrong data");
-
-        try
-        {
-            var userId = GuidHelper.GetGuidFromRequest(HttpContext);
-            if (userId is null)
-                return BadRequest();
-
-            Room? room = null;
-            var account = await _accountService.GetAccountByUserIdAsync(userId);
-
-            if (account is null)
-                return BadRequest();
-
-            if (historyDto.RoomId is not null)
-                room = await _roomService.GetRoomByIdAsync((Guid)historyDto.RoomId);
-
-            if (account != null)
-                await _historyService.CreateHistoryAsync(room, account, historyDto);
-        }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError("{Msg}", ex.Message);
+        var userId = GuidHelper.GetGuidFromRequest(HttpContext);
+        if (userId is null)
             return BadRequest();
-        }
+
+        var command = new CreateHistoryCommand { UserId = userId, AccountHistory = historyDto };
+
+        var (_, isFailure, _, error) = await _mediator.Send(command);
+
+        if (isFailure)
+            return BadRequest(error);
 
         _logger.LogDebug("Account history successfully added.");
         return Ok();
