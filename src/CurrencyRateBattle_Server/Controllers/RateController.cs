@@ -1,7 +1,8 @@
 ﻿using System.Net;
+using CurrencyRateBattleServer.Dal.Services.Interfaces;
+using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Dto;
-using CurrencyRateBattleServer.Helpers;
-using CurrencyRateBattleServer.Models;
+using CurrencyRateBattleServer.Infrastructure;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

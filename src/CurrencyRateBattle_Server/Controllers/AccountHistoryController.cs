@@ -1,7 +1,9 @@
 ﻿using System.Net;
-using CurrencyRateBattleServer.Dto;
-using CurrencyRateBattleServer.Models;
-using CurrencyRateBattleServer.Services.Interfaces;
+using CurrencyRateBattleServer.ApplicationServices.Dto;
+using CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.GetAccountHistory;
+using CurrencyRateBattleServer.Domain.Entities;
+using CurrencyRateBattleServer.Infrastructure;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,21 +17,12 @@ public class AccountHistoryController : ControllerBase
 {
     private readonly ILogger<AccountHistoryController> _logger;
 
-    private readonly IAccountHistoryService _historyService;
+    private readonly IMediator _mediator;
 
-    private readonly IRoomService _roomService;
-
-    private readonly IAccountService _accountService;
-
-    public AccountHistoryController(ILogger<AccountHistoryController> logger,
-        IAccountHistoryService historyService,
-        IRoomService roomService,
-        IAccountService accountService)
+    public AccountHistoryController(ILogger<AccountHistoryController> logger, IMediator mediator)
     {
         _logger = logger;
-        _historyService = historyService;
-        _roomService = roomService;
-        _accountService = accountService;
+        _mediator = mediator;
     }
 
     [HttpGet]
@@ -39,17 +32,14 @@ public class AccountHistoryController : ControllerBase
     {
         _logger.LogDebug($"{nameof(GetAccountHistoryAsync)} was triggered.");
 
-        var userId = _accountService.GetGuidFromRequest(HttpContext);
-        if (userId is null)
-            return BadRequest();
+        var command = new GetAccountHistoryCommand { UserId = GuidHelper.GetGuidFromRequest(HttpContext) };
 
-        var account = await _accountService.GetAccountByUserIdAsync(userId);
-        if (account is null)
-            return BadRequest();
+        var response = await _mediator.Send(command);
 
-        var history = await _historyService.GetAccountHistoryByAccountId(account.Id);
+        if (response.IsFailure)
+            return BadRequest(response.Error);
 
-        return Ok(history);
+        return Ok(response.Value.AccountHistories);
     }
 
     [HttpPost]
@@ -64,7 +54,7 @@ public class AccountHistoryController : ControllerBase
 
         try
         {
-            var userId = _accountService.GetGuidFromRequest(HttpContext);
+            var userId = GuidHelper.GetGuidFromRequest(HttpContext);
             if (userId is null)
                 return BadRequest();
 
