@@ -2,6 +2,8 @@
 using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Services.HostedServices.Handlers;
 using CurrencyRateBattleServer.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Services;
 

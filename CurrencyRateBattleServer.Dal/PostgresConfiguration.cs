@@ -26,6 +26,7 @@ public static class PostgresConfiguration
             .AddScoped<ICurrencyStateService, CurrencyStateService>()
             .AddScoped<IAccountHistoryService, AccountHistoryService>()
             .AddScoped<IRateCalculationService, RateCalculationService>()
-            .AddScoped<IPaymentService, PaymentService>();
+            .AddScoped<IPaymentService, PaymentService>()
+            .AddScoped<IRatingService, RatingService>();
     }
 }

@@ -1,13 +1,29 @@
 ﻿using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.GetRoom;
+using CurrencyRateBattleServer.Services.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.GetRates;
 
-public class GetRatesHandler : IRequestHandler<GetRoomCommand, Result<GetRoomResponse>>
+public class GetRatesHandler : IRequestHandler<GetRatesCommand, Result<GetRatesResponse>>
 {
-    public Task<Result<GetRoomResponse>> Handle(GetRoomCommand request, CancellationToken cancellationToken)
+    private readonly ILogger<GetRatesHandler> _logger;
+
+    private readonly IRateService _rateService;
+
+    public GetRatesHandler(ILogger<GetRatesHandler> logger, IRateService rateService)
     {
-        throw new NotImplementedException();
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _rateService = rateService ?? throw new ArgumentNullException(nameof(rateService));
+    }
+
+    public async Task<Result<GetRatesResponse>> Handle(GetRatesCommand request, CancellationToken cancellationToken)
+    {
+        _logger.LogDebug($"{nameof(GetRoomHandler)} was caused. Start processing.");
+
+        var rates = await _rateService.GetRatesAsync(request.IsActive, request.CurrencyCode);
+
+        return new GetRatesResponse { Rates = rates.ToDto() };
     }
 }

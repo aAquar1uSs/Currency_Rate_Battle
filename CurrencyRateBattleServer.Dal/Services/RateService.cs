@@ -1,14 +1,13 @@
-﻿using CurrencyRateBattleServer.Dal;
+﻿using CurrencyRateBattleServer.Dal.Data;
 using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Data;
-using CurrencyRateBattleServer.Dto;
-using CurrencyRateBattleServer.Helpers;
+using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace CurrencyRateBattleServer.Services;
+namespace CurrencyRateBattleServer.Dal.Services;
 
 public class RateService : IRateService
 {
@@ -25,7 +24,7 @@ public class RateService : IRateService
         _scopeFactory = scopeFactory;
     }
 
-    public async Task<RateDal> CreateRateAsync(RateDto rate, Guid accountId, Guid currencyId)
+    public async Task<RateDal> CreateRateAsync(Rate rate, Guid accountId, Guid currencyId)
     {
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
@@ -91,7 +90,7 @@ public class RateService : IRateService
         }
     }
 
-    public async Task<List<RateDal>> GetRatesAsync(bool? isActive, string? currencyCode)
+    public async Task<Rate[]> GetRatesAsync(bool? isActive, string? currencyCode)
     {
         _logger.LogInformation($"{nameof(GetRatesAsync)} was caused.");
 

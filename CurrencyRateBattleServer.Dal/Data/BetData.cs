@@ -1,4 +1,4 @@
-﻿namespace CurrencyRateBattleServer.Data;
+﻿namespace CurrencyRateBattleServer.Dal.Data;
 
 public class BetData
 {

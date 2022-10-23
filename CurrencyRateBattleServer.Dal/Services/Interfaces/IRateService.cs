@@ -1,11 +1,11 @@
 ﻿using CurrencyRateBattleServer.Dal.Entities;
-using CurrencyRateBattleServer.Dto;
+using CurrencyRateBattleServer.Domain.Entities;
 
 namespace CurrencyRateBattleServer.Services.Interfaces;
 
 public interface IRateService
 {
-    Task<RateDal> CreateRateAsync(RateDto rate, Guid accountId, Guid currencyId);
+    Task<RateDal> CreateRateAsync(Rate rate, Guid accountId, Guid currencyId);
 
     Task<List<RateDal>> GetRateByRoomIdAsync(Guid roomId);
 
@@ -13,9 +13,7 @@ public interface IRateService
 
     Task UpdateRateByRoomIdAsync(Guid id, RateDal updatedRateDal);
 
-    Task<List<RateDal>> GetRatesAsync(bool? isActive, string? currencyCode);
+    Task<Rate[]> GetRatesAsync(bool? isActive, string? currencyCode);
 
-    Task<List<BetDto>> GetRatesByAccountIdAsync(Guid accountId);
-
-    Task<List<UserRatingDto>> GetUsersRatingAsync();
+    Task<Bet[]> GetRatesByAccountIdAsync(Guid accountId);
 }

@@ -5,5 +5,5 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.Get
 
 public class GetUserBetsCommand : IRequest<Result<GetUserBetsResponse>>
 {
-    
+    public Guid UserId { get; set; }
 }

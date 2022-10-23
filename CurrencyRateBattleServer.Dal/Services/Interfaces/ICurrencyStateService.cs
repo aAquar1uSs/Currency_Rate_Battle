@@ -28,7 +28,7 @@ public interface ICurrencyStateService
     /// <returns>
     ///the task result contains <see cref="List{T}"/> of <see cref="CurrencyStateDto"/>;
     /// </returns>
-    Task<List<CurrencyStateDto>> GetCurrencyStateAsync();
+    Task<List<CurrencyState>> GetCurrencyStateAsync();
 
     /// <summary>
     /// Sends a request for currency exchange. The received data is recorded in the List.

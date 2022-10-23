@@ -13,8 +13,8 @@ public class GetFilteredRoomHandler : IRequestHandler<GetFilteredRoomCommand, Re
 
     public GetFilteredRoomHandler(ILogger<GetFilteredRoomHandler> logger, IRoomService roomService)
     {
-        _logger = logger;
-        _roomService = roomService;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _roomService = roomService ?? throw new ArgumentNullException(nameof(roomService));
     }
 
     public async Task<Result<GetFilteredRoomResponse>> Handle(GetFilteredRoomCommand request, CancellationToken cancellationToken)

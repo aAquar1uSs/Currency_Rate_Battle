@@ -2,7 +2,7 @@
 public class CurrencyState
 {
     public Guid Id { get; }
-    
+
     public DateTime Date { get; set; }
 
     public decimal CurrencyExchangeRate { get; set; }

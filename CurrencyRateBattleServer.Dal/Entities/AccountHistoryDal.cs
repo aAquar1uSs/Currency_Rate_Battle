@@ -18,5 +18,5 @@ public class AccountHistoryDal
 
     public RoomDal? Room { get; set; }
 
-    public Account Account { get; set; }
+    public AccountDal Account { get; set; }
 }

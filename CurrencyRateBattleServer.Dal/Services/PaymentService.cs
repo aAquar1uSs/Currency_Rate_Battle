@@ -1,88 +1,60 @@
-﻿using CurrencyRateBattleServer.Dal;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
-using CurrencyRateBattleServer.Data;
+﻿using CurrencyRateBattleServer.Dal.Services.Interfaces;
+using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
-namespace CurrencyRateBattleServer.Services;
+namespace CurrencyRateBattleServer.Dal.Services;
 
 public class PaymentService : IPaymentService
 {
     private readonly ILogger<PaymentService> _logger;
 
-    private readonly IServiceScopeFactory _scopeFactory;
-
     private readonly IAccountHistoryService _accountHistoryService;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
+    private readonly CurrencyRateBattleContext _dbContext;
 
     public PaymentService(ILogger<PaymentService> logger,
-        IServiceScopeFactory scopeFactory,
+        CurrencyRateBattleContext dbContext,
         IAccountHistoryService accountHistoryService)
     {
         _logger = logger;
-        _scopeFactory = scopeFactory;
+        _dbContext = dbContext;
         _accountHistoryService = accountHistoryService;
     }
 
     public async Task ApportionCashByRateAsync(Guid roomId, Guid accountId, decimal? payout)
     {
         _logger.LogInformation($"{nameof(ApportionCashByRateAsync)} was caused.");
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            var account = await db.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId);
+        var account = await _dbContext.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId);
 
-            if (account is null || payout is null)
-                return;
+        if (account is null || payout is null)
+            return;
 
-            account.Amount += (decimal)payout;
+        account.Amount += (decimal)payout;
 
-            _ = await db.SaveChangesAsync();
-            _logger.LogInformation("Successful payment");
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
-        }
+        _ = await _dbContext.SaveChangesAsync();
+        _logger.LogInformation("Successful payment");
 
         await _accountHistoryService.CreateHistoryByValuesAsync(roomId, accountId,
             DateTime.UtcNow, (decimal)payout, true);
     }
 
-    public async Task<bool> WritingOffMoneyAsync(Guid accountId, decimal? amount)
+    public async Task<bool> WritingOffMoneyAsync(Account account, decimal? amount)
     {
         _logger.LogInformation($"{nameof(WritingOffMoneyAsync)} was caused.");
 
         if (amount is null)
             return false;
 
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+        if (account.Amount == 0 || amount > account.Amount)
+            return false;
 
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            var account = await db.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId);
+        account.Amount -= (decimal)amount;
 
-            if (account is null)
-                return false;
-
-            if (account.Amount == 0 || amount > account.Amount)
-                return false;
-
-            account.Amount -= (decimal)amount;
-
-            _ = await db.SaveChangesAsync();
-            _logger.LogInformation("Successful withdrawal");
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
-        }
+        _ = await _dbContext.SaveChangesAsync();
+        _logger.LogInformation("Successful withdrawal");
 
         return true;
     }

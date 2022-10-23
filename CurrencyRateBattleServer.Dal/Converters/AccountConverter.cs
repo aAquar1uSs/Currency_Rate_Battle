@@ -7,7 +7,7 @@ public static class AccountConverter
 {
     public static Account ToDomain(this AccountDal accountDal)
     {
-        return new Account { Amount = accountDal.Amount };
+        return new Account {Id = accountDal.Id, Amount = accountDal.Amount};
     }
 
     public static AccountDal ToDal(this Account account)

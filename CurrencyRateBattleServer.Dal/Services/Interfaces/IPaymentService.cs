@@ -25,5 +25,5 @@ public interface IPaymentService
     /// <returns>
     ///A task that represents the asynchronous operation. <see cref="bool"/>;
     /// </returns>
-    Task<bool> WritingOffMoneyAsync(Guid accountId, decimal? amount);
+    Task<bool> WritingOffMoneyAsync(Account account, decimal? amount);
 }

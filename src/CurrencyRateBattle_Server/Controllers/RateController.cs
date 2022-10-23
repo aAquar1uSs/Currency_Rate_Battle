@@ -1,12 +1,13 @@
 ﻿using System.Net;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
+using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.GetRates;
+using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.GetUserBets;
+using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.MakeBetHandler;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Infrastructure;
-using CurrencyRateBattleServer.Services.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyRateBattleServer.Controllers;
 
@@ -17,33 +18,23 @@ public class RateController : ControllerBase
 {
     private readonly ILogger<RateController> _logger;
 
-    private readonly IRateService _rateService;
+    private readonly IMediator _mediator;
 
-    private readonly IAccountService _accountService;
-
-    private readonly ICurrencyStateService _currencyStateService;
-
-    private readonly IPaymentService _paymentService;
-
-    public RateController(ILogger<RateController> logger,
-        IRateService rateService,
-        IAccountService accountService,
-        ICurrencyStateService currencyStateService,
-        IPaymentService paymentService)
+    public RateController(ILogger<RateController> logger, IMediator mediator)
     {
         _logger = logger;
-        _rateService = rateService;
-        _accountService = accountService;
-        _currencyStateService = currencyStateService;
-        _paymentService = paymentService;
+        _mediator = mediator;
     }
 
     [HttpGet]
     public async Task<ActionResult<List<Room>>> GetRatesAsync(bool? isActive, string? currencyCode)
     {
         _logger.LogDebug("List of rates are retrieving.");
-        var rates = await _rateService.GetRatesAsync(isActive, currencyCode);
-        return Ok(rates);
+        var command = new GetRatesCommand {IsActive = isActive, CurrencyCode = currencyCode};
+
+        var response = await _mediator.Send(command);
+
+        return Ok(response.Value.Rates);
     }
 
     [HttpGet("get-user-bets")]
@@ -52,38 +43,18 @@ public class RateController : ControllerBase
     public async Task<IActionResult> GetUserBetsAsync()
     {
         _logger.LogDebug($"{nameof(GetUserBetsAsync)},  was caused.");
-        var userId = _accountService.GetGuidFromRequest(HttpContext);
+        var userId = GuidHelper.GetGuidFromRequest(HttpContext);
         if (userId is null)
             return BadRequest();
 
-        var account = await _accountService.GetAccountByUserIdAsync(userId);
-        if (account is null)
-            return BadRequest();
+        var command = new GetUserBetsCommand {UserId = (Guid)userId};
 
-        var bets = await _rateService.GetRatesByAccountIdAsync(account.Id);
-        return Ok(bets);
-    }
+        var response = await _mediator.Send(command);
 
-    // GET api/rates/
-    [HttpGet("get-users-rating")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<IActionResult> GetUsersRatingAsync()
-    {
-        _logger.LogDebug($"{nameof(GetUsersRatingAsync)},  was caused.");
+        if (response.IsFailure)
+            return BadRequest(response.Error);
 
-        return Ok(await _rateService.GetUsersRatingAsync());
-    }
-
-    [HttpGet("get-currency-rates")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<IActionResult> GetCurrencyRates()
-    {
-        _logger.LogDebug($"{nameof(GetCurrencyRates)},  was caused.");
-
-        var currencyState = await _currencyStateService.GetCurrencyStateAsync();
-        return Ok(currencyState);
+        return Ok(response.Value.Bets);
     }
 
     [HttpPost("make-bet")]
@@ -95,42 +66,19 @@ public class RateController : ControllerBase
     {
         _logger.LogDebug("New rate creation is triggerred.");
 
-        if (!ModelState.IsValid)
-            return BadRequest("Wrong data");
+        var userId = GuidHelper.GetGuidFromRequest(HttpContext);
 
-        try
-        {
-            var userId = _accountService.GetGuidFromRequest(HttpContext);
+        if (userId is null)
+            return BadRequest("Incorrect data");
 
-            if (userId is null)
-                return BadRequest("Incorrect data");
+        var command = new MakeBetCommand { RateToCreate = rateToCreate, UserId = (Guid)userId };
 
-            var account = await _accountService.GetAccountByUserIdAsync(userId);
+        var response = await _mediator.Send(command);
 
-            if (account is null)
-                return BadRequest("Incorrect data");
+        if (response.IsFailure)
+            return BadRequest(response.Error);
 
-            if (!await _paymentService.WritingOffMoneyAsync(account.Id, rateToCreate.Amount))
-                return Conflict("Payment processing error");
-
-            var currencyId = await _currencyStateService.GetCurrencyIdByRoomIdAsync(rateToCreate.RoomId);
-
-            if (currencyId == Guid.Empty)
-                return BadRequest("Incorrect data");
-
-            var rate = await _rateService.CreateRateAsync(rateToCreate, account.Id, currencyId);
-
-            _logger.LogInformation("Rate has been created successfully ({Id})", rate.Id);
-            return Ok(rate);
-        }
-        catch (GeneralException ex)
-        {
-            return BadRequest(new {message = ex.Message});
-        }
-        catch (DbUpdateException)
-        {
-            _logger.LogDebug("An unexpected error occurred during the attempt to create a rate in the DB.");
-            return BadRequest("An unexpected error occurred. Please try again.");
-        }
+        return Ok(response.Value.Rate);
     }
+
 }

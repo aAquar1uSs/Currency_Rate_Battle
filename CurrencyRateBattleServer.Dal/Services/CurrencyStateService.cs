@@ -1,12 +1,9 @@
-﻿using CurrencyRateBattleServer.Data;
-using CurrencyRateBattleServer.Dto;
-using CurrencyRateBattleServer.Services.Interfaces;
+﻿using CurrencyRateBattleServer.Services.Interfaces;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using CurrencyRateBattleServer.Dal;
 using CurrencyRateBattleServer.Domain.Entities;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Services;
@@ -17,31 +14,25 @@ public class CurrencyStateService : ICurrencyStateService
 
     private readonly ILogger<CurrencyStateService> _logger;
 
-    private List<CurrencyStateDto>? _rateStorage;
+    private List<CurrencyState>? _rateStorage;
 
-    private readonly IServiceScopeFactory _scopeFactory;
-
-    private readonly SemaphoreSlim _semaphoreSlimHosted = new(1, 1);
-
-    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
+    private readonly CurrencyRateBattleContext _dbContext;
 
     public CurrencyStateService(ILogger<CurrencyStateService> logger,
-        IServiceScopeFactory scopeFactory)
+        CurrencyRateBattleContext dbContext)
     {
         _logger = logger;
-        _scopeFactory = scopeFactory;
+        _dbContext = dbContext;
         _rateStorage = new List<CurrencyStateDto>();
     }
 
     public async Task<Guid> GetCurrencyIdByRoomIdAsync(Guid roomId)
     {
         _logger.LogDebug($"{nameof(GetCurrencyIdByRoomIdAsync)}, was caused.");
-        using var scope = _scopeFactory.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        var currId = await dbContext.CurrencyStates
-            .Where(currState => currState.RoomId == roomId)
-            .Select(currState => currState.CurrencyId).FirstAsync();
+        var currId = await _dbContext.CurrencyStates
+            .Where(currState => currState.Room.Id == roomId)
+            .Select(currState => currState.Currency.Id).FirstAsync();
 
         return currId;
     }
@@ -52,10 +43,7 @@ public class CurrencyStateService : ICurrencyStateService
 
         await GetCurrencyRatesFromNbuApiAsync();
 
-        using var scope = _scopeFactory.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
-        foreach (var room in dbContext.Rooms)
+        foreach (var room in _dbContext.Rooms)
         {
             if ((room.Date.Date == DateTime.UtcNow.Date
                 && room.Date.Hour == DateTime.UtcNow.Hour)
@@ -73,23 +61,20 @@ public class CurrencyStateService : ICurrencyStateService
     {
         _logger.LogDebug($"{nameof(GetCurrencyStateByRoomIdAsync)}, was caused.");
 
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+        var currencyState = await _dbContext.CurrencyStates
+            .FirstOrDefaultAsync(currState => currState.Room.Id == roomId);
 
-        var currencyState = await db.CurrencyStates
-            .FirstOrDefaultAsync(currState => currState.RoomId == roomId);
-
-        return currencyState;
+        return currencyState.ToDomain();
     }
 
-    public async Task<List<CurrencyStateDto>> GetCurrencyStateAsync()
+    public async Task<List<CurrencyState>> GetCurrencyStateAsync()
     {
         _logger.LogDebug($"{nameof(GetCurrencyStateAsync)} was caused");
 
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        List<CurrencyStateDto> currencyStates = new();
+        List<CurrencyState> currencyStates = new();
 
         if (_rateStorage is null)
             return currencyStates;

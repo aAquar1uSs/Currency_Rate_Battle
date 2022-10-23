@@ -13,8 +13,8 @@ public class GetRoomHandler : IRequestHandler<GetRoomCommand, Result<GetRoomResp
 
     public GetRoomHandler(ILogger<GetRoomHandler> logger, IRoomService roomService)
     {
-        _logger = logger;
-        _roomService = roomService;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _roomService = roomService ?? throw new ArgumentNullException(nameof(roomService));
     }
 
     public async Task<Result<GetRoomResponse>> Handle(GetRoomCommand request, CancellationToken cancellationToken)
