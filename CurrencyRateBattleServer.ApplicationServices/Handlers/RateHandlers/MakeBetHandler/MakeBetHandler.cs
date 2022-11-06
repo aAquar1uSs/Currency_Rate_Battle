@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
-using CurrencyRateBattleServer.Services.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

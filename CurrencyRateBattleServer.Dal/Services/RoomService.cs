@@ -1,58 +1,42 @@
 ﻿using System.Globalization;
-using CurrencyRateBattleServer.Dal;
 using CurrencyRateBattleServer.Dal.Entities;
+using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace CurrencyRateBattleServer.Services;
+namespace CurrencyRateBattleServer.Dal.Services;
 
 public class RoomService : IRoomService
 {
     private readonly ILogger<RoomService> _logger;
 
-    private readonly IServiceScopeFactory _scopeFactory;
-
     private readonly IRateCalculationService _rateCalculationService;
 
-    private readonly SemaphoreSlim _semaphoreSlimRateHosted = new(1, 1);
+    private readonly CurrencyRateBattleContext _dbContext;
 
-    private readonly SemaphoreSlim _semaphoreSlimRoomHosted = new(1, 1);
-
-    public RoomService(ILogger<RoomService> logger,
-        IRateCalculationService rateCalculationService,
-        IServiceScopeFactory scopeFactory)
+    public RoomService(ILogger<RoomService> logger, IRateCalculationService rateCalculationService,
+        CurrencyRateBattleContext dbContext)
     {
-        _logger = logger;
-        _rateCalculationService = rateCalculationService;
-        _scopeFactory = scopeFactory;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _rateCalculationService = rateCalculationService ?? throw new ArgumentNullException(nameof(rateCalculationService));
+        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
     public async Task GenerateRoomsByCurrencyCountAsync()
     {
         _logger.LogInformation($"{nameof(GenerateRoomsByCurrencyCountAsync)} was caused");
-        using var scope = _scopeFactory.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        await _semaphoreSlimRoomHosted.WaitAsync();
-        try
+        foreach (var curr in _dbContext.Currencies)
         {
-            foreach (var curr in dbContext.Currencies)
-            {
-                _ = await dbContext.CurrencyStates.AddAsync(await CreateRoomWithCurrencyStateAsync(curr));
-            }
+            _ = await _dbContext.CurrencyStates.AddAsync(await CreateRoomWithCurrencyStateAsync(curr));
+        }
 
-            _ = await dbContext.SaveChangesAsync();
-        }
-        finally
-        {
-            _ = _semaphoreSlimRoomHosted.Release();
-        }
+        _ = await _dbContext.SaveChangesAsync();
     }
 
-    public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
+
+public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
     {
         _logger.LogInformation($"{nameof(CreateRoomWithCurrencyStateAsync)} was caused");
         var currentDate = DateTime.ParseExact(
@@ -72,36 +56,23 @@ public class RoomService : IRoomService
     public async Task UpdateRoomAsync(Guid id, RoomDal updatedRoomDal)
     {
         _logger.LogInformation($"{nameof(UpdateRoomAsync)} was caused");
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
-        await _semaphoreSlimRateHosted.WaitAsync();
-        try
-        {
-            var roomExists = await db.Rooms.AnyAsync(r => r.Id == id);
+        
+            var roomExists = await _dbContext.Rooms.AnyAsync(r => r.Id == id);
             if (!roomExists)
                 throw new GeneralException($"{nameof(RoomDal)} with Id={id} is not found.");
 
-            _ = db.Rooms.Update(updatedRoomDal);
-            _ = await db.SaveChangesAsync();
-        }
-        finally
-        {
-            _ = _semaphoreSlimRateHosted.Release();
-        }
+            _ = _dbContext.Rooms.Update(updatedRoomDal);
+            _ = await _dbContext.SaveChangesAsync();
     }
 
     public async Task CheckRoomsStateAsync()
     {
         _logger.LogInformation($"{nameof(CheckRoomsStateAsync)} was caused");
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-
-        foreach (var r in db.Rooms)
+        foreach (var room in _dbContext.Rooms)
         {
-            await RoomClosureCheckAsync(r);
-            await CalculateRatesIfRoomClosed(r);
+            await RoomClosureCheckAsync(room);
+            await CalculateRatesIfRoomClosed(room);
         }
     }
 
@@ -128,27 +99,18 @@ public class RoomService : IRoomService
             || (DateTime.UtcNow > roomDal.Date
                 && roomDal.IsClosed))
         {
-            try
-            {
-                await _rateCalculationService.StartRateCalculationByRoomIdAsync(roomDal.Id);
+            await _rateCalculationService.StartRateCalculationByRoomIdAsync(roomDal.Id);
                 await UpdateRoomAsync(roomDal.Id, roomDal);
-            }
-            catch (GeneralException)
-            {
-                await DeleteRoomByIdAsync(roomDal.Id);
-            }
         }
     }
 
     public Task<Room[]> GetRoomsAsync(bool? isClosed)
     {
         _logger.LogInformation($"{nameof(GetRoomsAsync)} was caused");
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         List<RoomDto> roomDtoStorage = new();
-        var result = from curr in db.Currencies
-                     join currState in db.CurrencyStates on curr.Id equals currState.CurrencyId
+        var result = from curr in _dbContext.Currencies
+                     join currState in _dbContext.CurrencyStates on curr.Id equals currState.CurrencyId
                      join room in db.Rooms on currState.RoomId equals room.Id
                      where room.IsClosed == isClosed
                      select new
@@ -193,15 +155,13 @@ public class RoomService : IRoomService
     public Task<List<RoomDto>?> GetActiveRoomsWithFilterAsync(Filter filter)
     {
         _logger.LogInformation($"{nameof(GetActiveRoomsWithFilterAsync)} was caused");
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
         var result = new List<RoomDto>();
 
         var filteredRooms =
-            from currencyState in db.CurrencyStates
-            join room in db.Rooms on currencyState.RoomId equals room.Id
-            join curr in db.Currencies on currencyState.CurrencyId equals curr.Id
+            from currencyState in _dbContext.CurrencyStates
+            join room in _dbContext.Rooms on currencyState.RoomId equals room.Id
+            join curr in _dbContext.Currencies on currencyState.CurrencyId equals curr.Id
             where room.IsClosed == false
             select new
             {
@@ -244,23 +204,12 @@ public class RoomService : IRoomService
     public async Task DeleteRoomByIdAsync(Guid roomId)
     {
         _logger.LogInformation($"{nameof(DeleteRoomByIdAsync)} was caused");
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
-        await _semaphoreSlimRateHosted.WaitAsync();
-        try
-        {
-            var room = await db.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
+        var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
 
             if (room is null)
                 return;
 
-            _ = db.Remove(room);
-            _ = await db.SaveChangesAsync();
-        }
-        finally
-        {
-            _ = _semaphoreSlimRateHosted.Release();
-        }
+            _ = _dbContext.Remove(room);
+            _ = await _dbContext.SaveChangesAsync();
     }
 }

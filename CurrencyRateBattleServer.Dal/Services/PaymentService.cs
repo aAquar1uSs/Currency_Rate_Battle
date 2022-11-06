@@ -1,6 +1,6 @@
-﻿using CurrencyRateBattleServer.Dal.Services.Interfaces;
+﻿using CurrencyRateBattleServer.Dal.Converters;
+using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -12,15 +12,17 @@ public class PaymentService : IPaymentService
 
     private readonly IAccountHistoryService _accountHistoryService;
 
+    private readonly IRoomService _roomService;
+
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public PaymentService(ILogger<PaymentService> logger,
-        CurrencyRateBattleContext dbContext,
-        IAccountHistoryService accountHistoryService)
+    public PaymentService(ILogger<PaymentService> logger, CurrencyRateBattleContext dbContext,
+        IAccountHistoryService accountHistoryService, IRoomService roomService)
     {
-        _logger = logger;
-        _dbContext = dbContext;
-        _accountHistoryService = accountHistoryService;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        _accountHistoryService = accountHistoryService ?? throw new ArgumentNullException(nameof(accountHistoryService));
+        _roomService = roomService ?? throw new ArgumentNullException(nameof(roomService));
     }
 
     public async Task ApportionCashByRateAsync(Guid roomId, Guid accountId, decimal? payout)
@@ -36,9 +38,14 @@ public class PaymentService : IPaymentService
 
         _ = await _dbContext.SaveChangesAsync();
         _logger.LogInformation("Successful payment");
+        //ToDo Move this to handler
+        var accountHistory = AccountHistory.Create(accountId, DateTime.UtcNow, (decimal)payout, true);
 
-        await _accountHistoryService.CreateHistoryByValuesAsync(roomId, accountId,
-            DateTime.UtcNow, (decimal)payout, true);
+        var roomDal = await _roomService.GetRoomByIdAsync(roomId);
+        
+        accountHistory.AddRoom(roomDal.ToDomain());
+        
+        await _accountHistoryService.CreateHistoryAsync(accountHistory);
     }
 
     public async Task<bool> WritingOffMoneyAsync(Account account, decimal? amount)

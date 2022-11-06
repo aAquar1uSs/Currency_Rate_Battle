@@ -1,4 +1,4 @@
-﻿using CurrencyRateBattleServer.Services.Interfaces;
+﻿using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

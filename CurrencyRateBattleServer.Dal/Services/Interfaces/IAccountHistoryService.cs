@@ -1,5 +1,4 @@
-﻿using CurrencyRateBattleServer.Dal.Entities;
-using CurrencyRateBattleServer.Domain.Entities;
+﻿using CurrencyRateBattleServer.Domain.Entities;
 
 namespace CurrencyRateBattleServer.Dal.Services.Interfaces;
 

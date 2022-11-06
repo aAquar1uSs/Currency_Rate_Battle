@@ -1,7 +1,7 @@
 ﻿using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Domain.Entities;
 
-namespace CurrencyRateBattleServer.Services.Interfaces;
+namespace CurrencyRateBattleServer.Dal.Services.Interfaces;
 
 public interface IRoomService
 {

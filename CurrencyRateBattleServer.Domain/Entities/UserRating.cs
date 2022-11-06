@@ -1,12 +1,7 @@
-﻿namespace CurrencyRateBattleServer.ApplicationServices.Dto;
+﻿namespace CurrencyRateBattleServer.Domain.Entities;
 
-public class UserRatingDto
+public class UserRating
 {
-    // 1 - Basic rating, by number of bets;
-    // 2 - percentage of payout/bets amount;
-    // 3 - Number of won bets;
-    // 4 - Percentage of won bets
-
     // Basic rating by number of bets
     public long BetsNo { get; set; }
 
@@ -22,5 +17,4 @@ public class UserRatingDto
     public string Email { get; set; } = default!;
 
     public DateTime LastBetDate { get; set; }
-
 }

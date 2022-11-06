@@ -1,10 +1,9 @@
 ﻿using CurrencyRateBattleServer.Dal.Data;
 using CurrencyRateBattleServer.Dal.Entities;
+using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Dal.Services;
@@ -13,22 +12,20 @@ public class RateService : IRateService
 {
     private readonly ILogger<RateService> _logger;
 
-    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly CurrencyRateBattleContext _dbContext;
 
-    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
-
-    public RateService(ILogger<RateService> logger,
-        IServiceScopeFactory scopeFactory)
+    public RateService(ILogger<RateService> logger, CurrencyRateBattleContext dbContext)
     {
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(dbContext);
+
         _logger = logger;
-        _scopeFactory = scopeFactory;
+        _dbContext = dbContext;
     }
 
     public async Task<RateDal> CreateRateAsync(Rate rate, Guid accountId, Guid currencyId)
     {
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
+        //ToDo move to handler
         var newRate = new RateDal
         {
             RateCurrencyExchange = rate.UserCurrencyExchange,
@@ -39,16 +36,8 @@ public class RateService : IRateService
             CurrencyId = currencyId
         };
 
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            newRate = db.Rates.Add(newRate).Entity;
-            _ = await db.SaveChangesAsync();
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
-        }
+        newRate = _dbContext.Rates.Add(newRate).Entity;
+        _ = await _dbContext.SaveChangesAsync();
 
         return newRate ?? throw new GeneralException($"{nameof(RateDal)} can not be created.");
     }
@@ -56,11 +45,9 @@ public class RateService : IRateService
     public async Task<List<RateDal>> GetRateByRoomIdAsync(Guid roomId)
     {
         _logger.LogInformation($"{nameof(GetRateByRoomIdAsync)} was caused.");
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        var rates = await db.Rates
-            .Where(rate => rate.RoomId == roomId)
+        var rates = await _dbContext.Rates
+            .Where(dal => dal.Room.Id == roomId)
             .ToListAsync();
 
         return rates;
@@ -69,52 +56,37 @@ public class RateService : IRateService
     public async Task UpdateRateByRoomIdAsync(Guid id, RateDal updatedRateDal)
     {
         _logger.LogInformation($"{nameof(UpdateRateByRoomIdAsync)} was caused.");
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            var rateExists = await db.Rooms.AnyAsync(r => r.Id == id);
-            if (!rateExists)
-                throw new GeneralException($"{nameof(RateDal)} with Id={id} is not found.");
+        var rateExists = await _dbContext.Rooms.AnyAsync(r => r.Id == id);
+        if (!rateExists)
+            throw new GeneralException($"{nameof(RateDal)} with Id={id} is not found.");
 
-            updatedRateDal.SettleDate = DateTime.UtcNow;
+        updatedRateDal.SettleDate = DateTime.UtcNow;
 
-            _ = db.Rates.Update(updatedRateDal);
-            _ = await db.SaveChangesAsync();
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
-        }
+        _ = _dbContext.Rates.Update(updatedRateDal);
+        _ = await _dbContext.SaveChangesAsync();
     }
 
     public async Task<Rate[]> GetRatesAsync(bool? isActive, string? currencyCode)
     {
         _logger.LogInformation($"{nameof(GetRatesAsync)} was caused.");
 
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
         Guid? currencyId = Guid.Empty;
         if (currencyCode is not null)
         {
-            var currency = await db.Currencies.FirstOrDefaultAsync(c => c.CurrencyName == currencyCode);
-            currencyId = currency is not null
-                ? currency.Id
-                : throw new GeneralException($"Rates can not be retrieved: currency is invalid.");
+            var currency = await _dbContext.Currencies.FirstOrDefaultAsync(c => c.CurrencyName == currencyCode);
+            currencyId = currency?.Id ?? throw new GeneralException($"Rates can not be retrieved: currency is invalid.");
         }
 
         List<RateDal> result;
         if (currencyId != Guid.Empty)
-            result = await db.Rates.Where(r => r.CurrencyId == currencyId).ToListAsync();
+            result = await _dbContext.Rates.Where(dal => dal.Currency.Id == currencyId).ToListAsync();
 
         result = isActive switch
         {
-            null => await db.Rates.ToListAsync(),
-            true => await db.Rates.Where(r => !r.IsClosed).ToListAsync(),
-            _ => await db.Rates.Where(r => r.IsClosed).ToListAsync()
+            null => await _dbContext.Rates.ToListAsync(),
+            true => await _dbContext.Rates.Where(r => !r.IsClosed).ToListAsync(),
+            _ => await _dbContext.Rates.Where(r => r.IsClosed).ToListAsync()
         };
 
         return result;
@@ -126,11 +98,8 @@ public class RateService : IRateService
 
         List<BetDto> betDtoStorage = new();
 
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
-        var firstQuery = GetBetData(db, accountId);
-        var secondQuery = GetBetSubQuery(db, firstQuery);
+        var firstQuery = GetBetData(accountId);
+        var secondQuery = GetBetSubQuery(firstQuery);
 
         foreach (var data in secondQuery)
         {

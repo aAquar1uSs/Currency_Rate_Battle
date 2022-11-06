@@ -16,7 +16,7 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
 
     private readonly IAccountService _accountService;
 
-    private readonly IOptions<WebServerOptions> _options;
+    private readonly WebServerOptions _options;
     
     private readonly IAccountHistoryService _accountHistoryService;
     
@@ -27,7 +27,7 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
-        _options = options ?? throw new ArgumentNullException(nameof(options));
+        _options = options.Value ?? throw new ArgumentNullException(nameof(options));
         _accountHistoryService = historyService ?? throw new ArgumentNullException(nameof(historyService));
         _jwtManager = jwtManager ?? throw new ArgumentNullException(nameof(jwtManager));
     }
@@ -48,7 +48,7 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
             return Result.Failure<RegistrationResponse>("User with such email already exist");
 
         var account = Account.Create();
-        account.AddStartBalance(_options.Value.RegistrationReward);
+        account.AddStartBalance(_options.RegistrationReward);
         
         await _accountService.CreateAccountAsync(account);
         
@@ -56,7 +56,8 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
 
         await _accountService.CreateUserAsync(user);
 
-        await _accountHistoryService.CreateHistoryByValuesAsync(null, account.Id, DateTime.UtcNow, account.Amount, true);
+        var accountHistory = AccountHistory.Create(account.Id, DateTime.UtcNow, account.Amount, true);
+        await _accountHistoryService.CreateHistoryAsync(accountHistory);
 
         return new RegistrationResponse { Tokens = _jwtManager.Authenticate(user) };
     }

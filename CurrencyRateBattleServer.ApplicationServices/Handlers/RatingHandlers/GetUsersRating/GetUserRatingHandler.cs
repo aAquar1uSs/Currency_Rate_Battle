@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -19,9 +20,11 @@ public class GetUserRatingHandler : IRequestHandler<GetUserRatingCommand, Result
 
     public async Task<Result<GetUserRatingResponse>> Handle(GetUserRatingCommand request, CancellationToken cancellationToken)
     {
-        //ToDo
         var rating = await _ratingService.GetUsersRatingAsync();
-
-        return new GetUserRatingResponse();
+        
+        return new GetUserRatingResponse
+        {
+            UserRating = rating.ToDto()
+        };
     }
 }

@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Converters;
+using CurrencyRateBattleServer.Dal.Converters;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
-using CurrencyRateBattleServer.Services.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -28,6 +28,8 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
 
     public async Task<Result<CreateHistoryResponse>> Handle(CreateHistoryCommand request, CancellationToken cancellationToken)
     {
+        _logger.LogInformation($"{nameof(CreateHistoryHandler)} was caused... Start proccesing");
+        
         if (request.UserId is null)
             return Result.Failure<CreateHistoryResponse>("Incorrect data.");
 
@@ -43,7 +45,10 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
 
         var accountHistory = request.AccountHistory.ToDomain();
 
-        await _accountHistoryService.CreateHistoryAsync(room, account, accountHistory);
+        accountHistory.AddAccount(account);
+        accountHistory.AddRoom(room.ToDomain());
+        
+        await _accountHistoryService.CreateHistoryAsync(accountHistory);
 
         return new CreateHistoryResponse();
     }

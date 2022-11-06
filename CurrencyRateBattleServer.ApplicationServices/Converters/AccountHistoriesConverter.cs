@@ -19,7 +19,7 @@ public static class AccountHistoriesConverter
             Amount = accountHistory.Amount,
             Date = accountHistory.Date,
             IsCredit = accountHistory.IsCredit,
-            RoomId = accountHistory.RoomId
+            RoomId = accountHistory.Room.Id
         };
     }
 

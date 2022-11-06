@@ -1,7 +1,7 @@
 ﻿using CurrencyRateBattleServer.Dal.Services.HostedServices.Handlers;
+using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Services.HostedServices.Handlers;
-using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

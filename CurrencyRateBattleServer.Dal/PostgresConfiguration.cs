@@ -2,7 +2,6 @@
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Services;
 using CurrencyRateBattleServer.Services.HostedServices;
-using CurrencyRateBattleServer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,8 +1,7 @@
 ﻿using CurrencyRateBattleServer.Dal.Services.HostedServices;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Dto;
 
-namespace CurrencyRateBattleServer.Services.Interfaces;
+namespace CurrencyRateBattleServer.Dal.Services.Interfaces;
 
 public interface ICurrencyStateService
 {

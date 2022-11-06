@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.GetRates;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.GetUserBets;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.MakeBetHandler;

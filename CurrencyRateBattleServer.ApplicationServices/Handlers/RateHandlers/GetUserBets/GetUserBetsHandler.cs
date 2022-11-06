@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
-using CurrencyRateBattleServer.Services.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -32,6 +31,6 @@ public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<Get
 
         var bets = await _rateService.GetRatesByAccountIdAsync(account.Id);
 
-        return new GetUserBetsResponse { Bets = bets.ToDto()};
+        return new GetUserBetsResponse { Bets = bets)};
     }
 }

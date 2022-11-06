@@ -1,7 +1,6 @@
-﻿
-using CurrencyRateBattleServer.Dal.Entities;
+﻿using CurrencyRateBattleServer.Dal.Entities;
 
-namespace CurrencyRateBattleServer.Services.Interfaces;
+namespace CurrencyRateBattleServer.Dal.Services.Interfaces;
 
 public interface IRateCalculationService
 {
