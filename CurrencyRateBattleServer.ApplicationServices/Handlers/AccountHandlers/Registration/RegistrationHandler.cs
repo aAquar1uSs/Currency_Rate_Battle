@@ -15,20 +15,24 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
     private readonly ILogger<RegistrationHandler> _logger;
 
     private readonly IAccountService _accountService;
-
-    private readonly WebServerOptions _options;
     
     private readonly IAccountHistoryService _accountHistoryService;
-    
+
+    private readonly IUserService _userService;
+
+    private readonly WebServerOptions _options;
+
     private readonly IJwtManager _jwtManager;
 
     public RegistrationHandler(ILogger<RegistrationHandler> logger, IAccountService accountService, 
-        IOptions<WebServerOptions> options, IAccountHistoryService historyService, JwtManager jwtManager)
+        IOptions<WebServerOptions> options, IAccountHistoryService historyService, JwtManager jwtManager,
+        IUserService userService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
         _options = options.Value ?? throw new ArgumentNullException(nameof(options));
         _accountHistoryService = historyService ?? throw new ArgumentNullException(nameof(historyService));
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _jwtManager = jwtManager ?? throw new ArgumentNullException(nameof(jwtManager));
     }
 
@@ -39,10 +43,13 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
         var userResult = User.Create(request.UserDto.Email, request.UserDto.Password);
 
         if (userResult.IsFailure)
-            return Result.Failure<RegistrationResponse>(userResult.Error);
+        {
+            _logger.LogWarning(userResult.Error);
+            return Result.Failure<RegistrationResponse>(userResult.Error);   
+        }
 
         var user = userResult.Value;
-        var maybeUser = await _accountService.GetUserAsync(user);
+        var maybeUser = await _userService.FindAsync(user);
 
         if (maybeUser is not null)
             return Result.Failure<RegistrationResponse>("User with such email already exist");
@@ -54,10 +61,11 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
         
         user.AddAccount(account);
 
-        await _accountService.CreateUserAsync(user);
+        await _userService.CreateAsync(user);
 
         var accountHistory = AccountHistory.Create(account.Id, DateTime.UtcNow, account.Amount, true);
-        await _accountHistoryService.CreateHistoryAsync(accountHistory);
+        await _accountHistoryService.CreateAsync(accountHistory);
+        _logger.LogInformation($"{nameof(AccountHistory)} was successfully added");
 
         return new RegistrationResponse { Tokens = _jwtManager.Authenticate(user) };
     }

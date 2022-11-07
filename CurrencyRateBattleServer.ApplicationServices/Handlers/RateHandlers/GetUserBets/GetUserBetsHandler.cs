@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -24,13 +25,13 @@ public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<Get
     {
         _logger.LogDebug($"{nameof(GetUserBetsHandler)},  was caused. Start processing.");
 
-        var account = await _accountService.GetAccountByUserIdAsync(request.UserId);
+        var account = await _accountService.FindAsync(request.UserId);
 
         if (account is null)
             return Result.Failure<GetUserBetsResponse>($"Account with such user id {request.UserId} does not exist");
 
-        var bets = await _rateService.GetRatesByAccountIdAsync(account.Id);
+        var bets = await _rateService.FindAsync(account.Id);
 
-        return new GetUserBetsResponse { Bets = bets)};
+        return new GetUserBetsResponse { Bets = bets.ToDto()};
     }
 }

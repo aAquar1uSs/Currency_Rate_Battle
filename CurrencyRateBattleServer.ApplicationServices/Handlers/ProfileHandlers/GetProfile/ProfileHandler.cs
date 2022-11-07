@@ -25,7 +25,7 @@ public class ProfileHandler : IRequestHandler<GetProfileCommand, Result<GetProfi
         if (request.UserId is null)
             return Result.Failure<GetProfileResponse>("User id is null.");
         
-        var account = await _accountService.GetAccountByUserIdAsync(request.UserId);
+        var account = await _accountService.FindAsync(request.UserId);
         
         if (account is null)
             return Result.Failure<GetProfileResponse>($"User with suh id: {request.UserId} didn't found,");

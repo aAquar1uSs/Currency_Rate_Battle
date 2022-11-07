@@ -13,8 +13,6 @@ public class CurrencyStateService : ICurrencyStateService
 
     private readonly ILogger<CurrencyStateService> _logger;
 
-    private List<CurrencyState>? _rateStorage;
-
     private readonly CurrencyRateBattleContext _dbContext;
 
     public CurrencyStateService(ILogger<CurrencyStateService> logger,
@@ -22,7 +20,6 @@ public class CurrencyStateService : ICurrencyStateService
     {
         _logger = logger;
         _dbContext = dbContext;
-        _rateStorage = new List<CurrencyStateDto>();
     }
 
     public async Task<Guid> GetCurrencyIdByRoomIdAsync(Guid roomId)
@@ -66,18 +63,17 @@ public class CurrencyStateService : ICurrencyStateService
         return currencyState.ToDomain();
     }
 
-    public async Task<List<CurrencyState>> GetCurrencyStateAsync()
+    public async Task<CurrencyState[]> GetCurrencyStateAsync()
     {
         _logger.LogDebug($"{nameof(GetCurrencyStateAsync)} was caused");
 
-        List<CurrencyState> currencyStates = new();
-
         if (_rateStorage is null)
-            return currencyStates;
-
+            return Array.Empty<CurrencyState>();
+        
+        List<CurrencyState> currencyStates = new();
         foreach (var curr in _dbContext.Currencies)
         {
-            var item = _rateStorage.Find(x => x.Currency == curr.CurrencyName);
+            var item = _rateStorage.Find(x => x.Currency.CurrencyName == curr.CurrencyName);
 
             if (item is null)
                 continue;
@@ -85,7 +81,7 @@ public class CurrencyStateService : ICurrencyStateService
             currencyStates.Add(item);
         }
 
-        return await Task.FromResult(currencyStates);
+        return await Task.FromResult(currencyStates.ToArray());
     }
 
     public async Task GetCurrencyRatesFromNbuApiAsync()

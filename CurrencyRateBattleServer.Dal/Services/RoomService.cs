@@ -29,16 +29,16 @@ public class RoomService : IRoomService
 
         foreach (var curr in _dbContext.Currencies)
         {
-            _ = await _dbContext.CurrencyStates.AddAsync(await CreateRoomWithCurrencyStateAsync(curr));
+            _ = await _dbContext.CurrencyStates.AddAsync(await CreateAsync(curr));
         }
 
         _ = await _dbContext.SaveChangesAsync();
     }
 
 
-public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
+public Task<CurrencyState> CreateAsync(CurrencyDal curr)
     {
-        _logger.LogInformation($"{nameof(CreateRoomWithCurrencyStateAsync)} was caused");
+        _logger.LogInformation($"{nameof(CreateAsync)} was caused");
         var currentDate = DateTime.ParseExact(
             DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
             "MM.dd.yyyy HH:mm:ss", null);
@@ -53,9 +53,9 @@ public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
         });
     }
 
-    public async Task UpdateRoomAsync(Guid id, RoomDal updatedRoomDal)
+    public async Task UpdateAsync(Guid id, RoomDal updatedRoomDal)
     {
-        _logger.LogInformation($"{nameof(UpdateRoomAsync)} was caused");
+        _logger.LogInformation($"{nameof(UpdateAsync)} was caused");
         
             var roomExists = await _dbContext.Rooms.AnyAsync(r => r.Id == id);
             if (!roomExists)
@@ -86,7 +86,7 @@ public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
             || DateTime.UtcNow > roomDal.Date)
         {
             roomDal.IsClosed = true;
-            await UpdateRoomAsync(roomDal.Id, roomDal);
+            await UpdateAsync(roomDal.Id, roomDal);
         }
     }
 
@@ -100,13 +100,13 @@ public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
                 && roomDal.IsClosed))
         {
             await _rateCalculationService.StartRateCalculationByRoomIdAsync(roomDal.Id);
-                await UpdateRoomAsync(roomDal.Id, roomDal);
+                await UpdateAsync(roomDal.Id, roomDal);
         }
     }
 
-    public Task<Room[]> GetRoomsAsync(bool? isClosed)
+    public Task<Room[]> FindAsync(bool? isClosed)
     {
-        _logger.LogInformation($"{nameof(GetRoomsAsync)} was caused");
+        _logger.LogInformation($"{nameof(FindAsync)} was caused");
 
         List<RoomDto> roomDtoStorage = new();
         var result = from curr in _dbContext.Currencies
@@ -141,9 +141,9 @@ public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
         return Task.FromResult(roomDtoStorage);
     }
 
-    public async Task<RoomDal?> GetRoomByIdAsync(Guid id)
+    public async Task<RoomDal?> FindAsync(Guid id)
     {
-        _logger.LogInformation($"{nameof(GetRoomByIdAsync)} was caused");
+        _logger.LogInformation($"{nameof(FindAsync)} was caused");
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
 
@@ -201,9 +201,9 @@ public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
         return Task.FromResult(result);
     }
 
-    public async Task DeleteRoomByIdAsync(Guid roomId)
+    public async Task DeleteAsync(Guid roomId)
     {
-        _logger.LogInformation($"{nameof(DeleteRoomByIdAsync)} was caused");
+        _logger.LogInformation($"{nameof(DeleteAsync)} was caused");
         var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
 
             if (room is null)

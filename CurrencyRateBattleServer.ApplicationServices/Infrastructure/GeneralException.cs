@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
 
-namespace CurrencyRateBattleServer.Infrastructure;
+namespace CurrencyRateBattleServer.ApplicationServices.Infrastructure;
 public class GeneralException : Exception
 {
-    public GeneralException() : base() { }
+    public GeneralException() { }
 
     public GeneralException(string message) : base(message) { }
 

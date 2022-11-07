@@ -7,17 +7,17 @@ public interface IRoomService
 {
     Task GenerateRoomsByCurrencyCountAsync();
 
-    Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr);
+    Task<CurrencyState> CreateAsync(CurrencyDal curr);
 
-    Task UpdateRoomAsync(Guid id, RoomDal updatedRoomDal);
+    Task UpdateAsync(Guid id, RoomDal updatedRoomDal);
 
     Task CheckRoomsStateAsync();
 
-    Task<Room[]> GetRoomsAsync(bool? isClosed);
+    Task<Room[]> FindAsync(bool? isClosed);
 
-    Task<RoomDal?> GetRoomByIdAsync(Guid id);
+    Task<RoomDal?> FindAsync(Guid id);
 
     Task<Room?[]> GetActiveRoomsWithFilterAsync(FilterDto filter);
 
-    Task DeleteRoomByIdAsync(Guid roomId);
+    Task DeleteAsync(Guid roomId);
 }

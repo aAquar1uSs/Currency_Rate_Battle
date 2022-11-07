@@ -1,6 +1,6 @@
-﻿namespace CurrencyRateBattleServer.Dto;
+﻿namespace CurrencyRateBattleServer.ApplicationServices.Dto;
 
-public class BetDto
+public class BetInfoDto
 {
     public Guid Id { get; set; }
 

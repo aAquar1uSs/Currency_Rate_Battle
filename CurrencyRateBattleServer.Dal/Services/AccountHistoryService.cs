@@ -19,9 +19,9 @@ public class AccountHistoryService : IAccountHistoryService
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task<AccountHistory[]> GetAccountHistoryByAccountId(Guid? id)
+    public async Task<AccountHistory[]> FindAsync(Guid? id)
     {
-        _logger.LogDebug($"{nameof(GetAccountHistoryByAccountId)} was caused.");
+        _logger.LogDebug($"{nameof(FindAsync)} was caused.");
 
         var histories = await _dbContext.AccountHistory
             .Where(history => history.Account.Id == id)
@@ -30,10 +30,10 @@ public class AccountHistoryService : IAccountHistoryService
         return histories.ToDomain();
     }
 
-    public async Task CreateHistoryAsync(AccountHistory accountHistory)
+    public async Task CreateAsync(AccountHistory accountHistory)
     {
         var historyDal = accountHistory.ToDal();
-
+        
         _ = await _dbContext.AccountHistory.AddAsync(historyDal);
         _ = await _dbContext.SaveChangesAsync();
 

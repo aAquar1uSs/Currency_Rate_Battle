@@ -27,12 +27,12 @@ public class GetAccountHistoryHandler : IRequestHandler<GetAccountHistoryCommand
         if (request.UserId is null)
             return Result.Failure<GetAccountHistoryResponse>("User id is null.");
         
-        var account = await _accountService.GetAccountByUserIdAsync(request.UserId);
+        var account = await _accountService.FindAsync(request.UserId);
         
         if (account is null)
             return Result.Failure<GetAccountHistoryResponse>("Account not found.");
 
-        var history = await _accountHistoryService.GetAccountHistoryByAccountId(request.UserId);
+        var history = await _accountHistoryService.FindAsync(request.UserId);
 
         return new GetAccountHistoryResponse { AccountHistories = history.ToArray().ToDto() };
     }

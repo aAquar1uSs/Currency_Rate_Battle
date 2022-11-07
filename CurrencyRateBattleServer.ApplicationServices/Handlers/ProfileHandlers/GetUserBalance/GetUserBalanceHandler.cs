@@ -24,7 +24,7 @@ public class GetUserBalanceHandler : IRequestHandler<GetUserBalanceCommand, Resu
         if (request.UserId is null)
             return Result.Failure<GetUserBalanceResponse>("User id is null.");
         
-        var account = await _accountService.GetAccountByUserIdAsync(request.UserId);
+        var account = await _accountService.FindAsync(request.UserId);
         
         if (account is null)
             return Result.Failure<GetUserBalanceResponse>($"Account with id: {request.UserId} didn't found.");

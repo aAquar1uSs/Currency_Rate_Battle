@@ -22,7 +22,7 @@ public class GetRoomHandler : IRequestHandler<GetRoomCommand, Result<GetRoomResp
         //ToDo Create method which been get CountRate etc...
         _logger.LogDebug($"{nameof(GetRoomHandler)} was caused. Start processing.");
 
-        var rooms = await _roomService.GetRoomsAsync(request.IsClosed);
+        var rooms = await _roomService.FindAsync(request.IsClosed);
 
         return new GetRoomResponse {Rooms = rooms.ToDto()};
     }

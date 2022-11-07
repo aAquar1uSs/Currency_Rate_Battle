@@ -33,12 +33,12 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
         if (request.UserId is null)
             return Result.Failure<CreateHistoryResponse>("Incorrect data.");
 
-        var account = await _accountService.GetAccountByUserIdAsync(request.UserId);
+        var account = await _accountService.FindAsync(request.UserId);
 
         if (account is null)
             return Result.Failure<CreateHistoryResponse>("Account didn't found.");
 
-        var room = await _roomService.GetRoomByIdAsync(request.AccountHistory.RoomId);
+        var room = await _roomService.FindAsync(request.AccountHistory.RoomId);
 
         if (room is null)
             return Result.Failure<CreateHistoryResponse>("Room didn't found.");
@@ -48,7 +48,7 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
         accountHistory.AddAccount(account);
         accountHistory.AddRoom(room.ToDomain());
         
-        await _accountHistoryService.CreateHistoryAsync(accountHistory);
+        await _accountHistoryService.CreateAsync(accountHistory);
 
         return new CreateHistoryResponse();
     }

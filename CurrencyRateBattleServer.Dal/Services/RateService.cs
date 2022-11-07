@@ -23,7 +23,7 @@ public class RateService : IRateService
         _dbContext = dbContext;
     }
 
-    public async Task<RateDal> CreateRateAsync(Rate rate, Guid accountId, Guid currencyId)
+    public async Task CreateAsync(Rate rate, Guid accountId, Guid currencyId)
     {
         //ToDo move to handler
         var newRate = new RateDal
@@ -38,19 +38,17 @@ public class RateService : IRateService
 
         newRate = _dbContext.Rates.Add(newRate).Entity;
         _ = await _dbContext.SaveChangesAsync();
-
-        return newRate ?? throw new GeneralException($"{nameof(RateDal)} can not be created.");
     }
 
-    public async Task<List<RateDal>> GetRateByRoomIdAsync(Guid roomId)
+    public async Task<Rate[]> GetRateByRoomIdAsync(Guid roomId)
     {
         _logger.LogInformation($"{nameof(GetRateByRoomIdAsync)} was caused.");
 
         var rates = await _dbContext.Rates
             .Where(dal => dal.Room.Id == roomId)
-            .ToListAsync();
+            .ToArrayAsync();
 
-        return rates;
+        return rates.ToDomain();
     }
 
     public async Task UpdateRateByRoomIdAsync(Guid id, RateDal updatedRateDal)
@@ -67,9 +65,9 @@ public class RateService : IRateService
         _ = await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<Rate[]> GetRatesAsync(bool? isActive, string? currencyCode)
+    public async Task<Rate[]> FindAsync(bool? isActive, string? currencyCode)
     {
-        _logger.LogInformation($"{nameof(GetRatesAsync)} was caused.");
+        _logger.LogInformation($"{nameof(FindAsync)} was caused.");
 
         Guid? currencyId = Guid.Empty;
         if (currencyCode is not null)
@@ -92,18 +90,18 @@ public class RateService : IRateService
         return result;
     }
 
-    public Task<List<BetDto>> GetRatesByAccountIdAsync(Guid accountId)
+    public Task<BetInfo[]> FindAsync(Guid accountId)
     {
-        _logger.LogInformation($"{nameof(GetRatesByAccountIdAsync)} was caused.");
+        _logger.LogInformation($"{nameof(FindAsync)} was caused.");
 
-        List<BetDto> betDtoStorage = new();
+        List<BetInfo> betDtoStorage = new();
 
         var firstQuery = GetBetData(accountId);
         var secondQuery = GetBetSubQuery(firstQuery);
 
         foreach (var data in secondQuery)
         {
-            betDtoStorage.Add(new BetDto
+            betDtoStorage.Add(new BetInfo
             {
                 Id = data.RateId,
                 SetDate = data.RateSetDate,
@@ -120,53 +118,31 @@ public class RateService : IRateService
         }
 
         betDtoStorage.Sort((bet1, bet2) => bet1.RoomDate.CompareTo(bet2.RoomDate));
-        return Task.FromResult(betDtoStorage);
+        return Task.FromResult(betDtoStorage.ToArray());
     }
 
-    public async Task DeleteRateAsync(Guid id)
+    public async Task DeleteRateAsync(Rate rateToDelete)
     {
         _logger.LogInformation($"{nameof(DeleteRateAsync)} was caused.");
 
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
-
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            var rateToDelete = await db.Rates.FindAsync(id);
-            if (rateToDelete != null)
-            {
-                _ = db.Rates.Remove(rateToDelete);
-                _ = await db.SaveChangesAsync();
-            }
-            else
-            {
-                _logger.LogDebug("No rate found to be deleted.");
-            }
-        }
-        finally
-        {
-            _ = _semaphoreSlim.Release();
-        }
+        _ = _dbContext.Rates.Remove(rateToDelete.ToDal());
+        _ = await _dbContext.SaveChangesAsync();
     }
 
-    public Task<List<UserRatingDto>> GetUsersRatingAsync()
+    public Task<UserRating[]> GetUsersRatingAsync()
     {
         _logger.LogInformation($"{nameof(GetUsersRatingAsync)} was caused.");
 
-        using var scope = _scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<CurrencyRateBattleContext>();
+        List<UserRating> userRatings = new();
 
-        List<UserRatingDto> userRatings = new();
-
-        var query1 = GetUserRatingDataFirstQuery(db);
+        var query1 = GetUserRatingDataFirstQuery();
         var totalQuery = GetUserRatingDataTotalQuery(query1);
         var wonQuery = GetUserRatingDataWonQuery(query1);
         var query = GetUserRatingDataTotalWonQuery(totalQuery, wonQuery);
 
         foreach (var data in query)
         {
-            userRatings.Add(new UserRatingDto
+            userRatings.Add(new UserRating
             {
                 Email = data.TotalQ.UserEmail,
                 BetsNo = data.TotalQ.TotalBetCount,
@@ -180,9 +156,9 @@ public class RateService : IRateService
         return Task.FromResult(userRatings);
     }
 
-    private static IQueryable<BetData> GetBetData(CurrencyRateBattleContext db, Guid accountId)
+    private IQueryable<BetData> GetBetData(Guid accountId)
     {
-        var result = from rate in db.Rates
+        var result = from rate in _dbContext.Rates
                      join curr in db.Currencies on rate.CurrencyId equals curr.Id
                      join room in db.Rooms on rate.RoomId equals room.Id
                      where rate.AccountId == accountId
@@ -205,10 +181,10 @@ public class RateService : IRateService
         return result;
     }
 
-    private static IQueryable<BetData> GetBetSubQuery(CurrencyRateBattleContext db, IQueryable<BetData> data)
+    private IQueryable<BetData> GetBetSubQuery(IQueryable<BetData> data)
     {
         var query = from res in data
-                    join currState in db.CurrencyStates
+                    join currState in _dbContext.CurrencyStates
                 on new { res.RoomId, res.CurrencyId } equals new { currState.RoomId, currState.CurrencyId }
                 into gj
                     from subCurr in gj.DefaultIfEmpty()
@@ -232,7 +208,7 @@ public class RateService : IRateService
         return query;
     }
 
-    private static IQueryable<UserRatingData> GetUserRatingDataFirstQuery(CurrencyRateBattleContext db)
+    private IQueryable<UserRatingData> GetUserRatingDataFirstQuery(CurrencyRateBattleContext db)
     {
         var query1 = from rate in db.Rates
                      join acc in db.Accounts on rate.AccountId equals acc.Id
@@ -251,7 +227,7 @@ public class RateService : IRateService
         return query1;
     }
 
-    private static IQueryable<UserRatingData> GetUserRatingDataTotalQuery(IQueryable<UserRatingData> data)
+    private IQueryable<UserRatingData> GetUserRatingDataTotalQuery(IQueryable<UserRatingData> data)
     {
         var totalQuery = from res in data
                          group res by new { res.AccountId, res.UserEmail }
@@ -269,7 +245,7 @@ public class RateService : IRateService
         return totalQuery;
     }
 
-    private static IQueryable<UserRatingData> GetUserRatingDataWonQuery(IQueryable<UserRatingData> data)
+    private IQueryable<UserRatingData> GetUserRatingDataWonQuery(IQueryable<UserRatingData> data)
     {
         var wonQuery = from res in data
                        where res.IsWon
@@ -286,7 +262,7 @@ public class RateService : IRateService
         return wonQuery;
     }
 
-    private static IQueryable<ResultUserRatingData> GetUserRatingDataTotalWonQuery(IQueryable<UserRatingData> data,
+    private IQueryable<ResultUserRatingData> GetUserRatingDataTotalWonQuery(IQueryable<UserRatingData> data,
         IQueryable<UserRatingData> wonQuery)
     {
         var query = from totalQ in data

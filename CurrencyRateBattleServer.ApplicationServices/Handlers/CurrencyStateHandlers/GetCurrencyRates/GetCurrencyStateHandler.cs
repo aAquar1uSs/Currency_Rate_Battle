@@ -24,6 +24,6 @@ public class GetCurrencyStateHandler : IRequestHandler<GetCurrencyStateCommand, 
 
         var currencyRates = await _currencyStateService.GetCurrencyStateAsync();
 
-        return new GetCurrencyStateResponse { CurrencyStates = currencyRates.ToArray().ToDto()};
+        return new GetCurrencyStateResponse { CurrencyStates = currencyRates.ToDto()};
     }
 }

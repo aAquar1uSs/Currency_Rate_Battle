@@ -11,7 +11,7 @@ public interface IAccountHistoryService
     /// <returns>
     /// the list <see cref="List{T}"/> of AccountHistory models <see cref="AccountHistory"/>;
     /// </returns>
-    Task<AccountHistory[]> GetAccountHistoryByAccountId(Guid? id);
+    Task<AccountHistory[]> FindAsync(Guid? id);
 
     /// <summary>
     /// Creates a new account history;
@@ -20,5 +20,5 @@ public interface IAccountHistoryService
     /// <returns>
     ///A task that represents the asynchronous operation. <see cref="Task"/>;
     /// </returns>
-    Task CreateHistoryAsync(AccountHistory accountHistory);
+    Task CreateAsync(AccountHistory accountHistory);
 }

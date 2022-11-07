@@ -29,7 +29,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
     public async Task<Result<MakeBetResponse>> Handle(MakeBetCommand request, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(MakeBetHandler)} was caused.");
-        var account = await _accountService.GetAccountByUserIdAsync(request.UserId);
+        var account = await _accountService.FindAsync(request.UserId);
 
         if (account is null)
             return Result.Failure<MakeBetResponse>($"Account with such user id: {request.UserId} does not exist.");
@@ -41,12 +41,12 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
         if (result is false)
             return Result.Failure<MakeBetResponse>("Payment processing error");
 
-        var currencyId = await _currencyStateService.GetCurrencyIdByRoomIdAsync(rateToCreate.RoomId);
+        var currencyId = await _currencyStateService.FindIdAsync(rateToCreate.RoomId);
 
         if (currencyId == Guid.Empty)
             return Result.Failure<MakeBetResponse>("Incorrect data");
 
-        var rate = await _rateService.CreateRateAsync(rateToCreate, account.Id, currencyId);
+        var rate = await _rateService.CreateAsync(rateToCreate, account.Id, currencyId);
 
         return new MakeBetResponse { Rate = rate.ToDto() };
     }

@@ -18,16 +18,6 @@ public class AccountService : IAccountService
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task<User?> GetUserAsync(User userData)
-    {
-        _logger.LogDebug($"{nameof(GetUserAsync)} was caused.");
-
-        var userDal = await _dbContext.Users
-            .FirstOrDefaultAsync(dal => dal.Email == userData.Email && dal.Password == userData.Password);
-
-        return userDal?.ToDomain();
-    }
-
     public async Task CreateAccountAsync(Account account)
     {
         _logger.LogDebug($"{nameof(CreateAccountAsync)} was caused.");
@@ -39,19 +29,9 @@ public class AccountService : IAccountService
         _logger.LogInformation($"{nameof(CreateAccountAsync)} successfully added new account");
     }
 
-    public async Task CreateUserAsync(User userData)
+    public async Task<Account?> FindAsync(Guid? userId)
     {
-        var userDal = userData.ToDal();
-
-        _ = await _dbContext.Users.AddAsync(userDal);
-        _ = await _dbContext.SaveChangesAsync();
-
-        _logger.LogInformation("New user added to the database");
-    }
-
-    public async Task<Account?> GetAccountByUserIdAsync(Guid? userId)
-    {
-        _logger.LogDebug($"{nameof(GetAccountByUserIdAsync)} was caused.");
+        _logger.LogDebug($"{nameof(FindAsync)} was caused.");
 
         var account = await _dbContext.Accounts
                 .FirstOrDefaultAsync(acc => acc.User.Id == userId);

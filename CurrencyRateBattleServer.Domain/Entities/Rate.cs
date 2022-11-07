@@ -1,4 +1,5 @@
 ﻿namespace CurrencyRateBattleServer.Domain.Entities;
+
 public class Rate
 {
     public Guid Id { get; set; }

@@ -5,27 +5,8 @@ namespace CurrencyRateBattleServer.Dal.Services.Interfaces;
 
 public interface IAccountService
 {
-    /// <summary>
-    /// Verifies the presence of a user , if any, gives his unique token <see cref="Tokens"/>;
-    /// </summary>
-    /// <param name="userData"><see cref="UserDto"/></param>
-    /// <returns>
-    ///the task result contains <see cref="Tokens"/>
-    /// </returns>
-    public Task<User?> GetUserAsync(User userData);
+    public Task CreateAccountAsync(Account account);
 
-    public Task CreateAccountAsync(Account account); 
-
-    /// <summary>
-    /// Creates new account and gives his unique token <see cref="Tokens"/>;
-    /// </summary>
-    /// <param name="userData"><see cref="UserDto"/></param>
-    /// <returns>
-    ///the task result contains <see cref="Tokens"/>;
-    /// </returns>
-    /// <exception cref="Helpers.GeneralException"> Throws if such user is already taken;</exception>
-    public Task CreateUserAsync(User userData);
-    
     /// <summary>
     /// Get account model from database by user id;
     /// </summary>
@@ -33,5 +14,5 @@ public interface IAccountService
     /// <returns>
     ///the task result contains <see cref="Account"/>;
     /// </returns>
-    public Task<Account?> GetAccountByUserIdAsync(Guid? userId);
+    public Task<Account?> FindAsync(Guid? userId);
 }

@@ -41,11 +41,11 @@ public class PaymentService : IPaymentService
         //ToDo Move this to handler
         var accountHistory = AccountHistory.Create(accountId, DateTime.UtcNow, (decimal)payout, true);
 
-        var roomDal = await _roomService.GetRoomByIdAsync(roomId);
+        var roomDal = await _roomService.FindAsync(roomId);
         
         accountHistory.AddRoom(roomDal.ToDomain());
         
-        await _accountHistoryService.CreateHistoryAsync(accountHistory);
+        await _accountHistoryService.CreateAsync(accountHistory);
     }
 
     public async Task<bool> WritingOffMoneyAsync(Account account, decimal? amount)

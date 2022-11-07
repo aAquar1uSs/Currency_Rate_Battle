@@ -1,11 +1,10 @@
 ﻿using CurrencyRateBattleServer.Dal.Services.HostedServices.Handlers;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
-using CurrencyRateBattleServer.Helpers;
 using CurrencyRateBattleServer.Services.HostedServices.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace CurrencyRateBattleServer.Services;
+namespace CurrencyRateBattleServer.Dal.Services;
 
 public class RateCalculationService : IRateCalculationService
 {
@@ -43,7 +42,7 @@ public class RateCalculationService : IRateCalculationService
         _logger.LogInformation($"{nameof(StartRateCalculationByRoomIdAsync)} was caused.");
         var rates = await _rateService.GetRateByRoomIdAsync(roomId);
 
-        if (rates.Count == 0)
+        if (!rates.Any())
             throw new GeneralException();
 
         if (rates.Any(r => r.IsClosed))
