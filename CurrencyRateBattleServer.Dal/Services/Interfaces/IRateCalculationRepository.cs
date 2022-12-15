@@ -2,7 +2,7 @@
 
 namespace CurrencyRateBattleServer.Dal.Services.Interfaces;
 
-public interface IRateCalculationService
+public interface IRateCalculationRepository
 {
     /// <summary>
     /// Starts the winning and losing betting algorithm.

@@ -8,13 +8,13 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Dal.Services;
 
-public class RateService : IRateService
+public class RateRepository : IRateRepository
 {
-    private readonly ILogger<RateService> _logger;
+    private readonly ILogger<RateRepository> _logger;
 
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public RateService(ILogger<RateService> logger, CurrencyRateBattleContext dbContext)
+    public RateRepository(ILogger<RateRepository> logger, CurrencyRateBattleContext dbContext)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(dbContext);

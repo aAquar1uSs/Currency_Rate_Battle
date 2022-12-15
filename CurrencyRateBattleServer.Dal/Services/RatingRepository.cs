@@ -2,7 +2,7 @@
 
 namespace CurrencyRateBattleServer.Dal.Services;
 
-public class RatingService : IRatingService
+public class RatingRepository : IRatingRepository
 {
     public Task<List<UserRatingDto>> GetUsersRatingAsync()
     {

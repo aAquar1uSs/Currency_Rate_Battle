@@ -11,13 +11,13 @@ public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<Get
 
     private readonly IAccountRepository _accountRepository;
 
-    private readonly IRateService _rateService;
+    private readonly IRateRepository _rateRepository;
 
-    public GetUserBetsHandler(ILogger<GetUserBetsHandler> logger, IAccountRepository accountRepository, IRateService rateService)
+    public GetUserBetsHandler(ILogger<GetUserBetsHandler> logger, IAccountRepository accountRepository, IRateRepository rateRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
-        _rateService = rateService ?? throw new ArgumentNullException(nameof(rateService));
+        _rateRepository = rateRepository ?? throw new ArgumentNullException(nameof(rateRepository));
     }
 
     public async Task<Result<GetUserBetsResponse>> Handle(GetUserBetsCommand request, CancellationToken cancellationToken)
@@ -29,7 +29,7 @@ public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<Get
         if (account is null)
             return Result.Failure<GetUserBetsResponse>($"Account with such user id {request.UserId} does not exist");
 
-        var bets = await _rateService.GetRatesByAccountIdAsync(account.Id);
+        var bets = await _rateRepository.GetRatesByAccountIdAsync(account.Id);
 
         return new GetUserBetsResponse { Bets = bets)};
     }

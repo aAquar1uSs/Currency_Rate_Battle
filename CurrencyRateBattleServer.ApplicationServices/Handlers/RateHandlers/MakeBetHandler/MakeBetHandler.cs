@@ -11,19 +11,19 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
 
     private readonly IAccountRepository _accountRepository;
 
-    private readonly IPaymentService _paymentService;
+    private readonly IPaymentRepository _paymentRepository;
 
-    private readonly ICurrencyStateService _currencyStateService;
+    private readonly ICurrencyStateRepository _currencyStateRepository;
 
-    private readonly IRateService _rateService;
+    private readonly IRateRepository _rateRepository;
 
-    public MakeBetHandler(ILogger<MakeBetHandler> logger, IAccountRepository accountRepository, IPaymentService paymentService,
-        ICurrencyStateService currencyStateService, IRateService rateService)
+    public MakeBetHandler(ILogger<MakeBetHandler> logger, IAccountRepository accountRepository, IPaymentRepository paymentRepository,
+        ICurrencyStateRepository currencyStateRepository, IRateRepository rateRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
-        _currencyStateService = currencyStateService ?? throw new ArgumentNullException(nameof(currencyStateService));
-        _rateService = rateService ?? throw new ArgumentNullException(nameof(rateService));
+        _currencyStateRepository = currencyStateRepository ?? throw new ArgumentNullException(nameof(currencyStateRepository));
+        _rateRepository = rateRepository ?? throw new ArgumentNullException(nameof(rateRepository));
     }
 
     public async Task<Result<MakeBetResponse>> Handle(MakeBetCommand request, CancellationToken cancellationToken)
@@ -36,17 +36,17 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
 
         var rateToCreate = request.RateToCreate.ToDomain();
 
-        var result = await _paymentService.WritingOffMoneyAsync(account, rateToCreate.Amount);
+        var result = await _paymentRepository.WritingOffMoneyAsync(account, rateToCreate.Amount);
 
         if (result is false)
             return Result.Failure<MakeBetResponse>("Payment processing error");
 
-        var currencyId = await _currencyStateService.GetCurrencyIdByRoomIdAsync(rateToCreate.RoomId);
+        var currencyId = await _currencyStateRepository.GetCurrencyIdByRoomIdAsync(rateToCreate.RoomId);
 
         if (currencyId == Guid.Empty)
             return Result.Failure<MakeBetResponse>("Incorrect data");
 
-        var rate = await _rateService.CreateRateAsync(rateToCreate, account.Id, currencyId);
+        var rate = await _rateRepository.CreateRateAsync(rateToCreate, account.Id, currencyId);
 
         return new MakeBetResponse { Rate = rate.ToDto() };
     }

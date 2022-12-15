@@ -10,13 +10,14 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.AccountHandlers.
 public class LoginHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
 {
     private readonly ILogger<LoginHandler> _logger;
-    private readonly IAccountRepository _accountRepository;
+    private readonly IUserRepository _userRepository;
     private readonly IJwtManager _jwtManager;
 
-    public LoginHandler(ILogger<LoginHandler> logger, IAccountRepository accountRepository, IJwtManager jwtManager)
+    public LoginHandler(ILogger<LoginHandler> logger, IAccountRepository accountRepository,
+        IUserRepository userRepository, IJwtManager jwtManager)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _jwtManager = jwtManager ?? throw new ArgumentNullException(nameof(jwtManager));
     }
 
@@ -27,12 +28,12 @@ public class LoginHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
         if (userResult.IsFailure)
             return Result.Failure<LoginResponse>(userResult.Error);
 
-        var maybeUser = await _accountRepository.GetUserAsync(userResult.Value);
+        var maybeUser = await _userRepository.GetAsync(userResult.Value, cancellationToken);
 
         if (maybeUser is null)
         {
             _logger.LogInformation("User with such parameters doesn't exist");
-            return Result.Failure<LoginResponse>("User with such parameters doesn't exist");   
+            return Result.Failure<LoginResponse>("User with such parameters doesn't exist");
         }
 
         var tokens = _jwtManager.Authenticate(maybeUser);

@@ -7,17 +7,17 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Dal.Services;
 
-public class CurrencyStateService : ICurrencyStateService
+public class CurrencyStateRepository : ICurrencyStateRepository
 {
     private const string NBU_API = "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json";
 
-    private readonly ILogger<CurrencyStateService> _logger;
+    private readonly ILogger<CurrencyStateRepository> _logger;
 
     private List<CurrencyState>? _rateStorage;
 
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public CurrencyStateService(ILogger<CurrencyStateService> logger,
+    public CurrencyStateRepository(ILogger<CurrencyStateRepository> logger,
         CurrencyRateBattleContext dbContext)
     {
         _logger = logger;

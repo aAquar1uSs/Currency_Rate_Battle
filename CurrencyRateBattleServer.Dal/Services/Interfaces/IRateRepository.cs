@@ -3,7 +3,7 @@ using CurrencyRateBattleServer.Domain.Entities;
 
 namespace CurrencyRateBattleServer.Dal.Services.Interfaces;
 
-public interface IRateService
+public interface IRateRepository
 {
     Task<RateDal> CreateRateAsync(Rate rate, Guid accountId, Guid currencyId);
 

@@ -10,17 +10,17 @@ public class GetUserRatingHandler : IRequestHandler<GetUserRatingCommand, Result
 {
     private readonly ILogger<GetUserRatingHandler> _logger;
 
-    private readonly IRatingService _ratingService;
+    private readonly IRatingRepository _ratingRepository;
 
-    public GetUserRatingHandler(ILogger<GetUserRatingHandler> logger, IRatingService ratingService)
+    public GetUserRatingHandler(ILogger<GetUserRatingHandler> logger, IRatingRepository ratingRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _ratingService = ratingService ?? throw new ArgumentNullException(nameof(ratingService));
+        _ratingRepository = ratingRepository ?? throw new ArgumentNullException(nameof(ratingRepository));
     }
 
     public async Task<Result<GetUserRatingResponse>> Handle(GetUserRatingCommand request, CancellationToken cancellationToken)
     {
-        var rating = await _ratingService.GetUsersRatingAsync();
+        var rating = await _ratingRepository.GetUsersRatingAsync();
         
         return new GetUserRatingResponse
         {

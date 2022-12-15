@@ -19,12 +19,13 @@ public static class DbConfiguration
     public static void ConfigureServices(this IServiceCollection service)
     {
         _ = service.AddScoped<IAccountRepository, AccountRepository>()
-            .AddScoped<IRoomService, RoomService>()
-            .AddScoped<IRateService, RateService>()
-            .AddScoped<ICurrencyStateService, CurrencyStateService>()
+            .AddScoped<IRoomRepository, RoomRepository>()
+            .AddScoped<IRateRepository, RateRepository>()
+            .AddScoped<ICurrencyStateRepository, CurrencyStateRepository>()
             .AddScoped<IAccountHistoryRepository, AccountHistoryRepository>()
-            .AddScoped<IRateCalculationService, RateCalculationService>()
-            .AddScoped<IPaymentService, PaymentService>()
-            .AddScoped<IRatingService, RatingService>();
+            .AddScoped<IRateCalculationRepository, RateCalculationRepository>()
+            .AddScoped<IPaymentRepository, PaymentRepository>()
+            .AddScoped<IRatingRepository, RatingRepository>()
+            .AddScoped<IUserRepository, UserRepository>();
     }
 }

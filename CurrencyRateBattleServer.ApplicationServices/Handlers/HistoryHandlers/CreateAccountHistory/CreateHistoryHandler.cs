@@ -13,16 +13,16 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
 
     private readonly IAccountRepository _accountRepository;
 
-    private readonly IRoomService _roomService;
+    private readonly IRoomRepository _roomRepository;
 
     private readonly IAccountHistoryRepository _accountHistoryRepository;
 
     public CreateHistoryHandler(ILogger<CreateHistoryHandler> logger, IAccountRepository accountRepository,
-        IRoomService roomService, IAccountHistoryRepository accountHistoryRepository)
+        IRoomRepository roomRepository, IAccountHistoryRepository accountHistoryRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
-        _roomService = roomService ?? throw new ArgumentNullException(nameof(roomService));
+        _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
         _accountHistoryRepository = accountHistoryRepository ?? throw new ArgumentNullException(nameof(accountHistoryRepository));
     }
 
@@ -38,7 +38,7 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
         if (account is null)
             return Result.Failure<CreateHistoryResponse>("Account didn't found.");
 
-        var room = await _roomService.GetRoomByIdAsync(request.AccountHistory.RoomId);
+        var room = await _roomRepository.GetRoomByIdAsync(request.AccountHistory.RoomId);
 
         if (room is null)
             return Result.Failure<CreateHistoryResponse>("Room didn't found.");

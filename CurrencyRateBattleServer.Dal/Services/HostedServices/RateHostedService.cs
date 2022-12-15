@@ -12,13 +12,13 @@ public class RateHostedService : IHostedService, IDisposable
 
     private readonly ILogger<RateHostedService> _logger;
 
-    private readonly IRoomService _roomService;
+    private readonly IRoomRepository _roomRepository;
 
     public RateHostedService(ILogger<RateHostedService> logger,
-        IRoomService roomService)
+        IRoomRepository roomRepository)
     {
         _logger = logger;
-        _roomService = roomService;
+        _roomRepository = roomRepository;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -48,7 +48,7 @@ public class RateHostedService : IHostedService, IDisposable
     private async void Callback(object? state)
     {
         _logger.LogInformation("CheckRoomsStateAsync has been invoked.");
-        await _roomService.CheckRoomsStateAsync();
+        await _roomRepository.CheckRoomsStateAsync();
         _logger.LogInformation("CheckRoomsStateAsync сompleted the execution.");
     }
 

@@ -3,7 +3,7 @@ using CurrencyRateBattleServer.Domain.Entities;
 
 namespace CurrencyRateBattleServer.Dal.Services.Interfaces;
 
-public interface ICurrencyStateService
+public interface ICurrencyStateRepository
 {
     Task<Guid> GetCurrencyIdByRoomIdAsync(Guid roomId);
 

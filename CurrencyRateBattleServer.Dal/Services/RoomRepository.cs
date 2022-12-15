@@ -7,19 +7,19 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Dal.Services;
 
-public class RoomService : IRoomService
+public class RoomRepository : IRoomRepository
 {
-    private readonly ILogger<RoomService> _logger;
+    private readonly ILogger<RoomRepository> _logger;
 
-    private readonly IRateCalculationService _rateCalculationService;
+    private readonly IRateCalculationRepository _rateCalculationRepository;
 
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public RoomService(ILogger<RoomService> logger, IRateCalculationService rateCalculationService,
+    public RoomRepository(ILogger<RoomRepository> logger, IRateCalculationRepository rateCalculationRepository,
         CurrencyRateBattleContext dbContext)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _rateCalculationService = rateCalculationService ?? throw new ArgumentNullException(nameof(rateCalculationService));
+        _rateCalculationRepository = rateCalculationRepository ?? throw new ArgumentNullException(nameof(rateCalculationRepository));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
@@ -99,7 +99,7 @@ public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
             || (DateTime.UtcNow > roomDal.Date
                 && roomDal.IsClosed))
         {
-            await _rateCalculationService.StartRateCalculationByRoomIdAsync(roomDal.Id);
+            await _rateCalculationRepository.StartRateCalculationByRoomIdAsync(roomDal.Id);
                 await UpdateRoomAsync(roomDal.Id, roomDal);
         }
     }
