@@ -3,19 +3,8 @@ using CurrencyRateBattleServer.Domain.Entities;
 
 namespace CurrencyRateBattleServer.Dal.Services.Interfaces;
 
-public interface IAccountService
+public interface IAccountRepository
 {
-    /// <summary>
-    /// Verifies the presence of a user , if any, gives his unique token <see cref="Tokens"/>;
-    /// </summary>
-    /// <param name="userData"><see cref="UserDto"/></param>
-    /// <returns>
-    ///the task result contains <see cref="Tokens"/>
-    /// </returns>
-    public Task<User?> GetUserAsync(User userData);
-
-    public Task CreateAccountAsync(Account account); 
-
     /// <summary>
     /// Creates new account and gives his unique token <see cref="Tokens"/>;
     /// </summary>
@@ -24,8 +13,8 @@ public interface IAccountService
     ///the task result contains <see cref="Tokens"/>;
     /// </returns>
     /// <exception cref="Helpers.GeneralException"> Throws if such user is already taken;</exception>
-    public Task CreateUserAsync(User userData);
-    
+    public Task CreateAccountAsync(Account account);
+
     /// <summary>
     /// Get account model from database by user id;
     /// </summary>

@@ -14,7 +14,6 @@ namespace CurrencyRateBattleServer.Controllers;
 public class AccountController : ControllerBase
 {
     private readonly IMediator _mediator;
-
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(IMediator mediator, ILogger<AccountController> logger)
@@ -27,13 +26,13 @@ public class AccountController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<IActionResult> LoginAsync([FromBody] UserDto userData)
+    public async Task<IActionResult> LoginAsync([FromBody] UserDto userData, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(LoginAsync)} was triggered.");
 
         var command = new LoginCommand { UserDto = userData };
 
-        var (_, isFailure, value, error) = await _mediator.Send(command);
+        var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
 
         if (isFailure)
             Unauthorized(error);
@@ -45,13 +44,13 @@ public class AccountController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> CreateUserAsync([FromBody] UserDto userData)
+    public async Task<IActionResult> CreateUserAsync([FromBody] UserDto userData, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(CreateUserAsync)} was triggered.");
 
         var command = new RegistrationCommand { UserDto = userData };
 
-        var (_, isFailure, value, error) = await _mediator.Send(command);
+        var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
 
         if (isFailure)
             return BadRequest(error);

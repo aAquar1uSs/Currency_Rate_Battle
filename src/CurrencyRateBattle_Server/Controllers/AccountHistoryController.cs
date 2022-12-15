@@ -16,7 +16,6 @@ namespace CurrencyRateBattleServer.Controllers;
 public class AccountHistoryController : ControllerBase
 {
     private readonly ILogger<AccountHistoryController> _logger;
-
     private readonly IMediator _mediator;
 
     public AccountHistoryController(ILogger<AccountHistoryController> logger, IMediator mediator)
@@ -28,13 +27,13 @@ public class AccountHistoryController : ControllerBase
     [HttpGet]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<IActionResult> GetAccountHistoryAsync()
+    public async Task<IActionResult> GetAccountHistoryAsync(CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetAccountHistoryAsync)} was triggered.");
 
         var command = new GetAccountHistoryCommand { UserId = GuidHelper.GetGuidFromRequest(HttpContext) };
 
-        var (_, isFailure, value, error) = await _mediator.Send(command);
+        var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
 
         if (isFailure)
             return BadRequest(error);
@@ -45,7 +44,7 @@ public class AccountHistoryController : ControllerBase
     [HttpPost]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<IActionResult> CreateNewAccountHistory([FromBody] AccountHistoryDto historyDto)
+    public async Task<IActionResult> CreateNewAccountHistory([FromBody] AccountHistoryDto historyDto, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(CreateNewAccountHistory)}, was caused");
 
@@ -55,7 +54,7 @@ public class AccountHistoryController : ControllerBase
 
         var command = new CreateHistoryCommand { UserId = userId, AccountHistory = historyDto };
 
-        var (_, isFailure, _, error) = await _mediator.Send(command);
+        var (_, isFailure, _, error) = await _mediator.Send(command, cancellationToken);
 
         if (isFailure)
             return BadRequest(error);

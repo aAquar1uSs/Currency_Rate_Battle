@@ -9,7 +9,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
 {
     private readonly ILogger<MakeBetHandler> _logger;
 
-    private readonly IAccountService _accountService;
+    private readonly IAccountRepository _accountRepository;
 
     private readonly IPaymentService _paymentService;
 
@@ -17,11 +17,11 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
 
     private readonly IRateService _rateService;
 
-    public MakeBetHandler(ILogger<MakeBetHandler> logger, IAccountService accountService, IPaymentService paymentService,
+    public MakeBetHandler(ILogger<MakeBetHandler> logger, IAccountRepository accountRepository, IPaymentService paymentService,
         ICurrencyStateService currencyStateService, IRateService rateService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
         _currencyStateService = currencyStateService ?? throw new ArgumentNullException(nameof(currencyStateService));
         _rateService = rateService ?? throw new ArgumentNullException(nameof(rateService));
     }
@@ -29,7 +29,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
     public async Task<Result<MakeBetResponse>> Handle(MakeBetCommand request, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(MakeBetHandler)} was caused.");
-        var account = await _accountService.GetAccountByUserIdAsync(request.UserId);
+        var account = await _accountRepository.GetAccountByUserIdAsync(request.UserId);
 
         if (account is null)
             return Result.Failure<MakeBetResponse>($"Account with such user id: {request.UserId} does not exist.");

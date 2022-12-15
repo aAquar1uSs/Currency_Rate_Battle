@@ -79,7 +79,7 @@ public class CurrencyRateBattleContext : DbContext
 
         //unique constraints
         _ = modelBuilder.Entity<CurrencyStateDal>()
-            .HasIndex(cs => new { cs.Room.Id, cs.Currency.Id })
+            .HasIndex(cs => new { cs.RoomId, cs.CurrencyId })
             .IsUnique(true);
     }
 }

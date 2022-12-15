@@ -15,7 +15,6 @@ namespace CurrencyRateBattleServer.Controllers;
 public class ProfileController : ControllerBase
 {
     private readonly ILogger<ProfileController> _logger;
-
     private readonly IMediator _mediator;
 
     public ProfileController(IMediator mediator, ILogger<ProfileController> logger)
@@ -27,7 +26,7 @@ public class ProfileController : ControllerBase
     [HttpGet("get-balance")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> GetUserBalanceAsync()
+    public async Task<IActionResult> GetUserBalanceAsync(CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetUserBalanceAsync)} was triggered.");
 
@@ -35,7 +34,7 @@ public class ProfileController : ControllerBase
 
         var command = new GetUserBalanceCommand { UserId = userId };
 
-        var (_, isFailure, value, error) = await _mediator.Send(command);
+        var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
 
         if (isFailure)
             return BadRequest(error);
@@ -46,7 +45,7 @@ public class ProfileController : ControllerBase
     [HttpGet]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> GetUserInfoAsync()
+    public async Task<IActionResult> GetUserInfoAsync(CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetUserInfoAsync)} was triggered.");
 
@@ -54,7 +53,7 @@ public class ProfileController : ControllerBase
 
         var command = new GetProfileCommand { UserId = guidId };
 
-        var (_, isFailure, value, error) = await _mediator.Send(command);
+        var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
 
         if (isFailure)
             return BadRequest(error);

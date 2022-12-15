@@ -6,26 +6,16 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Dal.Services;
 
-public class AccountService : IAccountService
+public class AccountRepository : IAccountRepository
 {
-    private readonly ILogger<IAccountService> _logger;
+    private readonly ILogger<IAccountRepository> _logger;
 
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public AccountService(ILogger<AccountService> logger, CurrencyRateBattleContext dbContext)
+    public AccountRepository(ILogger<AccountRepository> logger, CurrencyRateBattleContext dbContext)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-    }
-
-    public async Task<User?> GetUserAsync(User userData)
-    {
-        _logger.LogDebug($"{nameof(GetUserAsync)} was caused.");
-
-        var userDal = await _dbContext.Users
-            .FirstOrDefaultAsync(dal => dal.Email == userData.Email && dal.Password == userData.Password);
-
-        return userDal?.ToDomain();
     }
 
     public async Task CreateAccountAsync(Account account)
@@ -37,16 +27,6 @@ public class AccountService : IAccountService
         await _dbContext.SaveChangesAsync();
 
         _logger.LogInformation($"{nameof(CreateAccountAsync)} successfully added new account");
-    }
-
-    public async Task CreateUserAsync(User userData)
-    {
-        var userDal = userData.ToDal();
-
-        _ = await _dbContext.Users.AddAsync(userDal);
-        _ = await _dbContext.SaveChangesAsync();
-
-        _logger.LogInformation("New user added to the database");
     }
 
     public async Task<Account?> GetAccountByUserIdAsync(Guid? userId)

@@ -10,18 +10,18 @@ public class PaymentService : IPaymentService
 {
     private readonly ILogger<PaymentService> _logger;
 
-    private readonly IAccountHistoryService _accountHistoryService;
+    private readonly IAccountHistoryRepository _accountHistoryRepository;
 
     private readonly IRoomService _roomService;
 
     private readonly CurrencyRateBattleContext _dbContext;
 
     public PaymentService(ILogger<PaymentService> logger, CurrencyRateBattleContext dbContext,
-        IAccountHistoryService accountHistoryService, IRoomService roomService)
+        IAccountHistoryRepository accountHistoryRepository, IRoomService roomService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        _accountHistoryService = accountHistoryService ?? throw new ArgumentNullException(nameof(accountHistoryService));
+        _accountHistoryRepository = accountHistoryRepository ?? throw new ArgumentNullException(nameof(accountHistoryRepository));
         _roomService = roomService ?? throw new ArgumentNullException(nameof(roomService));
     }
 
@@ -45,7 +45,7 @@ public class PaymentService : IPaymentService
         
         accountHistory.AddRoom(roomDal.ToDomain());
         
-        await _accountHistoryService.CreateHistoryAsync(accountHistory);
+        await _accountHistoryRepository.CreateAsync(accountHistory);
     }
 
     public async Task<bool> WritingOffMoneyAsync(Account account, decimal? amount)

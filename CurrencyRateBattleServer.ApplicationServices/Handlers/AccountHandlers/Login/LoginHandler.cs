@@ -10,26 +10,24 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.AccountHandlers.
 public class LoginHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
 {
     private readonly ILogger<LoginHandler> _logger;
-
-    private readonly IAccountService _accountService;
-    
+    private readonly IAccountRepository _accountRepository;
     private readonly IJwtManager _jwtManager;
-    
-    public LoginHandler(ILogger<LoginHandler> logger, IAccountService accountService, IJwtManager jwtManager)
+
+    public LoginHandler(ILogger<LoginHandler> logger, IAccountRepository accountRepository, IJwtManager jwtManager)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
         _jwtManager = jwtManager ?? throw new ArgumentNullException(nameof(jwtManager));
     }
-    
+
     public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var userResult = User.Create(request.UserDto.Email, request.UserDto.Password);
 
         if (userResult.IsFailure)
             return Result.Failure<LoginResponse>(userResult.Error);
-        
-        var maybeUser = await _accountService.GetUserAsync(userResult.Value);
+
+        var maybeUser = await _accountRepository.GetUserAsync(userResult.Value);
 
         if (maybeUser is null)
         {

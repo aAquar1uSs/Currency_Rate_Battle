@@ -9,14 +9,14 @@ public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<Get
 {
     private readonly ILogger<GetUserBetsHandler> _logger;
 
-    private readonly IAccountService _accountService;
+    private readonly IAccountRepository _accountRepository;
 
     private readonly IRateService _rateService;
 
-    public GetUserBetsHandler(ILogger<GetUserBetsHandler> logger, IAccountService accountService, IRateService rateService)
+    public GetUserBetsHandler(ILogger<GetUserBetsHandler> logger, IAccountRepository accountRepository, IRateService rateService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
         _rateService = rateService ?? throw new ArgumentNullException(nameof(rateService));
     }
 
@@ -24,7 +24,7 @@ public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<Get
     {
         _logger.LogDebug($"{nameof(GetUserBetsHandler)},  was caused. Start processing.");
 
-        var account = await _accountService.GetAccountByUserIdAsync(request.UserId);
+        var account = await _accountRepository.GetAccountByUserIdAsync(request.UserId);
 
         if (account is null)
             return Result.Failure<GetUserBetsResponse>($"Account with such user id {request.UserId} does not exist");

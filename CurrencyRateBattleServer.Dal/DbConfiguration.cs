@@ -1,13 +1,12 @@
 ﻿using CurrencyRateBattleServer.Dal.Services;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Services;
-using CurrencyRateBattleServer.Services.HostedServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CurrencyRateBattleServer.Dal;
 
-public static class PostgresConfiguration
+public static class DbConfiguration
 {
     public static void InitDatabase(this IServiceProvider serviceProvider)
     {
@@ -19,11 +18,11 @@ public static class PostgresConfiguration
 
     public static void ConfigureServices(this IServiceCollection service)
     {
-        _ = service.AddSingleton<IAccountService, AccountService>()
+        _ = service.AddScoped<IAccountRepository, AccountRepository>()
             .AddScoped<IRoomService, RoomService>()
             .AddScoped<IRateService, RateService>()
             .AddScoped<ICurrencyStateService, CurrencyStateService>()
-            .AddScoped<IAccountHistoryService, AccountHistoryService>()
+            .AddScoped<IAccountHistoryRepository, AccountHistoryRepository>()
             .AddScoped<IRateCalculationService, RateCalculationService>()
             .AddScoped<IPaymentService, PaymentService>()
             .AddScoped<IRatingService, RatingService>();

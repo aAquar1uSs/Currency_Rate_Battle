@@ -10,16 +10,16 @@ public class GetAccountHistoryHandler : IRequestHandler<GetAccountHistoryCommand
 {
     private readonly ILogger<GetAccountHistoryHandler> _logger;
 
-    private readonly IAccountService _accountService;
+    private readonly IAccountRepository _accountRepository;
 
-    private readonly IAccountHistoryService _accountHistoryService;
+    private readonly IAccountHistoryRepository _accountHistoryRepository;
 
-    public GetAccountHistoryHandler(ILogger<GetAccountHistoryHandler> logger, IAccountService accountService,
-        IAccountHistoryService accountHistoryService)
+    public GetAccountHistoryHandler(ILogger<GetAccountHistoryHandler> logger, IAccountRepository accountRepository,
+        IAccountHistoryRepository accountHistoryRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
-        _accountHistoryService = accountHistoryService ?? throw new ArgumentNullException(nameof(accountHistoryService));
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+        _accountHistoryRepository = accountHistoryRepository ?? throw new ArgumentNullException(nameof(accountHistoryRepository));
     }
 
     public async Task<Result<GetAccountHistoryResponse>> Handle(GetAccountHistoryCommand request, CancellationToken cancellationToken)
@@ -27,12 +27,12 @@ public class GetAccountHistoryHandler : IRequestHandler<GetAccountHistoryCommand
         if (request.UserId is null)
             return Result.Failure<GetAccountHistoryResponse>("User id is null.");
         
-        var account = await _accountService.GetAccountByUserIdAsync(request.UserId);
+        var account = await _accountRepository.GetAccountByUserIdAsync(request.UserId);
         
         if (account is null)
             return Result.Failure<GetAccountHistoryResponse>("Account not found.");
 
-        var history = await _accountHistoryService.GetAccountHistoryByAccountId(request.UserId);
+        var history = await _accountHistoryRepository.GetAsync(request.UserId);
 
         return new GetAccountHistoryResponse { AccountHistories = history.ToArray().ToDto() };
     }

@@ -16,7 +16,6 @@ namespace CurrencyRateBattleServer.Controllers;
 public class RoomController : ControllerBase
 {
     private readonly ILogger<RoomController> _logger;
-
     private readonly IMediator _mediator;
 
     public RoomController(ILogger<RoomController> logger, IMediator mediator)
@@ -28,12 +27,12 @@ public class RoomController : ControllerBase
     [HttpGet("get-rooms/{isClosed}")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<ActionResult<IEnumerable<Room>>> GetRoomsAsync([FromRoute] bool isClosed)
+    public async Task<ActionResult<IEnumerable<Room>>> GetRoomsAsync([FromRoute] bool isClosed, CancellationToken cancellationToken)
     {
         _logger.LogDebug("List of rooms are retrieving.");
         var command = new GetRoomCommand {IsClosed = isClosed};
 
-        var response = await _mediator.Send(command);
+        var response = await _mediator.Send(command, cancellationToken);
 
         return Ok(response.Value.Rooms);
     }
@@ -42,13 +41,13 @@ public class RoomController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromBody] FilterDto filter)
+    public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromBody] FilterDto filter, CancellationToken cancellationToken)
     {
         _logger.LogDebug("Filtered room list.");
 
         var command = new GetFilteredRoomCommand { Filter = filter };
 
-        var (_, isFailure, value) = await _mediator.Send(command);
+        var (_, isFailure, value) = await _mediator.Send(command, cancellationToken);
 
         if (isFailure)
             return BadRequest();

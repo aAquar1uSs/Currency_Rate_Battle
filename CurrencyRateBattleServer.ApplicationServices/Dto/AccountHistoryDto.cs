@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace CurrencyRateBattleServer.ApplicationServices.Dto;
 
 public class AccountHistoryDto
