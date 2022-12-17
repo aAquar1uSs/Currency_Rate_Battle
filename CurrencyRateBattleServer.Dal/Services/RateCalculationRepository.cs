@@ -6,29 +6,29 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Dal.Services;
 
-public class RateCalculationService : IRateCalculationService
+public class RateCalculationRepository : IRateCalculationRepository
 {
-    private readonly ILogger<RateCalculationService> _logger;
+    private readonly ILogger<RateCalculationRepository> _logger;
 
     private readonly IServiceScopeFactory _scopeFactory;
 
-    private readonly IRateService _rateService;
+    private readonly IRateRepository _rateRepository;
 
-    private readonly IPaymentService _paymentService;
+    private readonly IPaymentRepository _paymentRepository;
 
     private readonly WinnerHandler _winnerHandler;
 
     private readonly CalculationHandler _calculationHandler;
 
-    public RateCalculationService(ILogger<RateCalculationService> logger,
+    public RateCalculationRepository(ILogger<RateCalculationRepository> logger,
         IServiceScopeFactory scopeFactory,
-        IRateService rateService,
-        IPaymentService paymentService)
+        IRateRepository rateRepository,
+        IPaymentRepository paymentRepository)
     {
         _logger = logger;
         _scopeFactory = scopeFactory;
-        _rateService = rateService;
-        _paymentService = paymentService;
+        _rateRepository = rateRepository;
+        _paymentRepository = paymentRepository;
 
         //Chain of responsibility
         _winnerHandler = new WinnerHandler(_scopeFactory);
@@ -40,7 +40,7 @@ public class RateCalculationService : IRateCalculationService
     public async Task StartRateCalculationByRoomIdAsync(Guid roomId)
     {
         _logger.LogInformation($"{nameof(StartRateCalculationByRoomIdAsync)} was caused.");
-        var rates = await _rateService.GetRateByRoomIdAsync(roomId);
+        var rates = await _rateRepository.GetRateByRoomIdAsync(roomId);
 
         if (!rates.Any())
             throw new GeneralException();
@@ -55,8 +55,8 @@ public class RateCalculationService : IRateCalculationService
 
             foreach (var rate in updatedRate)
             {
-                await _paymentService.ApportionCashByRateAsync(roomId, rate.AccountId, rate.Payout);
-                await _rateService.UpdateRateByRoomIdAsync(roomId, rate);
+                await _paymentRepository.ApportionCashByRateAsync(roomId, rate.AccountId, rate.Payout);
+                await _rateRepository.UpdateRateByRoomIdAsync(roomId, rate);
             }
         }
         catch (GeneralException ex)

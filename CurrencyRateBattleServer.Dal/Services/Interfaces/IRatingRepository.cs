@@ -2,7 +2,7 @@
 
 namespace CurrencyRateBattleServer.Dal.Services.Interfaces;
 
-public interface IRatingService
+public interface IRatingRepository
 {
     Task<UserRating[]> GetUsersRatingAsync();
 }

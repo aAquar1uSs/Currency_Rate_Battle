@@ -20,5 +20,4 @@ public class CurrencyDal
 
     [Column(TypeName = "varchar(128)")]
     public string Description { get; set; }
-
 }

@@ -10,13 +10,13 @@ public class RoomHostedService : IHostedService, IDisposable
 
     private Timer? _timer;
 
-    private readonly IRoomService _roomService;
+    private readonly IRoomRepository _roomRepository;
 
     public RoomHostedService(ILogger<RoomHostedService> logger,
-        IRoomService roomService)
+        IRoomRepository roomRepository)
     {
         _logger = logger;
-        _roomService = roomService;
+        _roomRepository = roomRepository;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -32,7 +32,7 @@ public class RoomHostedService : IHostedService, IDisposable
     private async void Callback(object? state)
     {
         _logger.LogInformation("GenerateRoomsByCurrencyCountAsync has been invoked.");
-        await _roomService.GenerateRoomsByCurrencyCountAsync();
+        await _roomRepository.GenerateRoomsByCurrencyCountAsync();
         _logger.LogInformation("GenerateRoomsByCurrencyCountAsync сompleted the execution.");
     }
 

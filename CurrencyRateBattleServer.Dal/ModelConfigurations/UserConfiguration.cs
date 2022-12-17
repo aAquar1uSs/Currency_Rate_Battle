@@ -14,6 +14,6 @@ public class UserConfiguration : IEntityTypeConfiguration<UserDal>
         _ = builder.ToTable("User")
             .HasOne(user => user.Account)
             .WithOne(acc => acc.User)
-            .HasForeignKey<AccountDal>(acc => acc.User.Id);
+            .HasForeignKey<AccountDal>(acc => acc.UserId);
     }
 }

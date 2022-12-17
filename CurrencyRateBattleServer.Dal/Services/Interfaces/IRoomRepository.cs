@@ -3,7 +3,7 @@ using CurrencyRateBattleServer.Domain.Entities;
 
 namespace CurrencyRateBattleServer.Dal.Services.Interfaces;
 
-public interface IRoomService
+public interface IRoomRepository
 {
     Task GenerateRoomsByCurrencyCountAsync();
 

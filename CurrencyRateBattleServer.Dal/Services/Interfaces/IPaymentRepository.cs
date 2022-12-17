@@ -3,7 +3,7 @@ using CurrencyRateBattleServer.Domain.Entities;
 
 namespace CurrencyRateBattleServer.Dal.Services.Interfaces;
 
-public interface IPaymentService
+public interface IPaymentRepository
 {
     /// <summary>
     /// Makes a cash payment to the account;

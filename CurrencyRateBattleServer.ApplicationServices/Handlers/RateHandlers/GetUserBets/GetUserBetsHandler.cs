@@ -1,5 +1,4 @@
 ﻿using CSharpFunctionalExtensions;
-using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -10,28 +9,28 @@ public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<Get
 {
     private readonly ILogger<GetUserBetsHandler> _logger;
 
-    private readonly IAccountService _accountService;
+    private readonly IAccountRepository _accountRepository;
 
-    private readonly IRateService _rateService;
+    private readonly IRateRepository _rateRepository;
 
-    public GetUserBetsHandler(ILogger<GetUserBetsHandler> logger, IAccountService accountService, IRateService rateService)
+    public GetUserBetsHandler(ILogger<GetUserBetsHandler> logger, IAccountRepository accountRepository, IRateRepository rateRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
-        _rateService = rateService ?? throw new ArgumentNullException(nameof(rateService));
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+        _rateRepository = rateRepository ?? throw new ArgumentNullException(nameof(rateRepository));
     }
 
     public async Task<Result<GetUserBetsResponse>> Handle(GetUserBetsCommand request, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetUserBetsHandler)},  was caused. Start processing.");
 
-        var account = await _accountService.FindAsync(request.UserId);
+        var account = await _accountRepository.GetAccountByUserIdAsync(request.UserId);
 
         if (account is null)
             return Result.Failure<GetUserBetsResponse>($"Account with such user id {request.UserId} does not exist");
 
-        var bets = await _rateService.FindAsync(account.Id);
+        var bets = await _rateRepository.GetRatesByAccountIdAsync(account.Id);
 
-        return new GetUserBetsResponse { Bets = bets.ToDto()};
+        return new GetUserBetsResponse { Bets = bets)};
     }
 }

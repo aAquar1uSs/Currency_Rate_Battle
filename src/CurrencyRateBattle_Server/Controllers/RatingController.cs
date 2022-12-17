@@ -12,7 +12,6 @@ namespace CurrencyRateBattleServer.Controllers;
 public class RatingController : ControllerBase
 {
     private readonly ILogger<RatingController> _logger;
-
     private readonly IMediator _mediator;
 
     public RatingController(ILogger<RatingController> logger, IMediator mediator)
@@ -24,13 +23,13 @@ public class RatingController : ControllerBase
     [HttpGet("get-users-rating")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<IActionResult> GetUsersRatingAsync()
+    public async Task<IActionResult> GetUsersRatingAsync(CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetUsersRatingAsync)},  was caused.");
 
         var command = new GetUserRatingCommand();
 
-        var response = await _mediator.Send(command);
+        var response = await _mediator.Send(command, cancellationToken);
 
         return Ok(response.Value);
     }

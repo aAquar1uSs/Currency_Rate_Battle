@@ -10,19 +10,19 @@ public class GetCurrencyStateHandler : IRequestHandler<GetCurrencyStateCommand, 
 {
     private readonly ILogger<GetCurrencyStateHandler> _logger;
 
-    private readonly ICurrencyStateService _currencyStateService;
+    private readonly ICurrencyStateRepository _currencyStateRepository;
 
-    public GetCurrencyStateHandler(ILogger<GetCurrencyStateHandler> logger, ICurrencyStateService currencyStateService)
+    public GetCurrencyStateHandler(ILogger<GetCurrencyStateHandler> logger, ICurrencyStateRepository currencyStateRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _currencyStateService = currencyStateService ?? throw new ArgumentNullException(nameof(currencyStateService));
+        _currencyStateRepository = currencyStateRepository ?? throw new ArgumentNullException(nameof(currencyStateRepository));
     }
 
     public async Task<Result<GetCurrencyStateResponse>> Handle(GetCurrencyStateCommand request, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetCurrencyStateHandler)} was caused. Start processing.");
 
-        var currencyRates = await _currencyStateService.GetCurrencyStateAsync();
+        var currencyRates = await _currencyStateRepository.GetCurrencyStateAsync();
 
         return new GetCurrencyStateResponse { CurrencyStates = currencyRates.ToDto()};
     }

@@ -11,19 +11,19 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
 {
     private readonly ILogger<CreateHistoryHandler> _logger;
 
-    private readonly IAccountService _accountService;
+    private readonly IAccountRepository _accountRepository;
 
-    private readonly IRoomService _roomService;
+    private readonly IRoomRepository _roomRepository;
 
-    private readonly IAccountHistoryService _accountHistoryService;
+    private readonly IAccountHistoryRepository _accountHistoryRepository;
 
-    public CreateHistoryHandler(ILogger<CreateHistoryHandler> logger, IAccountService accountService,
-        IRoomService roomService, IAccountHistoryService accountHistoryService)
+    public CreateHistoryHandler(ILogger<CreateHistoryHandler> logger, IAccountRepository accountRepository,
+        IRoomRepository roomRepository, IAccountHistoryRepository accountHistoryRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
-        _roomService = roomService ?? throw new ArgumentNullException(nameof(roomService));
-        _accountHistoryService = accountHistoryService ?? throw new ArgumentNullException(nameof(accountHistoryService));
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+        _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
+        _accountHistoryRepository = accountHistoryRepository ?? throw new ArgumentNullException(nameof(accountHistoryRepository));
     }
 
     public async Task<Result<CreateHistoryResponse>> Handle(CreateHistoryCommand request, CancellationToken cancellationToken)
@@ -33,12 +33,12 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
         if (request.UserId is null)
             return Result.Failure<CreateHistoryResponse>("Incorrect data.");
 
-        var account = await _accountService.FindAsync(request.UserId);
+        var account = await _accountRepository.GetAccountByUserIdAsync(request.UserId);
 
         if (account is null)
             return Result.Failure<CreateHistoryResponse>("Account didn't found.");
 
-        var room = await _roomService.FindAsync(request.AccountHistory.RoomId);
+        var room = await _roomRepository.GetRoomByIdAsync(request.AccountHistory.RoomId);
 
         if (room is null)
             return Result.Failure<CreateHistoryResponse>("Room didn't found.");
@@ -48,7 +48,7 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
         accountHistory.AddAccount(account);
         accountHistory.AddRoom(room.ToDomain());
         
-        await _accountHistoryService.CreateAsync(accountHistory);
+        await _accountHistoryRepository.CreateAsync(accountHistory);
 
         return new CreateHistoryResponse();
     }

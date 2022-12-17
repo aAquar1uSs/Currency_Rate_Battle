@@ -9,7 +9,7 @@ public class AccountHistoryConfiguration : IEntityTypeConfiguration<AccountHisto
     public void Configure(EntityTypeBuilder<AccountHistoryDal> builder)
     {
         _ = builder.ToTable("AccountHistory")
-            .HasKey(acch => acch.Id);
+            .HasKey(acc => acc.Id);
     }
 }
 

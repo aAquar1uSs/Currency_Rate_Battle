@@ -10,11 +10,11 @@ public class ProfileHandler : IRequestHandler<GetProfileCommand, Result<GetProfi
 {
     private readonly ILogger<ProfileHandler> _logger;
 
-    private readonly IAccountService _accountService;
+    private readonly IAccountRepository _accountRepository;
 
-    public ProfileHandler(ILogger<ProfileHandler> logger, IAccountService accountService)
+    public ProfileHandler(ILogger<ProfileHandler> logger, IAccountRepository accountRepository)
     {
-        _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -25,7 +25,7 @@ public class ProfileHandler : IRequestHandler<GetProfileCommand, Result<GetProfi
         if (request.UserId is null)
             return Result.Failure<GetProfileResponse>("User id is null.");
         
-        var account = await _accountService.FindAsync(request.UserId);
+        var account = await _accountRepository.GetAccountByUserIdAsync(request.UserId);
         
         if (account is null)
             return Result.Failure<GetProfileResponse>($"User with suh id: {request.UserId} didn't found,");

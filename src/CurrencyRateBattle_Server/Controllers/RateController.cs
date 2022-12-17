@@ -18,7 +18,6 @@ namespace CurrencyRateBattleServer.Controllers;
 public class RateController : ControllerBase
 {
     private readonly ILogger<RateController> _logger;
-
     private readonly IMediator _mediator;
 
     public RateController(ILogger<RateController> logger, IMediator mediator)
@@ -27,13 +26,13 @@ public class RateController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Room>>> GetRatesAsync(bool? isActive, string? currencyCode)
+    [HttpGet] //ToDo add isActive and CurrecyCode in DTO
+    public async Task<ActionResult<List<Room>>> GetRatesAsync([FromBody]bool? isActive, [FromBody]string? currencyCode, CancellationToken cancellationToken)
     {
         _logger.LogDebug("List of rates are retrieving.");
         var command = new GetRatesCommand {IsActive = isActive, CurrencyCode = currencyCode};
 
-        var response = await _mediator.Send(command);
+        var response = await _mediator.Send(command, cancellationToken);
 
         return Ok(response.Value.Rates);
     }

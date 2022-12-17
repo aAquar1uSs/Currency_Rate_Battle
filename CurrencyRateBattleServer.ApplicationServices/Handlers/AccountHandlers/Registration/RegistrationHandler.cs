@@ -13,59 +13,50 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.AccountHandlers.
 public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<RegistrationResponse>>
 {
     private readonly ILogger<RegistrationHandler> _logger;
-
-    private readonly IAccountService _accountService;
-    
-    private readonly IAccountHistoryService _accountHistoryService;
-
-    private readonly IUserService _userService;
-
+    private readonly IAccountRepository _accountRepository;
+    private readonly IUserRepository _userRepository;
     private readonly WebServerOptions _options;
-
+    private readonly IAccountHistoryRepository _accountHistoryRepository;
     private readonly IJwtManager _jwtManager;
 
-    public RegistrationHandler(ILogger<RegistrationHandler> logger, IAccountService accountService, 
-        IOptions<WebServerOptions> options, IAccountHistoryService historyService, JwtManager jwtManager,
-        IUserService userService)
+    public RegistrationHandler(ILogger<RegistrationHandler> logger, IAccountRepository accountRepository, 
+        IOptions<WebServerOptions> options, IAccountHistoryRepository historyRepository, IUserRepository userRepository,
+        JwtManager jwtManager)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
         _options = options.Value ?? throw new ArgumentNullException(nameof(options));
-        _accountHistoryService = historyService ?? throw new ArgumentNullException(nameof(historyService));
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+        _accountHistoryRepository = historyRepository ?? throw new ArgumentNullException(nameof(historyRepository));
         _jwtManager = jwtManager ?? throw new ArgumentNullException(nameof(jwtManager));
     }
 
     public async Task<Result<RegistrationResponse>> Handle(RegistrationCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(RegistrationHandler)} was caused.");
-        
+
         var userResult = User.Create(request.UserDto.Email, request.UserDto.Password);
 
         if (userResult.IsFailure)
-        {
-            _logger.LogWarning(userResult.Error);
-            return Result.Failure<RegistrationResponse>(userResult.Error);   
-        }
+            return Result.Failure<RegistrationResponse>(userResult.Error);
 
         var user = userResult.Value;
-        var maybeUser = await _userService.FindAsync(user);
+        var maybeUser = await _userRepository.GetAsync(user, cancellationToken);
 
         if (maybeUser is not null)
             return Result.Failure<RegistrationResponse>("User with such email already exist");
 
         var account = Account.Create();
         account.AddStartBalance(_options.RegistrationReward);
-        
-        await _accountService.CreateAccountAsync(account);
-        
+
+        await _accountRepository.CreateAccountAsync(account);
+
         user.AddAccount(account);
 
-        await _userService.CreateAsync(user);
+        await _userRepository.CreateAsync(user, cancellationToken);
 
         var accountHistory = AccountHistory.Create(account.Id, DateTime.UtcNow, account.Amount, true);
-        await _accountHistoryService.CreateAsync(accountHistory);
-        _logger.LogInformation($"{nameof(AccountHistory)} was successfully added");
+        await _accountHistoryRepository.CreateAsync(accountHistory, cancellationToken);
 
         return new RegistrationResponse { Tokens = _jwtManager.Authenticate(user) };
     }

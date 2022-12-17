@@ -9,11 +9,11 @@ public class GetUserBalanceHandler : IRequestHandler<GetUserBalanceCommand, Resu
 {
     private readonly ILogger<GetUserBalanceHandler> _logger;
 
-    private readonly IAccountService _accountService;
+    private readonly IAccountRepository _accountRepository;
 
-    public GetUserBalanceHandler(ILogger<GetUserBalanceHandler> logger, IAccountService accountService)
+    public GetUserBalanceHandler(ILogger<GetUserBalanceHandler> logger, IAccountRepository accountRepository)
     {
-        _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
     
@@ -24,7 +24,7 @@ public class GetUserBalanceHandler : IRequestHandler<GetUserBalanceCommand, Resu
         if (request.UserId is null)
             return Result.Failure<GetUserBalanceResponse>("User id is null.");
         
-        var account = await _accountService.FindAsync(request.UserId);
+        var account = await _accountRepository.GetAccountByUserIdAsync(request.UserId);
         
         if (account is null)
             return Result.Failure<GetUserBalanceResponse>($"Account with id: {request.UserId} didn't found.");

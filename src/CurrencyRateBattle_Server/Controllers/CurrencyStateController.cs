@@ -12,7 +12,6 @@ namespace CurrencyRateBattleServer.Controllers;
 public class CurrencyStateController : ControllerBase
 {
     private readonly ILogger<CurrencyStateController> _logger;
-
     private readonly IMediator _mediator;
 
     public CurrencyStateController(ILogger<CurrencyStateController> logger, IMediator mediator)
@@ -24,13 +23,13 @@ public class CurrencyStateController : ControllerBase
     [HttpGet]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<IActionResult> GetCurrencyRates()
+    public async Task<IActionResult> GetCurrencyRates(CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(GetCurrencyRates)},  was caused.");
+        _logger.LogDebug($"{nameof(GetCurrencyRates)}, was caused.");
 
         var command = new GetCurrencyStateCommand();
 
-        var response = await _mediator.Send(command);
+        var response = await _mediator.Send(command, cancellationToken);
 
         return Ok(response.Value.CurrencyStates);
     }

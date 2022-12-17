@@ -12,13 +12,13 @@ public class CurrencyHostedService : IHostedService, IDisposable
 
     private static readonly object _sync = new();
 
-    private readonly ICurrencyStateService _currencyStateService;
+    private readonly ICurrencyStateRepository _currencyStateRepository;
 
     public CurrencyHostedService(ILogger<CurrencyHostedService> logger,
-        ICurrencyStateService currencyStateService)
+        ICurrencyStateRepository currencyStateRepository)
     {
         _logger = logger;
-        _currencyStateService = currencyStateService;
+        _currencyStateRepository = currencyStateRepository;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -50,7 +50,7 @@ public class CurrencyHostedService : IHostedService, IDisposable
     private async void Callback(object? state)
     {
         _logger.LogInformation("PrepareUpdateCurrencyRateAsync has been invoked.");
-        await _currencyStateService.PrepareUpdateCurrencyRateAsync();
+        await _currencyStateRepository.PrepareUpdateCurrencyRateAsync();
         _logger.LogInformation("PrepareUpdateCurrencyRateAsync сompleted the execution.");
     }
 

@@ -6,13 +6,13 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Dal.Services;
 
-public class AccountService : IAccountService
+public class AccountRepository : IAccountRepository
 {
-    private readonly ILogger<IAccountService> _logger;
+    private readonly ILogger<IAccountRepository> _logger;
 
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public AccountService(ILogger<AccountService> logger, CurrencyRateBattleContext dbContext)
+    public AccountRepository(ILogger<AccountRepository> logger, CurrencyRateBattleContext dbContext)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
@@ -29,9 +29,9 @@ public class AccountService : IAccountService
         _logger.LogInformation($"{nameof(CreateAccountAsync)} successfully added new account");
     }
 
-    public async Task<Account?> FindAsync(Guid? userId)
+    public async Task<Account?> GetAccountByUserIdAsync(Guid? userId)
     {
-        _logger.LogDebug($"{nameof(FindAsync)} was caused.");
+        _logger.LogDebug($"{nameof(GetAccountByUserIdAsync)} was caused.");
 
         var account = await _dbContext.Accounts
                 .FirstOrDefaultAsync(acc => acc.User.Id == userId);

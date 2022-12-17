@@ -9,19 +9,19 @@ public class GetFilteredRoomHandler : IRequestHandler<GetFilteredRoomCommand, Re
 {
     private readonly ILogger<GetFilteredRoomHandler> _logger;
 
-    private readonly IRoomService _roomService;
+    private readonly IRoomRepository _roomRepository;
 
-    public GetFilteredRoomHandler(ILogger<GetFilteredRoomHandler> logger, IRoomService roomService)
+    public GetFilteredRoomHandler(ILogger<GetFilteredRoomHandler> logger, IRoomRepository roomRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _roomService = roomService ?? throw new ArgumentNullException(nameof(roomService));
+        _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
     }
 
     public async Task<Result<GetFilteredRoomResponse>> Handle(GetFilteredRoomCommand request, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetFilteredRoomHandler)} was caused.");
 
-        var rooms = await _roomService.GetActiveRoomsWithFilterAsync(request.Filter);
+        var rooms = await _roomRepository.GetActiveRoomsWithFilterAsync(request.Filter);
 
         if (rooms is null)
             return Result.Failure<GetFilteredRoomResponse>("");
