@@ -25,4 +25,8 @@ public interface IAccountRepository
     ///the task result contains <see cref="Account"/>;
     /// </returns>
     public Task<Account?> GetAccountByUserIdAsync(UserId userId, CancellationToken cancellationToken);
+
+    public Task<Account?> GetAsync(AccountId accountId, CancellationToken cancellationToken);
+
+    public Task UpdateAsync(Account account, CancellationToken cancellationToken);
 }

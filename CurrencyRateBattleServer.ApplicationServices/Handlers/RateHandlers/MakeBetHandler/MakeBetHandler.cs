@@ -40,7 +40,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
         if (roomIdResult.IsFailure)
             return Result.Failure<MakeBetResponse>(roomIdResult.Error);
         
-        var currencyId = await _currencyStateRepository.GetCurrencyIdByRoomIdAsync(roomIdResult.Value, cancellationToken);
+        var currencyId = await _currencyStateRepository.GetCurrencyStateIdByRoomIdAsync(roomIdResult.Value, cancellationToken);
         var currencyIdResult = CurrencyCode.TryCreate(currencyId);
         if (currencyIdResult.IsFailure)
             return Result.Failure<MakeBetResponse>(currencyIdResult.Error);

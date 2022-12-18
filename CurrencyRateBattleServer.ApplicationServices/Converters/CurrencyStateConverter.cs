@@ -16,7 +16,7 @@ public static class CurrencyStateConverter
     {
         return new CurrencyDto
         {
-            Currency = currencyState.,
+            Currency = currencyState.CurrencyCode.Value,
             Date = currencyState.Date.ToString(CultureInfo.InvariantCulture),
             Rate = currencyState.CurrencyExchangeRate.Value
         };

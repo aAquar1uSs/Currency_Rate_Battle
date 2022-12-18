@@ -5,7 +5,7 @@ namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
 public interface ICurrencyStateRepository
 {
-    Task<string> GetCurrencyIdByRoomIdAsync(RoomId roomId, CancellationToken cancellationToken);
+    Task<string> GetCurrencyStateIdByRoomIdAsync(RoomId roomId, CancellationToken cancellationToken);
 
     Task<CurrencyState?> GetCurrencyStateByRoomIdAsync(RoomId roomId, CancellationToken cancellationToken);
 
@@ -15,7 +15,7 @@ public interface ICurrencyStateRepository
     /// <returns>
     ///the task result contains <see cref="List{T}"/> of <see cref="CurrencyStateDto"/>;
     /// </returns>
-    Task<CurrencyState[]> GetCurrencyStateAsync();
+    Task<CurrencyState[]> GetAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Updates currency states in the database;
@@ -24,5 +24,5 @@ public interface ICurrencyStateRepository
     /// <returns>
     ///A task that represents the asynchronous operation. <see cref="Task"/>;
     /// </returns>
-    Task UpdateCurrencyRateAsync(Currency currency, CancellationToken cancellationToken);
+    Task UpdateCurrencyRateAsync(Currency currency, DateTime currenctDate, CancellationToken cancellationToken);
 }

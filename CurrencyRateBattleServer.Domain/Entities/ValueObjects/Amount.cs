@@ -11,15 +11,20 @@ public class Amount
         Value = value;
     }
 
-    public static Result<Amount> TryCreate(decimal value)
+    public static Result<Amount> TryCreate(decimal? value)
     {
-        return value < 0 ? Result.Failure<Amount>($"{value} can not be less than 0") : new Amount(value);
+        return value is null or < 0 ? Result.Failure<Amount>($"{value} can not be less than 0 or null") : new Amount(value.Value);
     }
 
     public static Amount Create(decimal value) => new(value);
 
-    public void WithdrawalMoney(decimal money)
+    public void WithdrawalMoney(decimal value)
     {
-        Value -= money;
+        Value -= value;
+    }
+
+    public void ApportionCash(decimal value)
+    {
+        Value += value;
     }
 }

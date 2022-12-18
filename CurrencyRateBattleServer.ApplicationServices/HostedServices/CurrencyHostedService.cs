@@ -48,7 +48,6 @@ public class CurrencyHostedService : IHostedService, IDisposable
     private async void Callback(object? state)
     {
         _logger.LogInformation("PrepareUpdateCurrencyRateAsync has been invoked.");
-        //await _currencyStateRepository.PrepareUpdateCurrencyRateAsync();
         var command = new UpdateCurrencyRateCommand();
         var response = await _mediator.Send(command);
         _logger.LogInformation("PrepareUpdateCurrencyRateAsync сompleted the execution.");

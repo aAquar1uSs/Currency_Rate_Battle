@@ -1,7 +1,5 @@
 ﻿using CurrencyRateBattleServer.Dal.Repositories;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
-using CurrencyRateBattleServer.Dal.Services;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,8 +22,6 @@ public static class DbConfiguration
                  .AddScoped<IRateRepository, RateRepository>()
                  .AddScoped<ICurrencyStateRepository, CurrencyStateRepository>()
                  .AddScoped<IAccountHistoryRepository, AccountHistoryRepository>()
-                 .AddScoped<IRateCalculationRepository, RateCalculationRepository>()
-                 .AddScoped<IPaymentRepository, PaymentRepository>()
                  .AddScoped<IUserRatingQueryRepository, UserRatingQueryRepository>()
                  .AddScoped<IUserRepository, UserRepository>()
                  .AddScoped<IRoomQueryRepository, RoomQueryRepository>()

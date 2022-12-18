@@ -1,7 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -22,7 +21,7 @@ public class GetCurrencyStateHandler : IRequestHandler<GetCurrencyStateCommand, 
     {
         _logger.LogDebug($"{nameof(GetCurrencyStateHandler)} was caused. Start processing.");
 
-        var currencyRates = await _currencyStateRepository.GetCurrencyStateAsync();
+        var currencyRates = await _currencyStateRepository.GetAsync(cancellationToken);
 
         return new GetCurrencyStateResponse { CurrencyStates = currencyRates.ToDto()};
     }

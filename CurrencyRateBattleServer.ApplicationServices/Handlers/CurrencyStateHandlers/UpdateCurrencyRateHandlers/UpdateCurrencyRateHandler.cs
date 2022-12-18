@@ -29,11 +29,6 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
 
         await _currencyRepository.UpdateAsync(currencies, cancellationToken);
 
-        foreach (var currency in currencies)
-        {
-            await _currencyStateRepository.UpdateCurrencyRateAsync(currency, cancellationToken);
-        }
-
         return Unit.Value;
     }
 }

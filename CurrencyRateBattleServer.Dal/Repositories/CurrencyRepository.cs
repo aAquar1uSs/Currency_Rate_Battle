@@ -16,7 +16,7 @@ public class CurrencyRepository : ICurrencyRepository
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
-    
+
     public async Task UpdateAsync(Currency[] currencies, CancellationToken cancellationToken)
     {
         foreach (var currency in currencies)

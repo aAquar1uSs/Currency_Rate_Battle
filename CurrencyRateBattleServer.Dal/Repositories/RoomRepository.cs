@@ -2,7 +2,6 @@
 using CurrencyRateBattleServer.Dal.Converters;
 using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -13,14 +12,12 @@ namespace CurrencyRateBattleServer.Dal.Repositories;
 public class RoomRepository : IRoomRepository
 {
     private readonly ILogger<RoomRepository> _logger;
-    private readonly IRateCalculationRepository _rateCalculationRepository;
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public RoomRepository(ILogger<RoomRepository> logger, IRateCalculationRepository rateCalculationRepository,
+    public RoomRepository(ILogger<RoomRepository> logger,
         CurrencyRateBattleContext dbContext)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _rateCalculationRepository = rateCalculationRepository ?? throw new ArgumentNullException(nameof(rateCalculationRepository));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
@@ -78,20 +75,6 @@ public class RoomRepository : IRoomRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return closedRooms.ToDomain();
-    }
-
-    private async Task CalculateRatesIfRoomClosed(RoomDal roomDal)
-    {
-        _logger.LogInformation($"{nameof(CalculateRatesIfRoomClosed)} was caused");
-        if ((roomDal.EndDate.Date == DateTime.Today
-             && roomDal.EndDate.Hour == DateTime.UtcNow.Hour
-             && roomDal.IsClosed)
-            || (DateTime.UtcNow > roomDal.EndDate
-                && roomDal.IsClosed))
-        {
-            await _rateCalculationRepository.StartRateCalculationByRoomIdAsync(roomDal.Id);
-                await UpdateAsync(roomDal, CancellationToken.None);
-        }
     }
 
     public async Task<RoomDal?> FindAsync(Guid id, CancellationToken cancellationToken)

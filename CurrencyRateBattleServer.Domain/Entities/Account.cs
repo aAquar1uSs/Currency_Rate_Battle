@@ -26,10 +26,10 @@ public sealed class Account
         if (amountResult.IsFailure)
             return Result.Failure<Account>(amountResult.Error);
 
-        var accIdResult = AccountId.TryCreate(id); 
+        var accIdResult = AccountId.TryCreate(id);
         if(amountResult.IsFailure)
             return Result.Failure<Account>(amountResult.Error);
-        
+
         var userIdResult = UserId.TryCreate(userId);
         if(amountResult.IsFailure)
             return Result.Failure<Account>(amountResult.Error);
@@ -42,7 +42,7 @@ public sealed class Account
         var accOneId = AccountId.Create(id);
         var amountDomain = Amount.Create(amount);
         var userOneId = UserId.Create(userId);
-            
+
         return new Account (accOneId, amountDomain, userOneId);
     }
 
@@ -51,7 +51,7 @@ public sealed class Account
         var accountIdResult = AccountId.TryCreate(id);
         if (accountIdResult.IsFailure)
             return Result.Failure<Account>(accountIdResult.Error);
-        
+
         var userIdResult = UserId.TryCreate(userId);
         if (userIdResult.IsFailure)
             return Result.Failure<Account>(userIdResult.Error);
@@ -74,6 +74,16 @@ public sealed class Account
 
         Amount.WithdrawalMoney(money.Value);
 
+        return Result.Success();
+    }
+
+    public Result ApportionCash(Amount money)
+    {
+        if (money is null)
+            return Result.Failure<Account>("Payment processing error");
+
+        Amount.ApportionCash(money.Value);
+        
         return Result.Success();
     }
 }

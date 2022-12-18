@@ -37,7 +37,7 @@ public class AccountHistory
         bool isCredit = false, Guid? roomId = null)
     {
         var accountHistoryId = AccountHistoryId.Create(accHistoryId);
-        
+
         var accOneId = AccountId.Create(accId);
 
         var amountDomain = Amount.Create(value);

@@ -3,7 +3,6 @@ using CurrencyRateBattleServer.ApplicationServices.Infrastructure;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager.Interfaces;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;
@@ -54,11 +53,11 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
         if (accountResult.IsFailure)
             return Result.Failure<RegistrationResponse>(accountResult.Error);
         var account = accountResult.Value;
-        
+
         var amountResult = Amount.TryCreate(_options.RegistrationReward);
         if (amountResult.IsFailure)
             return Result.Failure<RegistrationResponse>(amountResult.Error);
-        
+
         accountResult.Value.AddStartBalance(amountResult.Value);
 
         await _accountRepository.CreateAccountAsync(account, cancellationToken);

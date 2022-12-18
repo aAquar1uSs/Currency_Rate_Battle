@@ -18,6 +18,11 @@ public static class RateConverter
             rate.AccountId);
     }
 
+    public static RateDal[] ToDal(this Rate[] domain)
+    {
+        return domain.Select(x => x.ToDal()).ToArray();
+    }
+
     public static RateDal ToDal(this Rate rate)
     {
         return new RateDal

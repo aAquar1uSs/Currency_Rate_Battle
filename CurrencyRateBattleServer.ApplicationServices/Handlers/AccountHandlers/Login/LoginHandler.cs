@@ -1,7 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager.Interfaces;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;

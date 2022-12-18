@@ -28,7 +28,7 @@ public class AccountRepository : IAccountRepository
 
         _logger.LogInformation($"{nameof(CreateAccountAsync)} successfully added new account");
     }
-    
+
     public async Task<Account?> GetAccountByUserIdAsync(UserId userId, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetAccountByUserIdAsync)} was caused.");
@@ -37,5 +37,20 @@ public class AccountRepository : IAccountRepository
                 .FirstOrDefaultAsync(acc => acc.User.Id == userId.Id, cancellationToken);
 
         return account?.ToDomain();
+    }
+
+    public async Task<Account?> GetAsync(AccountId accountId, CancellationToken cancellationToken)
+    {
+        var account = await _dbContext.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId.Id, cancellationToken);
+
+        return account?.ToDomain();
+    }
+
+    public async Task UpdateAsync(Account account, CancellationToken cancellationToken)
+    {
+        var accountDal = account.ToDal();
+
+        _dbContext.Accounts.Update(accountDal);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

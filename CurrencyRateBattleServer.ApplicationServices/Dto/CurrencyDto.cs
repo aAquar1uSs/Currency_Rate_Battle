@@ -2,7 +2,7 @@
 
 namespace CurrencyRateBattleServer.ApplicationServices.Dto;
 
-public class CurrencyStateDto
+public class CurrencyDto
 {
     [JsonPropertyName("rate")]
     public decimal Rate { get; set; }

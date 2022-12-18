@@ -14,13 +14,13 @@ public class Rate
     public Amount Amount { get; }
 
     //Date when the rate is settled
-    public DateTime? SettleDate { get; }
+    public DateTime? SettleDate { get; private set; }
 
     public Payout? Payout { get; private set; }
 
     public bool IsClosed { get; private set; }
 
-    public bool IsWon { get; }
+    public bool IsWon { get; private set; }
 
     public RoomId RoomId { get; }
 
@@ -102,7 +102,7 @@ public class Rate
             settleDate, payoutResult.Value, isClosed, isWon, roomOneIdResult.Value, currencyCodeResult.Value,
             accountOneIdResult.Value);
     }
-    
+
     public static Rate Create(Guid id,
         DateTime setDate,
         decimal rateCurrencyExchange,
@@ -135,21 +135,37 @@ public class Rate
             accountOneId);
     }
 
-    public void Change(bool isClosed, 
-        decimal payout)
+    public void Change(bool isClosed,
+        decimal payout,
+        DateTime settledDate)
     {
         IsClosed = isClosed;
         Payout = Payout.Create(payout);
+        SettleDate = settledDate;
     }
-    
+
     public Result Change(decimal payout,
-        bool isClosed)
+        bool isClosed,
+        DateTime settledDate)
     {
         var payoutResult = Payout.TryCreate(payout);
         if (payoutResult.IsFailure)
             return Result.Failure(payoutResult.Error);
 
         IsClosed = isClosed;
+        SettleDate = settledDate;
         return Result.Success();
+    }
+
+    public void IsWonBet()
+    {
+        IsWon = true;
+        IsClosed = true;
+    }
+
+    public void CreatePayout(decimal payout, DateTime settledDate)
+    {
+        Payout = Payout.Create(payout);
+        SettleDate = settledDate;
     }
 }
