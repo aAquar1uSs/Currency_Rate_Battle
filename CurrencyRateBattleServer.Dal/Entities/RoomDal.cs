@@ -12,9 +12,5 @@ public class RoomDal
     public DateTime Date { get; set; }
 
     public bool IsClosed { get; set; }
-
-    [ForeignKey("CurrencyStateId")]
-    public Guid CurrencyStateId { get; set; }
-
-    public CurrencyStateDal CurrencyState { get; set; }
+    
 }

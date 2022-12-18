@@ -5,5 +5,5 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.
 
 public class GetAccountHistoryCommand : IRequest<Result<GetAccountHistoryResponse>>
 {
-    public Guid? UserId { get; set; }
+    public Guid UserId { get; set; }
 }

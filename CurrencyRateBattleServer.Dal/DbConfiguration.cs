@@ -1,6 +1,7 @@
-﻿using CurrencyRateBattleServer.Dal.Services;
+﻿using CurrencyRateBattleServer.Dal.Repositories;
+using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
+using CurrencyRateBattleServer.Dal.Services;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
-using CurrencyRateBattleServer.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,13 +20,14 @@ public static class DbConfiguration
     public static void ConfigureServices(this IServiceCollection service)
     {
         _ = service.AddScoped<IAccountRepository, AccountRepository>()
-            .AddScoped<IRoomRepository, RoomRepository>()
-            .AddScoped<IRateRepository, RateRepository>()
-            .AddScoped<ICurrencyStateRepository, CurrencyStateRepository>()
-            .AddScoped<IAccountHistoryRepository, AccountHistoryRepository>()
-            .AddScoped<IRateCalculationRepository, RateCalculationRepository>()
-            .AddScoped<IPaymentRepository, PaymentRepository>()
-            .AddScoped<IRatingRepository, RatingRepository>()
-            .AddScoped<IUserRepository, UserRepository>();
-    }
+                 .AddScoped<IRoomRepository, RoomRepository>()
+                 .AddScoped<IRateRepository, RateRepository>()
+                 .AddScoped<ICurrencyStateRepository, CurrencyStateRepository>()
+                 .AddScoped<IAccountHistoryRepository, AccountHistoryRepository>()
+                 .AddScoped<IRateCalculationRepository, RateCalculationRepository>()
+                 .AddScoped<IPaymentRepository, PaymentRepository>()
+                 .AddScoped<IUserRatingQueryRepository, UserRatingQueryRepository>()
+                 .AddScoped<IUserRepository, UserRepository>()
+                 .AddScoped<IRoomQueryRepository, RoomQueryRepository>();
+         }
 }

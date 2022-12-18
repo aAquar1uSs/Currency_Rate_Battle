@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Converters;
+using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,6 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyStateHan
 public class GetCurrencyStateHandler : IRequestHandler<GetCurrencyStateCommand, Result<GetCurrencyStateResponse>>
 {
     private readonly ILogger<GetCurrencyStateHandler> _logger;
-
     private readonly ICurrencyStateRepository _currencyStateRepository;
 
     public GetCurrencyStateHandler(ILogger<GetCurrencyStateHandler> logger, ICurrencyStateRepository currencyStateRepository)

@@ -2,8 +2,8 @@
 using System.Security.Claims;
 using System.Text;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager.Interfaces;
-using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Domain.Entities;
+using CurrencyRateBattleServer.Domain.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;

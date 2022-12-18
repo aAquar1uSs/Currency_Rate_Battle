@@ -31,8 +31,10 @@ public class ProfileController : ControllerBase
         _logger.LogDebug($"{nameof(GetUserBalanceAsync)} was triggered.");
 
         var userId = GuidHelper.GetGuidFromRequest(HttpContext);
+        if (userId is null)
+            return BadRequest();
 
-        var command = new GetUserBalanceCommand { UserId = userId };
+        var command = new GetUserBalanceCommand { UserId = userId.Value };
 
         var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
 
@@ -49,9 +51,11 @@ public class ProfileController : ControllerBase
     {
         _logger.LogDebug($"{nameof(GetUserInfoAsync)} was triggered.");
 
-        var guidId = GuidHelper.GetGuidFromRequest(HttpContext);
+        var userId = GuidHelper.GetGuidFromRequest(HttpContext);
+        if (userId is null)
+            return BadRequest();
 
-        var command = new GetProfileCommand { UserId = guidId };
+        var command = new GetProfileCommand { UserId = userId.Value };
 
         var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
 

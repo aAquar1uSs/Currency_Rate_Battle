@@ -12,14 +12,8 @@ public static class AccountHistoryConverter
 
     public static AccountHistory ToDomain(this AccountHistoryDal accountHistoryDal)
     {
-        return new AccountHistory
-        {
-            Account = accountHistoryDal.Account.ToDomain(),
-            Amount = accountHistoryDal.Amount,
-            Date = accountHistoryDal.Date,
-            IsCredit = accountHistoryDal.IsCredit,
-            Room = accountHistoryDal.Room?.ToDomain()
-        };
+        return AccountHistory.Create(accountHistoryDal.Id, accountHistoryDal.AccountId, accountHistoryDal.Date,
+            accountHistoryDal.Amount, accountHistoryDal.IsCredit, accountHistoryDal.RoomId);
     }
 
     public static AccountHistoryDal[] ToDal(this AccountHistory[] accountHistory)
@@ -27,15 +21,16 @@ public static class AccountHistoryConverter
         return accountHistory.Select(dal => dal.ToDal()).ToArray();
     }
 
-    public static AccountHistoryDal ToDal(this AccountHistory accountHistoryDal)
+    public static AccountHistoryDal ToDal(this AccountHistory accountHistory)
     {
         return new AccountHistoryDal
         {
-            Account = accountHistoryDal.Account.ToDal(),
-            Amount = accountHistoryDal.Amount,
-            Date = accountHistoryDal.Date,
-            IsCredit = accountHistoryDal.IsCredit,
-            Room = accountHistoryDal.Room?.ToDal()
+            Id = accountHistory.Id.Id,
+            AccountId = accountHistory.AccountId.Id,
+            Amount = accountHistory.Amount.Value,
+            Date = accountHistory.Date,
+            IsCredit = accountHistory.IsCredit,
+            RoomId = accountHistory.RoomId?.Id
         };
     }
 }

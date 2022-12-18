@@ -1,5 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
+using CurrencyRateBattleServer.ApplicationServices.Converters;
+using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
+using CurrencyRateBattleServer.Domain.Entities;
+using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -8,16 +11,11 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.Mak
 public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResponse>>
 {
     private readonly ILogger<MakeBetHandler> _logger;
-
     private readonly IAccountRepository _accountRepository;
-
-    private readonly IPaymentRepository _paymentRepository;
-
     private readonly ICurrencyStateRepository _currencyStateRepository;
-
     private readonly IRateRepository _rateRepository;
 
-    public MakeBetHandler(ILogger<MakeBetHandler> logger, IAccountRepository accountRepository, IPaymentRepository paymentRepository,
+    public MakeBetHandler(ILogger<MakeBetHandler> logger, IAccountRepository accountRepository,
         ICurrencyStateRepository currencyStateRepository, IRateRepository rateRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -29,25 +27,38 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
     public async Task<Result<MakeBetResponse>> Handle(MakeBetCommand request, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(MakeBetHandler)} was caused.");
-        var account = await _accountRepository.GetAccountByUserIdAsync(request.UserId);
-
+        var userIdResult = UserId.TryCreate(request.UserId);
+        if (userIdResult.IsFailure)
+            return Result.Failure<MakeBetResponse>(userIdResult.Error);
+        
+        var account = await _accountRepository.GetAccountByUserIdAsync(userIdResult.Value, cancellationToken);
         if (account is null)
             return Result.Failure<MakeBetResponse>($"Account with such user id: {request.UserId} does not exist.");
+        
+        var rateToCreate = request.UserRateToCreate;
+        var roomIdResult = RoomId.TryCreate(rateToCreate.RoomId);
+        if (roomIdResult.IsFailure)
+            return Result.Failure<MakeBetResponse>(roomIdResult.Error);
+        
+        var currencyId = await _currencyStateRepository.GetCurrencyIdByRoomIdAsync(roomIdResult.Value, cancellationToken);
+        var currencyIdResult = CurrencyId.TryCreate(currencyId);
+        if (currencyIdResult.IsFailure)
+            return Result.Failure<MakeBetResponse>(currencyIdResult.Error);
+        
+        var amountResult = Amount.TryCreate(rateToCreate.Amount);
+        if (amountResult.IsFailure)
+            return Result.Failure<MakeBetResponse>(amountResult.Error);
+        
+        var result = account.WritingOffMoney(amountResult.Value);
+        if (result.IsFailure)
+            return Result.Failure<MakeBetResponse>(result.Error);
 
-        var rateToCreate = request.RateToCreate.ToDomain();
+        var rate = Rate.Create(OneId.GenerateId().Id, DateTime.UtcNow, rateToCreate.UserCurrencyExchange,
+            rateToCreate.Amount, null, null, false, false, roomIdResult.Value.Id,
+            currencyIdResult.Value.Id, account.Id.Id);
 
-        var result = await _paymentRepository.WritingOffMoneyAsync(account, rateToCreate.Amount);
+        await _rateRepository.CreateAsync(rate, cancellationToken);
 
-        if (result is false)
-            return Result.Failure<MakeBetResponse>("Payment processing error");
-
-        var currencyId = await _currencyStateRepository.GetCurrencyIdByRoomIdAsync(rateToCreate.RoomId);
-
-        if (currencyId == Guid.Empty)
-            return Result.Failure<MakeBetResponse>("Incorrect data");
-
-        var rate = await _rateRepository.CreateRateAsync(rateToCreate, account.Id, currencyId);
-
-        return new MakeBetResponse { Rate = rate.ToDto() };
+        return new MakeBetResponse { UserRate = rate.ToDto() };
     }
 }

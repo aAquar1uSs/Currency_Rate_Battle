@@ -1,4 +1,5 @@
-﻿using CurrencyRateBattleServer.Dto;
+﻿using CurrencyRateBattleServer.ApplicationServices.Dto;
+using CurrencyRateBattleServer.Dto;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.GetFilteredRoom;
 

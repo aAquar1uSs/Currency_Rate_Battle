@@ -11,13 +11,14 @@ public class CurrencyStateDal
     public DateTime Date { get; set; }
 
     public decimal CurrencyExchangeRate { get; set; }
-
-    [ForeignKey("RoomId")]
+    
     public Guid RoomId { get; set; }
+    
+    [ForeignKey("RoomId")]
     public RoomDal Room { get; set; }
-
-    [ForeignKey("CurrencyId")]
+    
     public Guid CurrencyId { get; set; }
 
+    [ForeignKey("CurrencyId")]
     public CurrencyDal Currency { get; set; }
 }

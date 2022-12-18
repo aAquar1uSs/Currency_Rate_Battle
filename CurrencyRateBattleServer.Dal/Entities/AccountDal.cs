@@ -8,12 +8,12 @@ public sealed class AccountDal
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Id { get; }
+    public Guid Id { get; set; }
 
     public decimal Amount { get; set; }
-
-    [ForeignKey("UserId")]
+    
     public Guid UserId { get; set; }
 
+    [ForeignKey("UserId")]
     public UserDal User { get; set; }
 }

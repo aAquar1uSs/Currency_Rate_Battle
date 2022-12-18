@@ -7,11 +7,16 @@ public static class AccountConverter
 {
     public static Account ToDomain(this AccountDal accountDal)
     {
-        return new Account {Id = accountDal.Id, Amount = accountDal.Amount};
+        return Account.Create(accountDal.Id, accountDal.Amount, accountDal.UserId);
     }
 
     public static AccountDal ToDal(this Account account)
     {
-        return new AccountDal { Amount = account.Amount };
+        return new AccountDal
+        {
+            UserId = account.UserId.Id,
+            Id = account.Id.Id,
+            Amount = account.Amount.Value
+        };
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
+using CurrencyRateBattleServer.ApplicationServices.Converters;
+using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -8,21 +9,19 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.Get
 public class GetRoomHandler : IRequestHandler<GetRoomCommand, Result<GetRoomResponse>>
 {
     private readonly ILogger<GetRoomHandler> _logger;
+    private readonly IRoomQueryRepository _roomQueryRepository;
 
-    private readonly IRoomRepository _roomRepository;
-
-    public GetRoomHandler(ILogger<GetRoomHandler> logger, IRoomRepository roomRepository)
+    public GetRoomHandler(ILogger<GetRoomHandler> logger, IRoomQueryRepository roomQueryRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
+        _roomQueryRepository = roomQueryRepository ?? throw new ArgumentNullException(nameof(roomQueryRepository));
     }
 
     public async Task<Result<GetRoomResponse>> Handle(GetRoomCommand request, CancellationToken cancellationToken)
-    {
-        //ToDo Create method which been get CountRate etc...
+    { 
         _logger.LogDebug($"{nameof(GetRoomHandler)} was caused. Start processing.");
 
-        var rooms = await _roomRepository.GetRoomsAsync(request.IsClosed);
+        var rooms = await _roomQueryRepository.FindAsync(request.IsClosed, cancellationToken);
 
         return new GetRoomResponse {Rooms = rooms.ToDto()};
     }

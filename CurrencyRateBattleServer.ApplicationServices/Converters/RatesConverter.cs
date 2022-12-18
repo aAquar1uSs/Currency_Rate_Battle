@@ -7,15 +7,15 @@ namespace CurrencyRateBattleServer.ApplicationServices.Converters;
 
 public static class RatesConverter
 {
-    public static RateDto ToDto(this Rate rate)
+    public static UserRateDto ToDto(this Rate rate)
     {
         return new()
         {
-            Amount = rate.Amount, RoomId = rate.Room.Id, UserCurrencyExchange = rate.RateCurrencyExchange,
+            Amount = rate.Amount.Value, RoomId = rate.RoomId.Id, UserCurrencyExchange = rate.RateCurrencyExchange.Value
         };
     }
 
-    public static RateDto[] ToDto(this Rate[] rates)
+    public static UserRateDto[] ToDto(this Rate[] rates)
     {
         return rates.Select(x => x.ToDto()).ToArray();
     }

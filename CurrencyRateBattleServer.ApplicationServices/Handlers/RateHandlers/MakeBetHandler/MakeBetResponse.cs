@@ -5,5 +5,5 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.Mak
 
 public class MakeBetResponse
 {
-    public RateDto Rate { get; set; }
+    public UserRateDto UserRate { get; set; }
 }

@@ -9,14 +9,14 @@ public sealed class UserDal
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Id { get; }
+    public Guid Id { get; set; }
 
     public string Email { get; set; }
 
     public string Password { get; set; }
-
-    [ForeignKey("AccountId")]
+    
     public Guid AccountId { get; set; }
 
+    [ForeignKey("AccountId")]
     public AccountDal Account { get; set; }
 }

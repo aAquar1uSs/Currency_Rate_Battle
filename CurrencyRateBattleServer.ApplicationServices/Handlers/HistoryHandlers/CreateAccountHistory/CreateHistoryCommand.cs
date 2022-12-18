@@ -6,7 +6,7 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.
 
 public class CreateHistoryCommand : IRequest<Result<CreateHistoryResponse>>
 {
-    public Guid? UserId { get; set; }
+    public Guid UserId { get; set; }
     
     public AccountHistoryDto AccountHistory { get; set; }
 }

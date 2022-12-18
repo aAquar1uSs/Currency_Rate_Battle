@@ -5,24 +5,24 @@ namespace CurrencyRateBattleServer.ApplicationServices.Converters;
 
 public static class BetInfoConverter
 {
-    public static BetInfoDto ToDto(this BetInfo betInfo)
+    public static BetInfoDto ToDto(this Bet bet)
     {
         return new BetInfoDto
         {
-            СurrencyName = betInfo.СurrencyName,
-            BetAmount = betInfo.BetAmount,
-            Id = betInfo.Id,
-            IsClosed = betInfo.IsClosed,
-            PayoutAmount = betInfo.PayoutAmount,
-            RoomDate = betInfo.RoomDate,
-            SetDate = betInfo.SetDate,
-            SettleDate = betInfo.SettleDate,
-            UserCurrencyExchange = betInfo.UserCurrencyExchange,
-            WonCurrencyExchange = betInfo.WonCurrencyExchange
+            СurrencyName = bet.СurrencyName,
+            BetAmount = bet.BetAmount,
+            Id = bet.Id,
+            IsClosed = bet.IsClosed,
+            PayoutAmount = bet.PayoutAmount,
+            RoomDate = bet.RoomDate,
+            SetDate = bet.SetDate,
+            SettleDate = bet.SettleDate,
+            UserCurrencyExchange = bet.UserCurrencyExchange,
+            WonCurrencyExchange = bet.WonCurrencyExchange
         };
     }
 
-    public static BetInfoDto[] ToDto(this BetInfo[] betInfos)
+    public static BetInfoDto[] ToDto(this Bet[] betInfos)
     {
         return betInfos.Select(x => x.ToDto()).ToArray();
     }

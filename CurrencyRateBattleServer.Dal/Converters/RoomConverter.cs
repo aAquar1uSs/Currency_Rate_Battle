@@ -10,13 +10,32 @@ public static class RoomConverter
         return rooms.Select(x => x.ToDomain()).ToArray();
     }
 
-    public static Room ToDomain(this RoomDal room)
+    public static Room ToDomain(this RoomDal roomDal)
     {
-        return new Room {Date = room.Date, Id = room.Id, IsClosed = room.IsClosed};
+        return Room.Create(roomDal.Id, roomDal.Date, roomDal.IsClosed);
     }
 
     public static RoomDal ToDal(this Room room)
     {
-        return new RoomDal {Date = room.Date, Id = room.Id, IsClosed = room.IsClosed};
+        return new RoomDal
+        {
+            Id = room.Id.Id,
+            Date = room.CreatedDate,
+            IsClosed = room.IsClosed
+        };
+    }
+
+    public static RoomInfo ToDomain(this RoomInfoDal dal)
+    {
+        return new()
+        {
+            Id = dal.Id,
+            CurrencyName = dal.CurrencyName,
+            CountRates = dal.CountRates,
+            CurrencyExchangeRate = dal.CurrencyExchangeRate,
+            Date = dal.Date,
+            IsClosed = dal.IsClosed,
+            UpdateRateTime = dal.UpdateRateTime
+        };
     }
 }

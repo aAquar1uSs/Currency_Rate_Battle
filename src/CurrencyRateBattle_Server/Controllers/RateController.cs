@@ -62,7 +62,7 @@ public class RateController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    public async Task<IActionResult> CreateRateAsync([FromBody] RateDto rateToCreate)
+    public async Task<IActionResult> CreateRateAsync([FromBody] UserRateDto userRateToCreate)
     {
         _logger.LogDebug("New rate creation is triggerred.");
 
@@ -71,14 +71,14 @@ public class RateController : ControllerBase
         if (userId is null)
             return BadRequest("Incorrect data");
 
-        var command = new MakeBetCommand { RateToCreate = rateToCreate, UserId = (Guid)userId };
+        var command = new MakeBetCommand { UserRateToCreate = userRateToCreate, UserId = (Guid)userId };
 
         var response = await _mediator.Send(command);
 
         if (response.IsFailure)
             return BadRequest(response.Error);
 
-        return Ok(response.Value.Rate);
+        return Ok(response.Value.UserRate);
     }
 
 }

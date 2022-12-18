@@ -30,8 +30,11 @@ public class AccountHistoryController : ControllerBase
     public async Task<IActionResult> GetAccountHistoryAsync(CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetAccountHistoryAsync)} was triggered.");
-
-        var command = new GetAccountHistoryCommand { UserId = GuidHelper.GetGuidFromRequest(HttpContext) };
+        var userId = GuidHelper.GetGuidFromRequest(HttpContext);
+        if (userId is null)
+            return BadRequest();
+        
+        var command = new GetAccountHistoryCommand { UserId = userId.Value };
 
         var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
 
@@ -52,7 +55,7 @@ public class AccountHistoryController : ControllerBase
         if (userId is null)
             return BadRequest();
 
-        var command = new CreateHistoryCommand { UserId = userId, AccountHistory = historyDto };
+        var command = new CreateHistoryCommand { UserId = userId.Value, AccountHistory = historyDto };
 
         var (_, isFailure, _, error) = await _mediator.Send(command, cancellationToken);
 

@@ -2,8 +2,10 @@
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager.Interfaces;
+using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
+using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -35,7 +37,8 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
     {
         _logger.LogInformation($"{nameof(RegistrationHandler)} was caused.");
 
-        var userResult = User.Create(request.UserDto.Email, request.UserDto.Password);
+        var customUserId = UserId.GenerateId();
+        var userResult = User.TryCreate(customUserId.Id, request.UserDto.Email, request.UserDto.Password, null);
 
         if (userResult.IsFailure)
             return Result.Failure<RegistrationResponse>(userResult.Error);
@@ -46,16 +49,24 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
         if (maybeUser is not null)
             return Result.Failure<RegistrationResponse>("User with such email already exist");
 
-        var account = Account.Create();
-        account.AddStartBalance(_options.RegistrationReward);
+        var customAccountId = AccountId.GenerateId();
+        var accountResult = Account.TryCreateNewAccount(customAccountId.Id, customAccountId.Id);
+        if (accountResult.IsFailure)
+            return Result.Failure<RegistrationResponse>(accountResult.Error);
+        var account = accountResult.Value;
+        
+        var amountResult = Amount.TryCreate(_options.RegistrationReward);
+        if (amountResult.IsFailure)
+            return Result.Failure<RegistrationResponse>(amountResult.Error);
+        
+        accountResult.Value.AddStartBalance(amountResult.Value);
 
-        await _accountRepository.CreateAccountAsync(account);
-
-        user.AddAccount(account);
+        await _accountRepository.CreateAccountAsync(account, cancellationToken);
 
         await _userRepository.CreateAsync(user, cancellationToken);
 
-        var accountHistory = AccountHistory.Create(account.Id, DateTime.UtcNow, account.Amount, true);
+        var accountHistoryId = AccountHistoryId.GenerateId();
+        var accountHistory = AccountHistory.Create(accountHistoryId.Id, account.Id.Id, DateTime.Now, account.Amount.Value);
         await _accountHistoryRepository.CreateAsync(accountHistory, cancellationToken);
 
         return new RegistrationResponse { Tokens = _jwtManager.Authenticate(user) };

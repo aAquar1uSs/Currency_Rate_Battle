@@ -7,11 +7,17 @@ public static class UserConverter
 {
     public static UserDal ToDal(this User user)
     {
-        return new UserDal { Email = user.Email, Password = user.Password, Account = user.Account.ToDal() };
+        return new UserDal
+        {
+            Id = user.Id.Id,
+            AccountId = user.AccountId.Id,
+            Email = user.Email.Value,
+            Password = user.Password.Value
+        };
     }
 
     public static User ToDomain(this UserDal userDal)
     {
-        return new User { Account = userDal.Account.ToDomain(), Email = userDal.Email, Password = userDal.Password };
+        return User.Create(userDal.Id, userDal.Email, userDal.Password, userDal.AccountId);
     }
 }

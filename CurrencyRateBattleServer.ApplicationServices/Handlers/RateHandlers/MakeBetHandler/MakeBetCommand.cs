@@ -9,5 +9,5 @@ public class MakeBetCommand : IRequest<Result<MakeBetResponse>>
 {
     public Guid UserId { get; set; }
     
-    public RateDto RateToCreate { get; set; }
+    public UserRateDto UserRateToCreate { get; set; }
 }

@@ -7,12 +7,7 @@ public static class CurrencyConverter
 {
     public static Currency ToDomain(this CurrencyDal currencyDal)
     {
-        return new Currency
-        {
-            CurrencyName = currencyDal.CurrencyName,
-            CurrencySymbol = currencyDal.CurrencyCode,
-            Description = currencyDal.Description,
-            Rate = currencyDal.Rate
-        };
+        return Currency.Create(currencyDal.Id, currencyDal.CurrencyName, currencyDal.CurrencyCode, currencyDal.Rate,
+            currencyDal.Description);
     }
 }

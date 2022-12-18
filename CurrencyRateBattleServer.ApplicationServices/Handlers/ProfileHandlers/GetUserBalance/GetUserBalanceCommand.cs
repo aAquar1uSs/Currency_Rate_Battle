@@ -5,5 +5,5 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.ProfileHandlers.
 
 public class GetUserBalanceCommand : IRequest<Result<GetUserBalanceResponse>>
 {
-    public Guid? UserId { get; set; }
+    public Guid UserId { get; set; }
 }

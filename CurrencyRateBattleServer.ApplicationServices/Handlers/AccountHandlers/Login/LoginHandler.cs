@@ -1,7 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager.Interfaces;
+using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
+using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -23,7 +25,8 @@ public class LoginHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
 
     public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var userResult = User.Create(request.UserDto.Email, request.UserDto.Password);
+        var customId = UserId.GenerateId();
+        var userResult = User.TryCreate(customId.Id, request.UserDto.Email, request.UserDto.Password, null);
 
         if (userResult.IsFailure)
             return Result.Failure<LoginResponse>(userResult.Error);

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace CurrencyRateBattleServer.Dto;
+namespace CurrencyRateBattleServer.ApplicationServices.Dto;
 
 public class RoomDto
 {

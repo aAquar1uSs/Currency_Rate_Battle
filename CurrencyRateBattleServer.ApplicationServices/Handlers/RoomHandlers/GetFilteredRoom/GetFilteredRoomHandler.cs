@@ -1,5 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
+using CurrencyRateBattleServer.ApplicationServices.Converters;
+using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
+using CurrencyRateBattleServer.Domain.Infrastructure;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -8,23 +10,20 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.Get
 public class GetFilteredRoomHandler : IRequestHandler<GetFilteredRoomCommand, Result<GetFilteredRoomResponse>>
 {
     private readonly ILogger<GetFilteredRoomHandler> _logger;
+    private readonly IRoomQueryRepository _roomQueryRepository;
 
-    private readonly IRoomRepository _roomRepository;
-
-    public GetFilteredRoomHandler(ILogger<GetFilteredRoomHandler> logger, IRoomRepository roomRepository)
+    public GetFilteredRoomHandler(ILogger<GetFilteredRoomHandler> logger, IRoomQueryRepository roomQueryRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
+        _roomQueryRepository = roomQueryRepository ?? throw new ArgumentNullException(nameof(roomQueryRepository));
     }
 
     public async Task<Result<GetFilteredRoomResponse>> Handle(GetFilteredRoomCommand request, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetFilteredRoomHandler)} was caused.");
-
-        var rooms = await _roomRepository.GetActiveRoomsWithFilterAsync(request.Filter);
-
-        if (rooms is null)
-            return Result.Failure<GetFilteredRoomResponse>("");
+        var filter = new Filter(request.Filter.CurrencyName, request.Filter.StartDate, request.Filter.EndDate);
+        
+        var rooms = await _roomQueryRepository.GetActiveRoomsWithFilterAsync(filter, cancellationToken);
 
         return new GetFilteredRoomResponse {Rooms = rooms.ToDto()};
     }

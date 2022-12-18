@@ -1,6 +1,5 @@
 ﻿using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Dto;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Converters;
 
@@ -15,19 +14,11 @@ public static class AccountHistoriesConverter
     {
         return new AccountHistoryDto
         {
-            AccountHistoryId = accountHistory.Id,
-            Amount = accountHistory.Amount,
+            AccountHistoryId = accountHistory.Id.Id,
+            Amount = accountHistory.Amount.Value,
             Date = accountHistory.Date,
             IsCredit = accountHistory.IsCredit,
-            RoomId = accountHistory.Room.Id
-        };
-    }
-
-    public static AccountHistory ToDomain(this AccountHistoryDto accountHistoryDto)
-    {
-        return new AccountHistory
-        {
-            Amount = accountHistoryDto.Amount, Date = accountHistoryDto.Date, IsCredit = accountHistoryDto.IsCredit
+            RoomId = accountHistory.RoomId.Id
         };
     }
 }

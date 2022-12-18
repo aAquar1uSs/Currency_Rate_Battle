@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
+using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
+using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -8,7 +9,6 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.ProfileHandlers.
 public class GetUserBalanceHandler : IRequestHandler<GetUserBalanceCommand, Result<GetUserBalanceResponse>>
 {
     private readonly ILogger<GetUserBalanceHandler> _logger;
-
     private readonly IAccountRepository _accountRepository;
 
     public GetUserBalanceHandler(ILogger<GetUserBalanceHandler> logger, IAccountRepository accountRepository)
@@ -20,15 +20,16 @@ public class GetUserBalanceHandler : IRequestHandler<GetUserBalanceCommand, Resu
     public async Task<Result<GetUserBalanceResponse>> Handle(GetUserBalanceCommand request, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetUserBalanceHandler)} was caused.");
+
+        var userIdResult = UserId.TryCreate(request.UserId);
+        if (userIdResult.IsFailure)
+            return Result.Failure<GetUserBalanceResponse>(userIdResult.Error);
         
-        if (request.UserId is null)
-            return Result.Failure<GetUserBalanceResponse>("User id is null.");
-        
-        var account = await _accountRepository.GetAccountByUserIdAsync(request.UserId);
+        var account = await _accountRepository.GetAccountByUserIdAsync(userIdResult.Value, cancellationToken);
         
         if (account is null)
             return Result.Failure<GetUserBalanceResponse>($"Account with id: {request.UserId} didn't found.");
 
-        return new GetUserBalanceResponse { Amount = account.Amount };
+        return new GetUserBalanceResponse { Amount = account.Amount.Value };
     }
 }

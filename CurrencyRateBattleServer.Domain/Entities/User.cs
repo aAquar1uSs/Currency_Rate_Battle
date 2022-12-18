@@ -1,65 +1,66 @@
-﻿using System.Net.Mail;
-using CSharpFunctionalExtensions;
-using CurrencyRateBattleServer.Domain.Infrastructure.Encoder;
+﻿using CSharpFunctionalExtensions;
+using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 
 namespace CurrencyRateBattleServer.Domain.Entities;
 
 public sealed class User
 {
-    public Guid Id { get; set; }
+    public UserId Id { get; set; }
 
-    public string Email { get; set; } = default!;
+    public Email Email { get; }
 
-    public string Password { get; set; } = default!;
+    public Password Password { get; }
 
-    public Account Account { get; set; }
+    public AccountId? AccountId { get; }
 
-    public static Result<User> Create(string email, string password, Account account = null!)
+    private User(UserId id,
+        Email email,
+        Password password,
+        AccountId? accountId)
     {
-        var validateResult = Validate(email, password);
-
-        if (validateResult.IsFailure)
-            return Result.Failure<User>("Invalid data. Please try again.");
-
-        var encodedPassword = Sha256Encoder.Encrypt(password);
-
-        return new User { Account = account, Email = email, Password = encodedPassword };
+        Id = id;
+        Email = email;
+        Password = password;
+        AccountId = accountId;
     }
 
-    private static Result Validate(string email, string password)
+    public static Result<User> TryCreate(Guid id, string email, string password, Guid? accountId)
     {
-        if (!IsValidEmail(email) || !IsValidPassword(password))
-            return Result.Failure("Invalid data. Please try again.");
+        var oneIdResult = UserId.TryCreate(id);
+        if (oneIdResult.IsFailure)
+            return Result.Failure<User>(oneIdResult.Error);
+        
+        var emailResult = Email.TryCreate(email);
+        if (emailResult.IsFailure)
+            return Result.Failure<User>(emailResult.Error);
 
-        return Result.Success();
+        var passwordResult = Password.TryCreate(password);
+        if (passwordResult.IsFailure)
+            return Result.Failure<User>(passwordResult.Error);
+
+        if (accountId is null)
+            return new User(oneIdResult.Value, emailResult.Value, passwordResult.Value, null);
+
+        var accOneIdResult = ValueObjects.AccountId.TryCreate((Guid)accountId);
+        if (accOneIdResult.IsFailure)
+            return Result.Failure<User>(accOneIdResult.Error);
+        
+        return new User(oneIdResult.Value, emailResult.Value, passwordResult.Value, accOneIdResult.Value);
     }
 
-    private static bool IsValidEmail(string email)
+    public static User Create(Guid id, string email, string password, Guid? accountId)
     {
-        var trimmedEmail = email.Trim();
+        var userId = UserId.Create(id);
 
-        if (trimmedEmail.EndsWith("."))
-            return false;
+        var emailDomain = Email.Create(email);
 
-        if (trimmedEmail.Length is > 30 or < 6)
-            return false;
+        var passwordDomain = Password.Create(password);
 
-        try {
-            var addr = new MailAddress(email);
-            return addr.Address == trimmedEmail;
-        }
-        catch {
-            return false;
-        }
-    }
+        if (accountId is null)
+            return new User(userId, emailDomain, passwordDomain, null);
 
-    private static bool IsValidPassword(string password)
-    {
-        return password.Length is < 30 and > 6;
-    }
+        var accOneId = ValueObjects.AccountId.Create((Guid)accountId);
 
-    public void AddAccount(Account account)
-    {
-        Account = account;
+        return new User(userId, emailDomain, passwordDomain, accOneId);
     }
 }

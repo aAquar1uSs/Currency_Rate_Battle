@@ -5,5 +5,5 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.Get
 
 public class GetRatesResponse
 {
-    public RateDto[] Rates { get; set; }
+    public UserRateDto[] Rates { get; set; }
 }
