@@ -1,8 +1,8 @@
-﻿using CurrencyRateBattleServer.ApplicationServices.Infrastructure;
+﻿using CurrencyRateBattleServer.ApplicationServices.HostedServices;
+using CurrencyRateBattleServer.ApplicationServices.Infrastructure;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager.Interfaces;
 using CurrencyRateBattleServer.Dal;
-using CurrencyRateBattleServer.Dal.HostedServices;
 using CurrencyRateBattleServer.Dal.Services.HostedServices;
 using CurrencyRateBattleServer.Infrastructure;
 using MediatR;
@@ -52,6 +52,7 @@ host.ConfigureAppConfiguration(app =>
         });
 
         service.ConfigureServices();
+        services.ConfigureClients(builder.Configuration);
 
         //ToDo Migrate to custom method
         _ = service.AddHostedService<CurrencyHostedService>()

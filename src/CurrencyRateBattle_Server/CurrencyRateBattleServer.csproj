@@ -25,6 +25,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\CurrencyRateBattleServer.ApplicationServices\CurrencyRateBattleServer.ApplicationServices.csproj" />
+      <ProjectReference Include="..\..\NbuClient\NbuClient.csproj" />
     </ItemGroup>
 
 </Project>

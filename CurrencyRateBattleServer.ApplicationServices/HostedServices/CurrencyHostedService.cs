@@ -1,25 +1,22 @@
-﻿using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
+﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyStateHandlers.UpdateCurrencyRateHandlers;
+using MediatR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace CurrencyRateBattleServer.Dal.HostedServices;
+namespace CurrencyRateBattleServer.ApplicationServices.HostedServices;
 
 public class CurrencyHostedService : IHostedService, IDisposable
 {
     private readonly ILogger<CurrencyHostedService> _logger;
-
     private Timer? _timer;
-
     private static readonly object _sync = new();
-
-    private readonly ICurrencyStateRepository _currencyStateRepository;
+    private readonly IMediator _mediator;
 
     public CurrencyHostedService(ILogger<CurrencyHostedService> logger,
-        ICurrencyStateRepository currencyStateRepository)
+        IMediator mediator)
     {
-        _logger = logger;
-        _currencyStateRepository = currencyStateRepository;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -51,7 +48,9 @@ public class CurrencyHostedService : IHostedService, IDisposable
     private async void Callback(object? state)
     {
         _logger.LogInformation("PrepareUpdateCurrencyRateAsync has been invoked.");
-        await _currencyStateRepository.PrepareUpdateCurrencyRateAsync();
+        //await _currencyStateRepository.PrepareUpdateCurrencyRateAsync();
+        var command = new UpdateCurrencyRateCommand();
+        var response = await _mediator.Send(command);
         _logger.LogInformation("PrepareUpdateCurrencyRateAsync сompleted the execution.");
     }
 

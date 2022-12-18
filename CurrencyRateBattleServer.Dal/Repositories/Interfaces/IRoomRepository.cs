@@ -6,13 +6,11 @@ namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
 public interface IRoomRepository
 {
-    Task GenerateRoomsByCurrencyCountAsync();
-
-    Task<CurrencyState> CreateAsync(CurrencyDal curr);
+    Task CreateAsync(CancellationToken cancellationToken);
 
     Task UpdateAsync(RoomDal updatedRoomDal, CancellationToken cancellationToken);
 
-    Task CheckRoomsStateAsync();
+    Task<Room[]> RoomClosureCheckAsync(CancellationToken cancellationToken);
 
     Task<RoomDal?> FindAsync(Guid id, CancellationToken cancellationToken);
 

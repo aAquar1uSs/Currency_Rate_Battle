@@ -12,7 +12,7 @@ public static class RoomConverter
 
     public static Room ToDomain(this RoomDal roomDal)
     {
-        return Room.Create(roomDal.Id, roomDal.Date, roomDal.IsClosed);
+        return Room.Create(roomDal.Id, roomDal.EndDate, roomDal.IsClosed);
     }
 
     public static RoomDal ToDal(this Room room)
@@ -20,7 +20,7 @@ public static class RoomConverter
         return new RoomDal
         {
             Id = room.Id.Id,
-            Date = room.CreatedDate,
+            EndDate = room.EndDate,
             IsClosed = room.IsClosed
         };
     }

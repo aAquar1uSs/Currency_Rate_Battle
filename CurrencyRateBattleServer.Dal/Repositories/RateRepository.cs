@@ -2,6 +2,7 @@
 using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
+using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -29,13 +30,13 @@ public class RateRepository : IRateRepository
         _ = await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Rate[]> GetRateByRoomIdAsync(Guid roomId)
+    public async Task<Rate[]> GetRateByRoomIdAsync(RoomId[] roomIds, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(GetRateByRoomIdAsync)} was caused.");
 
         var rates = await _dbContext.Rates
-            .Where(dal => dal.Room.Id == roomId)
-            .ToArrayAsync();
+            .Where(dal => roomIds.Any(x => x.Id == dal.RoomId))
+            .ToArrayAsync(cancellationToken);
 
         return rates.ToDomain();
     }
@@ -59,16 +60,16 @@ public class RateRepository : IRateRepository
     {
         _logger.LogInformation($"{nameof(FindAsync)} was caused.");
 
-        Guid? currencyId = Guid.Empty;
+        var currencyId = string.Empty;
         if (currencyCode is not null)
         {
             var currency = await _dbContext.Currencies.FirstOrDefaultAsync(c => c.CurrencyName == currencyCode, cancellationToken);
-            currencyId = currency?.Id;
+            currencyId = currency?.CurrencyCode;
         }
 
         RateDal[] result;
-        if (currencyId is not null || currencyId != Guid.Empty)
-            result = await _dbContext.Rates.Where(dal => dal.Currency.Id == currencyId).ToArrayAsync(cancellationToken);
+        if (currencyId is not null || currencyId != string.Empty)
+            result = await _dbContext.Rates.Where(dal => dal.Currency.CurrencyCode == currencyId).ToArrayAsync(cancellationToken);
 
         result = isActive switch
         {

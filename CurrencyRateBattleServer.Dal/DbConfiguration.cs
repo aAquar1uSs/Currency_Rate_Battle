@@ -28,6 +28,7 @@ public static class DbConfiguration
                  .AddScoped<IPaymentRepository, PaymentRepository>()
                  .AddScoped<IUserRatingQueryRepository, UserRatingQueryRepository>()
                  .AddScoped<IUserRepository, UserRepository>()
-                 .AddScoped<IRoomQueryRepository, RoomQueryRepository>();
+                 .AddScoped<IRoomQueryRepository, RoomQueryRepository>()
+                 .AddScoped<ICurrencyRepository, CurrencyRepository>();
          }
 }

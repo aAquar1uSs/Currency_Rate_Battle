@@ -8,7 +8,7 @@ public class CurrencyStateDal
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; }
 
-    public DateTime Date { get; set; }
+    public DateTime UpdateDate { get; set; }
 
     public decimal CurrencyExchangeRate { get; set; }
     
@@ -16,9 +16,8 @@ public class CurrencyStateDal
     
     [ForeignKey("RoomId")]
     public RoomDal Room { get; set; }
-    
-    public Guid CurrencyId { get; set; }
 
-    [ForeignKey("CurrencyId")]
-    public CurrencyDal Currency { get; set; }
+    public string CurrencyName { get; set; }
+    
+    public string CurrencyCode { get; set; }
 }

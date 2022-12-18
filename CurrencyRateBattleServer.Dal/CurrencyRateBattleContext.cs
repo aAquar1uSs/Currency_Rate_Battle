@@ -43,35 +43,30 @@ public class CurrencyRateBattleContext : DbContext
         _ = modelBuilder.Entity<CurrencyDal>()
             .HasData(new CurrencyDal
             {
-                Id = Guid.NewGuid(),
                 CurrencyName = "USD",
                 CurrencyCode = "$",
                 Description = "US Dollar"
             },
             new CurrencyDal
             {
-                Id = Guid.NewGuid(),
                 CurrencyName = "EUR",
                 CurrencyCode = "$",
                 Description = "Euro"
             },
             new CurrencyDal
             {
-                Id = Guid.NewGuid(),
                 CurrencyName = "PLN",
                 CurrencyCode = "zł",
                 Description = "Polish Zlotych"
             },
             new CurrencyDal
             {
-                Id = Guid.NewGuid(),
                 CurrencyName = "GBP",
                 CurrencyCode = "£",
                 Description = "British Pound"
             },
             new CurrencyDal
             {
-                Id = Guid.NewGuid(),
                 CurrencyName = "CHF",
                 CurrencyCode = "Fr",
                 Description = "Swiss Franc"
@@ -79,7 +74,7 @@ public class CurrencyRateBattleContext : DbContext
 
         //unique constraints
         _ = modelBuilder.Entity<CurrencyStateDal>()
-            .HasIndex(cs => new { cs.RoomId, cs.CurrencyId })
+            .HasIndex(cs => new { cs.RoomId, cs.CurrencyCode })
             .IsUnique(true);
     }
 }

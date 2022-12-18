@@ -11,12 +11,15 @@ public class CurrencyName
         Value = value;
     }
 
-    public static CurrencyName Create(string value) => new(value);
+    public static CurrencyName Create(string value) => new CurrencyName(value);
 
     public static Result<CurrencyName> TryCreate(string value)
     {
         if (string.IsNullOrEmpty(value))
             return Result.Failure<CurrencyName>("Currency symbols can not be null or empty");
+        
+        if (value.Length != 3)
+            return Result.Failure<CurrencyName>("CurrencyCode can not be less or more than 3 symbols");
 
         return new CurrencyName(value);
     }

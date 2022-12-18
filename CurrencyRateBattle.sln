@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyRateBattleServer.Do
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyRateBattleServer.Dal", "CurrencyRateBattleServer.Dal\CurrencyRateBattleServer.Dal.csproj", "{9D8A16A5-97A0-4C06-94BB-47D585F3E5AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NbuClient", "NbuClient\NbuClient.csproj", "{FD28FE20-C3C2-4CC0-82D2-AF5990D36521}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{9D8A16A5-97A0-4C06-94BB-47D585F3E5AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D8A16A5-97A0-4C06-94BB-47D585F3E5AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D8A16A5-97A0-4C06-94BB-47D585F3E5AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD28FE20-C3C2-4CC0-82D2-AF5990D36521}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD28FE20-C3C2-4CC0-82D2-AF5990D36521}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD28FE20-C3C2-4CC0-82D2-AF5990D36521}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD28FE20-C3C2-4CC0-82D2-AF5990D36521}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{78E20CF4-C1A6-411C-94C1-A02925685B88} = {C410E5ED-BBE9-49D2-845D-33C898B7BFDA}
 		{8DF4DDCF-EB02-45CD-BA72-BB8874EB6528} = {C410E5ED-BBE9-49D2-845D-33C898B7BFDA}
 		{9D8A16A5-97A0-4C06-94BB-47D585F3E5AB} = {C410E5ED-BBE9-49D2-845D-33C898B7BFDA}
+		{FD28FE20-C3C2-4CC0-82D2-AF5990D36521} = {C410E5ED-BBE9-49D2-845D-33C898B7BFDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A2574B94-42E4-4924-B08C-C53F2F7744FF}

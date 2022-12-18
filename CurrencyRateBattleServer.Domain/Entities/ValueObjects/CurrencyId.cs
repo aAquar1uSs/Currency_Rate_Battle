@@ -18,5 +18,5 @@ public class CurrencyId : OneId
     
     public static CurrencyId Create(Guid id) => new CurrencyId(id);
     
-    public static CurrencyId GenerateAccountId() => new CurrencyId(Guid.NewGuid());
+    public static CurrencyId GenerateId() => new CurrencyId(Guid.NewGuid());
 }

@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using CurrencyRateBattleServer.Dal.Converters;
 using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Dal.Services.Interfaces;
@@ -23,33 +24,34 @@ public class RoomRepository : IRoomRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task GenerateRoomsByCurrencyCountAsync()
+    //Add Settings to count of rooms
+    public async Task CreateAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(GenerateRoomsByCurrencyCountAsync)} was caused");
+        _logger.LogInformation($"{nameof(CreateAsync)} was caused");
 
         foreach (var curr in _dbContext.Currencies)
         {
-            _ = await _dbContext.CurrencyStates.AddAsync(await CreateRoomWithCurrencyStateAsync(curr));
+            _ = await _dbContext.CurrencyStates.AddAsync(await CreateRoomWithCurrencyStateAsync(curr), cancellationToken);
         }
 
-        _ = await _dbContext.SaveChangesAsync();
+        _ = await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
 
-public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
+    private Task<CurrencyStateDal> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
     {
         _logger.LogInformation($"{nameof(CreateRoomWithCurrencyStateAsync)} was caused");
         var currentDate = DateTime.ParseExact(
             DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
             "MM.dd.yyyy HH:mm:ss", null);
 
-        return Task.FromResult(new CurrencyState
+        return Task.FromResult(new CurrencyStateDal
         {
-            Date = currentDate,
+            UpdateDate = currentDate,
             CurrencyExchangeRate = 0,
-            Currency = curr,
-            CurrencyId = curr.Id,
-            Room = new RoomDal { Date = currentDate.AddDays(1), IsClosed = false }
+            CurrencyName = curr.CurrencyName,
+            CurrencyCode = curr.CurrencyCode,
+            Room = new RoomDal { EndDate = currentDate.AddDays(1), IsClosed = false }
         });
     }
 
@@ -61,38 +63,30 @@ public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
         _ = await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task CheckRoomsStateAsync()
-    {
-        _logger.LogInformation($"{nameof(CheckRoomsStateAsync)} was caused");
-
-        foreach (var room in _dbContext.Rooms)
-        {
-            await RoomClosureCheckAsync(room);
-            await CalculateRatesIfRoomClosed(room);
-        }
-    }
-
-    private async Task RoomClosureCheckAsync(RoomDal roomDal)
+    public async Task<Room[]> RoomClosureCheckAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(RoomClosureCheckAsync)} was caused");
-        if ((roomDal.Date.Date == DateTime.Today
-             && roomDal.Date.Hour == DateTime.UtcNow.AddHours(1).Hour)
-            || ((roomDal.Date.Date == DateTime.Today.AddDays(1))
-            && roomDal.Date.Hour == 0 && DateTime.UtcNow.Hour == 23)
-            || DateTime.UtcNow > roomDal.Date)
-        {
-            roomDal.IsClosed = true;
-            await UpdateAsync(roomDal.Id, roomDal);
-        }
+        var closedRooms = await _dbContext.Rooms
+            .Where(dal => (dal.EndDate.Date == DateTime.Today
+                           && dal.EndDate.Hour == DateTime.UtcNow.AddHours(1).Hour)
+                          || ((dal.EndDate.Date == DateTime.Today.AddDays(1))
+                              && dal.EndDate.Hour == 0 && DateTime.UtcNow.Hour == 23)
+                          || DateTime.UtcNow > dal.EndDate)
+            .Select(dal => new RoomDal() { EndDate = dal.EndDate, IsClosed = true, Id = dal.Id })
+            .ToArrayAsync(cancellationToken);
+        _dbContext.Rooms.UpdateRange(closedRooms);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return closedRooms.ToDomain();
     }
 
     private async Task CalculateRatesIfRoomClosed(RoomDal roomDal)
     {
         _logger.LogInformation($"{nameof(CalculateRatesIfRoomClosed)} was caused");
-        if ((roomDal.Date.Date == DateTime.Today
-             && roomDal.Date.Hour == DateTime.UtcNow.Hour
+        if ((roomDal.EndDate.Date == DateTime.Today
+             && roomDal.EndDate.Hour == DateTime.UtcNow.Hour
              && roomDal.IsClosed)
-            || (DateTime.UtcNow > roomDal.Date
+            || (DateTime.UtcNow > roomDal.EndDate
                 && roomDal.IsClosed))
         {
             await _rateCalculationRepository.StartRateCalculationByRoomIdAsync(roomDal.Id);
@@ -111,10 +105,10 @@ public Task<CurrencyState> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
         _logger.LogInformation($"{nameof(DeleteAsync)} was caused");
         var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == roomId.Id, cancellationToken);
 
-            if (room is null)
-                return;
+        if (room is null)
+            return;
 
-            _ = _dbContext.Remove(room);
-            _ = await _dbContext.SaveChangesAsync(cancellationToken);
+        _ = _dbContext.Remove(room);
+        _ = await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

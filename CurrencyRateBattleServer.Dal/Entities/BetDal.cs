@@ -24,9 +24,7 @@ public class BetDal
 
     public Guid RoomId { get; set; }
 
-    public string CurrencyName { get; set; }
-
-    public Guid CurrencyId { get; set; }
+    public string CurrencyCode { get; set; }
 
     public decimal? CurrencyExchangeRate { get; set; }
 }

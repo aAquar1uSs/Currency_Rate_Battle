@@ -41,7 +41,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
             return Result.Failure<MakeBetResponse>(roomIdResult.Error);
         
         var currencyId = await _currencyStateRepository.GetCurrencyIdByRoomIdAsync(roomIdResult.Value, cancellationToken);
-        var currencyIdResult = CurrencyId.TryCreate(currencyId);
+        var currencyIdResult = CurrencyCode.TryCreate(currencyId);
         if (currencyIdResult.IsFailure)
             return Result.Failure<MakeBetResponse>(currencyIdResult.Error);
         
@@ -55,7 +55,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
 
         var rate = Rate.Create(OneId.GenerateId().Id, DateTime.UtcNow, rateToCreate.UserCurrencyExchange,
             rateToCreate.Amount, null, null, false, false, roomIdResult.Value.Id,
-            currencyIdResult.Value.Id, account.Id.Id);
+            currencyIdResult.Value.Value, account.Id.Id);
 
         await _rateRepository.CreateAsync(rate, cancellationToken);
 

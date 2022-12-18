@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace CurrencyRateBattleServer.ApplicationServices.Dto;
+namespace NbuClient.Dto;
 
-public class CurrencyStateDto
+public class CurrencyDto
 {
     [JsonPropertyName("rate")]
     public decimal Rate { get; set; }

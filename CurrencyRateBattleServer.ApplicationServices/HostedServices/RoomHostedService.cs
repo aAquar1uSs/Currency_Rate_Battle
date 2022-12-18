@@ -1,23 +1,22 @@
-﻿using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
+﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.GenerateRoomHandler;
+using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
+using MediatR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace CurrencyRateBattleServer.Dal.Services.HostedServices;
+namespace CurrencyRateBattleServer.ApplicationServices.HostedServices;
 
 public class RoomHostedService : IHostedService, IDisposable
 {
     private readonly ILogger<RoomHostedService> _logger;
-
+    private readonly IMediator _mediator;
     private Timer? _timer;
 
-    private readonly IRoomRepository _roomRepository;
-
     public RoomHostedService(ILogger<RoomHostedService> logger,
-        IRoomRepository roomRepository)
+        IMediator mediator)
     {
         _logger = logger;
-        _roomRepository = roomRepository;
+        _mediator = mediator;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -33,7 +32,8 @@ public class RoomHostedService : IHostedService, IDisposable
     private async void Callback(object? state)
     {
         _logger.LogInformation("GenerateRoomsByCurrencyCountAsync has been invoked.");
-        await _roomRepository.GenerateRoomsByCurrencyCountAsync();
+        var command = new GenerateRoomCommand();
+        _ = await _mediator.Send(command);
         _logger.LogInformation("GenerateRoomsByCurrencyCountAsync сompleted the execution.");
     }
 

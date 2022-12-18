@@ -1,8 +1,9 @@
-﻿using CurrencyRateBattleServer.Dto;
+﻿using CurrencyRateBattleServer.ApplicationServices.Dto;
+using CurrencyRateBattleServer.Dto;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyStateHandlers.GetCurrencyRates;
 
 public class GetCurrencyStateResponse
 {
-    public CurrencyStateDto[] CurrencyStates { get; set; }
+    public CurrencyDto[] CurrencyStates { get; set; }
 }

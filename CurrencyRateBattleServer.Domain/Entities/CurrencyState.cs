@@ -12,24 +12,32 @@ public class CurrencyState
     public Amount CurrencyExchangeRate { get; }
 
     public RoomId RoomId { get; }
-
-    public CurrencyId CurrencyId { get; }
+    
+    public CurrencyCode CurrencyCode { get; set; }
+    
+    public CurrencyName CurrencyName { get; set; }
 
     private CurrencyState(OneId id,
         DateTime date,
         Amount currencyExchangeRate,
         RoomId roomId,
-        CurrencyId currencyId)
+        CurrencyCode currencyCode,
+        CurrencyName currencyName)
     {
         Id = id;
         Date = date;
         CurrencyExchangeRate = currencyExchangeRate;
         RoomId = roomId;
-        CurrencyId = currencyId;
+        CurrencyCode = currencyCode;
+        CurrencyName = currencyName;
     }
 
-    public static Result<CurrencyState> TryCreate(Guid id, DateTime date, decimal currencyExchange, Guid roomId,
-        Guid currencyId)
+    public static Result<CurrencyState> TryCreate(Guid id,
+        DateTime date,
+        decimal currencyExchange,
+        Guid roomId,
+        string currencyCode,
+        string currencyName)
     {
         var oneIdResult = OneId.TryCreate(id);
         if (oneIdResult.IsFailure)
@@ -43,16 +51,28 @@ public class CurrencyState
         if (roomOneIdResult.IsFailure)
             return Result.Failure<CurrencyState>(roomOneIdResult.Error);
 
-        var currencyOneIdResult = CurrencyId.TryCreate(currencyId);
-        if (currencyExchangeRateResult.IsFailure)
-            return Result.Failure<CurrencyState>(currencyExchangeRateResult.Error);
+        var currencyCodeResult = CurrencyCode.TryCreate(currencyCode);
+        if (currencyCodeResult.IsFailure)
+            return Result.Failure<CurrencyState>(currencyCodeResult.Error);
 
-        return new CurrencyState(oneIdResult.Value, date, currencyExchangeRateResult.Value, roomOneIdResult.Value,
-            currencyOneIdResult.Value);
+        var currencyNameResult = CurrencyName.TryCreate(currencyName);
+        if (currencyNameResult.IsFailure)    
+            return Result.Failure<CurrencyState>(currencyCodeResult.Error);
+        
+        return new CurrencyState(oneIdResult.Value,
+            date,
+            currencyExchangeRateResult.Value,
+            roomOneIdResult.Value,
+            currencyCodeResult.Value,
+            currencyNameResult.Value);
     }
     
-    public static CurrencyState Create(Guid id, DateTime date, decimal currencyExchange, Guid roomId,
-        Guid currencyId)
+    public static CurrencyState Create(Guid id,
+        DateTime date,
+        decimal currencyExchange,
+        Guid roomId,
+        string currencyCode,
+        string currencyName)
     {
         var oneId = OneId.Create(id);
 
@@ -60,9 +80,13 @@ public class CurrencyState
 
         var roomOneId = RoomId.Create(roomId);
 
-        var currencyOneId = CurrencyId.Create(currencyId);
-
-        return new CurrencyState(oneId, date, currencyExchangeRate, roomOneId,
-            currencyOneId);
+        var currencyCodeDomain = CurrencyCode.Create(currencyCode);
+        var currencyNameDomain = CurrencyName.Create(currencyName);
+        return new CurrencyState(oneId,
+            date,
+            currencyExchangeRate,
+            roomOneId,
+            currencyCodeDomain,
+            currencyNameDomain);
     }
 }

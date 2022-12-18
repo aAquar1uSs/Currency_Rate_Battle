@@ -1,25 +1,22 @@
-﻿using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
+﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.CalculationRateHandler;
+using MediatR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace CurrencyRateBattleServer.Dal.Services.HostedServices;
+namespace CurrencyRateBattleServer.ApplicationServices.HostedServices;
 
 public class RateHostedService : IHostedService, IDisposable
 {
     private Timer? _timer;
-
     private static readonly object _sync = new();
-
     private readonly ILogger<RateHostedService> _logger;
-
-    private readonly IRoomRepository _roomRepository;
+    private readonly IMediator _mediator;
 
     public RateHostedService(ILogger<RateHostedService> logger,
-        IRoomRepository roomRepository)
+        IMediator mediator)
     {
-        _logger = logger;
-        _roomRepository = roomRepository;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -49,7 +46,8 @@ public class RateHostedService : IHostedService, IDisposable
     private async void Callback(object? state)
     {
         _logger.LogInformation("CheckRoomsStateAsync has been invoked.");
-        await _roomRepository.CheckRoomsStateAsync();
+        var command = new CalculationRateCommand();
+        _ = await _mediator.Send(command);
         _logger.LogInformation("CheckRoomsStateAsync сompleted the execution.");
     }
 

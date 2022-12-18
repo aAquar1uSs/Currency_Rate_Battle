@@ -9,7 +9,7 @@ public class RoomDal
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
 
-    public DateTime Date { get; set; }
+    public DateTime EndDate { get; set; }
 
     public bool IsClosed { get; set; }
     

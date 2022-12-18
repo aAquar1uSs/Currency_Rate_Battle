@@ -24,17 +24,17 @@ public class RoomQueryRepository : IRoomQueryRepository
         _logger.LogInformation($"{nameof(FindAsync)} was caused");
         
         var result = from curr in _dbContext.Currencies
-            join currState in _dbContext.CurrencyStates on curr.Id equals currState.CurrencyId
+            join currState in _dbContext.CurrencyStates on curr.CurrencyCode equals currState.CurrencyCode
             join room in _dbContext.Rooms on currState.RoomId equals room.Id
             where room.IsClosed == isClosed
             select new RoomInfoDal
             {
                 Id = room.Id,
                 CurrencyName = curr.CurrencyName,
-                Date = room.Date,
+                Date = room.EndDate,
                 IsClosed = room.IsClosed,
                 CurrencyExchangeRate = currState.CurrencyExchangeRate,
-                UpdateRateTime = currState.Date,
+                UpdateRateTime = currState.UpdateDate,
                 CountRates = _dbContext.Rates.Count(r => r.RoomId == room.Id)
             };
         var roomInfos = await result.ToArrayAsync(cancellationToken);
@@ -47,16 +47,16 @@ public class RoomQueryRepository : IRoomQueryRepository
         var filteredRooms =
             await (from currencyState in _dbContext.CurrencyStates
             join room in _dbContext.Rooms on currencyState.RoomId equals room.Id
-            join curr in _dbContext.Currencies on currencyState.CurrencyId equals curr.Id
+            join curr in _dbContext.Currencies on currencyState.CurrencyCode equals curr.CurrencyCode
             where room.IsClosed == false
             select new RoomInfoDal
             {
                 Id = room.Id,
-                Date = room.Date,
+                Date = room.EndDate,
                 CurrencyExchangeRate = currencyState.CurrencyExchangeRate,
                 IsClosed = room.IsClosed,
                 CurrencyName = curr.CurrencyName,
-                UpdateRateTime = currencyState.Date,
+                UpdateRateTime = currencyState.UpdateDate,
                 CountRates = _dbContext.Rates.Count(r => r.RoomId == room.Id)
             }).ToArrayAsync(cancellationToken);
 

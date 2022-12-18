@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Dto;
 
@@ -6,17 +7,24 @@ namespace CurrencyRateBattleServer.ApplicationServices.Converters;
 
 public static class CurrencyStateConverter
 {
-    public static CurrencyStateDto[] ToDto(this CurrencyState[] currencyStates)
+    public static CurrencyDto[] ToDto(this CurrencyState[] currencyStates)
     {
         return currencyStates.Select(x => x.ToDto()).ToArray();
     }
 
-    private static CurrencyStateDto ToDto(this CurrencyState currencyState)
+    private static CurrencyDto ToDto(this CurrencyState currencyState)
     {
-        return new CurrencyStateDto
+        return new CurrencyDto
         {
             Currency = currencyState.,
             Date = currencyState.Date.ToString(CultureInfo.InvariantCulture),
             Rate = currencyState.CurrencyExchangeRate.Value
+        };
+
+    }
+
+    public static Currency ToDomain(this NbuClient.Dto.CurrencyDto currencyDto)
+    {
+        return Currency.Create(currencyDto.Currency, currencyDto.Rate);
     }
 }

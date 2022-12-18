@@ -7,7 +7,7 @@ public class Room
 {
     public RoomId Id { get; }
 
-    public DateTime CreatedDate { get; }
+    public DateTime EndDate { get; }
 
     public bool IsClosed { get; }
 
@@ -16,7 +16,7 @@ public class Room
         bool isClosed)
     {
         Id = id;
-        CreatedDate = date;
+        EndDate = date;
         IsClosed = isClosed;
     }
 

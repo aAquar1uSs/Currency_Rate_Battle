@@ -14,7 +14,7 @@ public static class RateConverter
             rate.RateCurrencyExchange, rate.Amount,
             rate.SettleDate, rate.Payout,
             rate.IsClosed, rate.IsWon,
-            rate.RoomId, rate.CurrencyId,
+            rate.RoomId, rate.CurrencyCode,
             rate.AccountId);
     }
 
@@ -24,7 +24,7 @@ public static class RateConverter
         {
             AccountId = rate.AccountId.Id,
             Amount = rate.Amount.Value,
-            CurrencyId = rate.CurrencyId.Id,
+            CurrencyCode = rate.CurrencyCode.Value,
             IsClosed = rate.IsClosed,
             IsWon = rate.IsWon,
             Id = rate.Id.Id,

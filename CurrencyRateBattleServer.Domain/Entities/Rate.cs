@@ -16,15 +16,15 @@ public class Rate
     //Date when the rate is settled
     public DateTime? SettleDate { get; }
 
-    public Payout? Payout { get; }
+    public Payout? Payout { get; private set; }
 
-    public bool IsClosed { get; }
+    public bool IsClosed { get; private set; }
 
     public bool IsWon { get; }
 
     public RoomId RoomId { get; }
 
-    public CurrencyId CurrencyId { get; }
+    public CurrencyCode CurrencyCode { get; }
 
     public AccountId AccountId { get; }
 
@@ -37,7 +37,7 @@ public class Rate
         bool isClosed,
         bool isWon,
         RoomId roomId,
-        CurrencyId currencyId,
+        CurrencyCode currencyCode,
         AccountId accountId)
     {
         Id = id;
@@ -49,7 +49,7 @@ public class Rate
         IsClosed = isClosed;
         IsWon = isWon;
         RoomId = roomId;
-        CurrencyId = currencyId;
+        CurrencyCode = currencyCode;
         AccountId = accountId;
     }
 
@@ -62,7 +62,7 @@ public class Rate
         bool isClosed,
         bool isWon,
         Guid roomId,
-        Guid currencyId,
+        string currencyCode,
         Guid accountId)
     {
         var oneIdResult = OneId.TryCreate(id);
@@ -81,9 +81,9 @@ public class Rate
         if (roomOneIdResult.IsFailure)
             return Result.Failure<Rate>(roomOneIdResult.Error);
 
-        var currencyOneIdResult = CurrencyId.TryCreate(currencyId);
-        if (currencyOneIdResult.IsFailure)
-            return Result.Failure<Rate>(currencyOneIdResult.Error);
+        var currencyCodeResult = CurrencyCode.TryCreate(currencyCode);
+        if (currencyCodeResult.IsFailure)
+            return Result.Failure<Rate>(currencyCodeResult.Error);
 
         var accountOneIdResult = AccountId.TryCreate(accountId);
         if (accountOneIdResult.IsFailure)
@@ -91,7 +91,7 @@ public class Rate
 
         if (payout is null)
             return new Rate(oneIdResult.Value, setDate, rateCurrencyExchangeResult.Value, amountResult.Value,
-                settleDate, null, isClosed, isWon, roomOneIdResult.Value, currencyOneIdResult.Value,
+                settleDate, null, isClosed, isWon, roomOneIdResult.Value, currencyCodeResult.Value,
                 accountOneIdResult.Value);
 
         var payoutResult = Payout.TryCreate((decimal)payout);
@@ -99,7 +99,7 @@ public class Rate
             return Result.Failure<Rate>(payoutResult.Error);
 
         return new Rate(oneIdResult.Value, setDate, rateCurrencyExchangeResult.Value, amountResult.Value,
-            settleDate, payoutResult.Value, isClosed, isWon, roomOneIdResult.Value, currencyOneIdResult.Value,
+            settleDate, payoutResult.Value, isClosed, isWon, roomOneIdResult.Value, currencyCodeResult.Value,
             accountOneIdResult.Value);
     }
     
@@ -112,7 +112,7 @@ public class Rate
         bool isClosed,
         bool isWon,
         Guid roomId,
-        Guid currencyId,
+        string currency,
         Guid accountId)
     {
         var oneId = OneId.Create(id);
@@ -120,18 +120,36 @@ public class Rate
         var amountDomain = Amount.Create(amount);
 
         var roomOneId = RoomId.Create(roomId);
-        var currencyOneId = CurrencyId.Create(currencyId);
+        var currencyCode = CurrencyCode.Create(currency);
 
         var accountOneId = AccountId.Create(accountId);
         if (payout is null)
             return new Rate(oneId, setDate, rateExchange, amountDomain,
-                settleDate, null, isClosed, isWon, roomOneId, currencyOneId,
+                settleDate, null, isClosed, isWon, roomOneId, currencyCode,
                 accountOneId);
 
         var payoutDomain = Payout.Create((decimal)payout);
 
         return new Rate(oneId, setDate, rateExchange, amountDomain,
-            settleDate, payoutDomain, isClosed, isWon, roomOneId, currencyOneId,
+            settleDate, payoutDomain, isClosed, isWon, roomOneId, currencyCode,
             accountOneId);
+    }
+
+    public void Change(bool isClosed, 
+        decimal payout)
+    {
+        IsClosed = isClosed;
+        Payout = Payout.Create(payout);
+    }
+    
+    public Result Change(decimal payout,
+        bool isClosed)
+    {
+        var payoutResult = Payout.TryCreate(payout);
+        if (payoutResult.IsFailure)
+            return Result.Failure(payoutResult.Error);
+
+        IsClosed = isClosed;
+        return Result.Success();
     }
 }

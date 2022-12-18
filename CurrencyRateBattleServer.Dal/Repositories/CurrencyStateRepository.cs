@@ -1,77 +1,51 @@
 ﻿using System.Globalization;
-using System.Text.Json;
+using CurrencyRateBattleServer.Dal.Converters;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
-using CurrencyRateBattleServer.Dal.Services.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using NbuClient;
 
 namespace CurrencyRateBattleServer.Dal.Repositories;
 
 public class CurrencyStateRepository : ICurrencyStateRepository
 {
-    private const string NBU_API = "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json";
-
     private readonly ILogger<CurrencyStateRepository> _logger;
-
     private readonly CurrencyRateBattleContext _dbContext;
 
     public CurrencyStateRepository(ILogger<CurrencyStateRepository> logger,
         CurrencyRateBattleContext dbContext)
     {
-        _logger = logger;
-        _dbContext = dbContext;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task<Guid> GetCurrencyIdByRoomIdAsync(RoomId roomId, CancellationToken cancellationToken)
+    public async Task<string> GetCurrencyIdByRoomIdAsync(RoomId roomId, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetCurrencyIdByRoomIdAsync)}, was caused.");
 
         var currId = await _dbContext.CurrencyStates
             .Where(currState => currState.Room.Id == roomId.Id)
-            .Select(currState => currState.Currency.Id).FirstAsync(cancellationToken);
+            .Select(currState => currState.CurrencyCode).FirstAsync(cancellationToken);
 
         return currId;
     }
 
-    public async Task PrepareUpdateCurrencyRateAsync()
-    {
-        _logger.LogDebug($"{nameof(PrepareUpdateCurrencyRateAsync)}, was caused.");
-
-        await GetCurrencyRatesFromNbuApiAsync();
-
-        foreach (var room in _dbContext.Rooms)
-        {
-            if ((room.Date.Date == DateTime.UtcNow.Date
-                 && room.Date.Hour == DateTime.UtcNow.Hour)
-                || DateTime.UtcNow.Date > room.Date.Date)
-            {
-                var currencyState = await GetCurrencyStateByRoomIdAsync(room.Id);
-
-                if (currencyState != null)
-                    await UpdateCurrencyRateAsync(currencyState);
-            }
-        }
-    }
-
-    public async Task<CurrencyState?> GetCurrencyStateByRoomIdAsync(Guid roomId)
+    public async Task<CurrencyState?> GetCurrencyStateByRoomIdAsync(RoomId roomId, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetCurrencyStateByRoomIdAsync)}, was caused.");
 
         var currencyState = await _dbContext.CurrencyStates
-            .FirstOrDefaultAsync(currState => currState.Room.Id == roomId);
+            .FirstOrDefaultAsync(currState => currState.Room.Id == roomId.Id, cancellationToken);
 
-        return currencyState.ToDomain();
+        return currencyState?.ToDomain();
     }
 
     public async Task<CurrencyState[]> GetCurrencyStateAsync()
     {
         _logger.LogDebug($"{nameof(GetCurrencyStateAsync)} was caused");
 
-        if (_rateStorage is null)
-            return Array.Empty<CurrencyState>();
-        
         List<CurrencyState> currencyStates = new();
         foreach (var curr in _dbContext.Currencies)
         {
@@ -82,25 +56,11 @@ public class CurrencyStateRepository : ICurrencyStateRepository
 
             currencyStates.Add(item);
         }
-
+        
         return await Task.FromResult(currencyStates.ToArray());
     }
 
-    public async Task GetCurrencyRatesFromNbuApiAsync()
-    {
-        _logger.LogDebug($"{nameof(GetCurrencyRatesFromNbuApiAsync)} was caused");
-
-        using var client = new HttpClient();
-        client.BaseAddress = new Uri(NBU_API);
-
-        var stream = await client.GetStreamAsync(NBU_API);
-        _rateStorage = await JsonSerializer.DeserializeAsync<List<CurrencyStateDto>>(stream);
-
-        if (_rateStorage is null)
-            throw new ArgumentException(nameof(_rateStorage));
-    }
-
-    public async Task UpdateCurrencyRateAsync(CurrencyState currencyState)
+    public async Task UpdateCurrencyRateAsync(Currency currency, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(UpdateCurrencyRateAsync)} was caused");
 
@@ -108,23 +68,17 @@ public class CurrencyStateRepository : ICurrencyStateRepository
             DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
             "MM.dd.yyyy HH:mm:ss", null);
 
-        var currencyName = (await _dbContext.Currencies
-            .FirstOrDefaultAsync(curr => curr.Id == currencyState.CurrencyId))?.CurrencyName;
-
-        if (_rateStorage is null)
+        var currencyState = (await _dbContext.CurrencyStates
+            .FirstOrDefaultAsync(curr => curr.CurrencyCode == currency.CurrencyCode.Value, cancellationToken: cancellationToken));
+        if (currencyState is null)
             return;
-
-        var currencyDto = _rateStorage.FirstOrDefault(curr => curr.Currency == currencyName);
-
-        if (currencyDto is null)
-            return;
-
-        currencyState.Date = currentDate;
-        currencyState.CurrencyExchangeRate = Math.Round(currencyDto.Rate, 2);
+        
+        currencyState.UpdateDate = currentDate;
+        currencyState.CurrencyExchangeRate = Math.Round(currency.Rate.Value, 2);
 
         _ = _dbContext.CurrencyStates.Update(currencyState);
 
-        _ = await _dbContext.SaveChangesAsync();
+        _ = await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }
 
