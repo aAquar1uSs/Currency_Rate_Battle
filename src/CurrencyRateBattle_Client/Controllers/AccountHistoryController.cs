@@ -12,7 +12,6 @@ namespace CRBClient.Controllers;
 public class AccountHistoryController : Controller
 {
     private readonly ILogger<AccountHistoryController> _logger;
-
     private readonly IUserService _userService;
 
     public AccountHistoryController(ILogger<AccountHistoryController> logger,
@@ -31,7 +30,6 @@ public class AccountHistoryController : Controller
             try
             {
                 var accountHistoryInfo = await _userService.GetAccountHistoryAsync();
-                //accountHistories = accountHistoryInfo.ToPagedList(pageIndex, pageSize);
                 var accountHistories = PagedListExtensions.ToPagedList(accountHistoryInfo, pageIndex, pageSize);
                 return View(accountHistories);
             }

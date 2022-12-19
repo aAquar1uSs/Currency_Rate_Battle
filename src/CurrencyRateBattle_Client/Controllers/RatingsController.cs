@@ -12,11 +12,8 @@ namespace CRBClient.Controllers;
 public class RatingsController : Controller
 {
     private readonly ILogger<RatingsController> _logger;
-
     private readonly IRatingService _ratingService;
-
     private readonly IUserService _userService;
-
     private const int PageSize = 10;
 
     public RatingsController(ILogger<RatingsController> logger,

@@ -10,9 +10,7 @@ namespace CRBClient.Controllers;
 public class RateController : Controller
 {
     private readonly ILogger<RateController> _logger;
-
     private readonly IUserRateService _rateService;
-
     private readonly IUserService _userService;
 
     public RateController(ILogger<RateController> logger,

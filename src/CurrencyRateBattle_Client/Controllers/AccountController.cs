@@ -10,7 +10,6 @@ namespace CRBClient.Controllers;
 public class AccountController : Controller
 {
     private readonly ILogger<AccountController> _logger;
-
     private readonly IUserService _userService;
 
     public AccountController(ILogger<AccountController> logger,

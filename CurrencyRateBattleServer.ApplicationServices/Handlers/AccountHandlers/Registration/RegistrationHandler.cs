@@ -49,17 +49,15 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
             return Result.Failure<RegistrationResponse>("User with such email already exist");
 
         var customAccountId = AccountId.GenerateId();
-        var accountResult = Account.TryCreateNewAccount(customAccountId.Id, customAccountId.Id);
-        if (accountResult.IsFailure)
-            return Result.Failure<RegistrationResponse>(accountResult.Error);
-        var account = accountResult.Value;
+        var account = Account.TryCreateNewAccount(customAccountId, customUserId);
 
         var amountResult = Amount.TryCreate(_options.RegistrationReward);
         if (amountResult.IsFailure)
             return Result.Failure<RegistrationResponse>(amountResult.Error);
 
-        accountResult.Value.AddStartBalance(amountResult.Value);
-
+        account.AddStartBalance(amountResult.Value);
+        user.AddAccount(account.Id);
+        
         await _accountRepository.CreateAccountAsync(account, cancellationToken);
 
         await _userRepository.CreateAsync(user, cancellationToken);

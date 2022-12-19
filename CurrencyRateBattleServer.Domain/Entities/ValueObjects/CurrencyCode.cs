@@ -23,4 +23,9 @@ public class CurrencyCode
 
         return new CurrencyCode(value);
     }
+
+    public override string ToString()
+    {
+        return Value;
+    }
 }

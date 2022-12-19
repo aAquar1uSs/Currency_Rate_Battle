@@ -15,16 +15,6 @@ public static class RoomConverter
         return Room.Create(roomDal.Id, roomDal.EndDate, roomDal.IsClosed);
     }
 
-    public static RoomDal ToDal(this Room room)
-    {
-        return new RoomDal
-        {
-            Id = room.Id.Id,
-            EndDate = room.EndDate,
-            IsClosed = room.IsClosed
-        };
-    }
-
     public static RoomInfo ToDomain(this RoomInfoDal dal)
     {
         return new()

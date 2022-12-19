@@ -4,5 +4,5 @@ namespace CRBClient.Services.Interfaces;
 
 public interface ICurrencyStateService
 {
-    Task<List<CurrencyStateDto>> GetCurrencyRatesAsync();
+    Task<List<CurrencyDto>> GetCurrencyRatesAsync();
 }

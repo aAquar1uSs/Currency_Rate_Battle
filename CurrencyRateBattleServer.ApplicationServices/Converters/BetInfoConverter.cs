@@ -9,7 +9,7 @@ public static class BetInfoConverter
     {
         return new BetInfoDto
         {
-            СurrencyName = bet.СurrencyName,
+            СurrencyName = bet.CurrencyName,
             BetAmount = bet.BetAmount,
             Id = bet.Id,
             IsClosed = bet.IsClosed,

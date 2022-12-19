@@ -12,9 +12,7 @@ namespace CRBClient.Controllers;
 public class BetController : Controller
 {
     private readonly ILogger<BetController> _logger;
-
     private readonly IUserService _userService;
-
     private readonly IUserRateService _userRateService;
 
     public BetController(ILogger<BetController> logger,

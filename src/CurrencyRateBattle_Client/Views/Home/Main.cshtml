@@ -59,7 +59,7 @@
     <div class="currency-info">
         <h3>Latest Exchange Rates</h3>
         @{
-            List<CurrencyStateDto>? curRates = ViewBag.CurrencyRates as List<CurrencyStateDto>;
+            List<CurrencyDto>? curRates = ViewBag.CurrencyRates as List<CurrencyDto>;
         }
         @if (curRates is not null)
         foreach (var curr in curRates)

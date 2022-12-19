@@ -7,6 +7,7 @@ public static class RoomConverter
 {
     public static RoomDto[] ToDto(this RoomInfo[] domain)
         => domain.Select(ToDto).ToArray();
+    
     public static RoomDto ToDto(this RoomInfo domain)
     {
         return new RoomDto

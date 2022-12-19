@@ -25,6 +25,12 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
     public async Task<Unit> Handle(UpdateCurrencyRateCommand request, CancellationToken cancellationToken)
     {
         var updatedCurrencies = await _nbuApiClient.GetCurrencyRatesAsync(cancellationToken);
+        if (updatedCurrencies is null)
+        {
+            _logger.LogWarning("Failed to get currency data form NBU api. Skip processing.");
+            return Unit.Value;
+        }
+        
         var currencies = updatedCurrencies.Select(x => x.ToDomain()).ToArray();
 
         await _currencyRepository.UpdateAsync(currencies, cancellationToken);

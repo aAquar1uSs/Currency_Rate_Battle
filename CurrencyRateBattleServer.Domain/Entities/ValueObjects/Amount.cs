@@ -23,7 +23,7 @@ public class Amount
         Value -= value;
     }
 
-    public void ApportionCash(decimal value)
+    public void ApportionMoney(decimal value)
     {
         Value += value;
     }

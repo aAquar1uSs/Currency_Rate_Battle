@@ -16,7 +16,7 @@ public class RoomId : OneId
         return new RoomId(id);
     }
     
-    public static RoomId Create(Guid id) => new RoomId(id);
+    public static RoomId Create(Guid id) => new(id);
     
-    public static RoomId GenerateAccountId() => new RoomId(Guid.NewGuid());
+    public static RoomId GenerateId() => new(Guid.NewGuid());
 }

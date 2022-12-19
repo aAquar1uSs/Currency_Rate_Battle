@@ -46,17 +46,9 @@ public sealed class Account
         return new Account (accOneId, amountDomain, userOneId);
     }
 
-    public static Result<Account> TryCreateNewAccount(Guid id, Guid userId)
+    public static Account TryCreateNewAccount(AccountId id, UserId userId)
     {
-        var accountIdResult = AccountId.TryCreate(id);
-        if (accountIdResult.IsFailure)
-            return Result.Failure<Account>(accountIdResult.Error);
-
-        var userIdResult = UserId.TryCreate(userId);
-        if (userIdResult.IsFailure)
-            return Result.Failure<Account>(userIdResult.Error);
-
-        return new Account(accountIdResult.Value, Amount.Create(0), userIdResult.Value);
+        return new Account(id, Amount.Create(0), userId);
     }
 
     public void AddStartBalance(Amount startBalance)
@@ -82,7 +74,7 @@ public sealed class Account
         if (money is null)
             return Result.Failure<Account>("Payment processing error");
 
-        Amount.ApportionCash(money.Value);
+        Amount.ApportionMoney(money.Value);
         
         return Result.Success();
     }

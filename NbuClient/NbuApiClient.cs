@@ -14,7 +14,7 @@ public class NbuApiClient
         _client = client ?? throw new ArgumentNullException(nameof(client));
     }
 
-    public async Task<CurrencyDto[]> GetCurrencyRatesAsync(CancellationToken cancellationToken)
+    public async Task<CurrencyDto[]?> GetCurrencyRatesAsync(CancellationToken cancellationToken)
     {
         var response = await _client.GetAsync(Path, cancellationToken);
 
@@ -22,6 +22,6 @@ public class NbuApiClient
             return Array.Empty<CurrencyDto>();
         var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         var currencies  = await JsonSerializer.DeserializeAsync<List<CurrencyDto>>(stream, cancellationToken: cancellationToken);
-        return currencies.ToArray();
+        return currencies?.ToArray();
     }
 }

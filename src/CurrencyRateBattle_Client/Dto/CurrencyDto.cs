@@ -2,7 +2,7 @@
 
 namespace CRBClient.Dto;
 
-public class CurrencyStateDto
+public class CurrencyDto
 {
     [JsonPropertyName("rate")]
     public decimal Rate { get; set; }

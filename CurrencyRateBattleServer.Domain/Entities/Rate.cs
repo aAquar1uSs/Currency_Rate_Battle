@@ -144,19 +144,6 @@ public class Rate
         SettleDate = settledDate;
     }
 
-    public Result Change(decimal payout,
-        bool isClosed,
-        DateTime settledDate)
-    {
-        var payoutResult = Payout.TryCreate(payout);
-        if (payoutResult.IsFailure)
-            return Result.Failure(payoutResult.Error);
-
-        IsClosed = isClosed;
-        SettleDate = settledDate;
-        return Result.Success();
-    }
-
     public void IsWonBet()
     {
         IsWon = true;

@@ -186,7 +186,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                     data.CurrencyExchangeRate == 0 ? null : Math.Round((decimal)data.CurrencyExchangeRate, 2),
                 UserCurrencyExchange = Math.Round(data.RateCurrencyExchange, 2),
                 PayoutAmount = data.Payout,
-                СurrencyName = data.CurrencyCode,
+                CurrencyName = data.CurrencyCode,
                 IsClosed = data.IsClosed,
                 RoomDate = data.RoomDate
             });

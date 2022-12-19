@@ -11,15 +11,9 @@ namespace CRBClient.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-
     private readonly IRoomService _roomService;
-
     private readonly IUserService _userService;
-
     private readonly ICurrencyStateService _currencyStateService;
-
-    private const int PageSize = 4;
-
     private List<RoomViewModel> _roomStorage = new();
 
     public HomeController(ILogger<HomeController> logger,

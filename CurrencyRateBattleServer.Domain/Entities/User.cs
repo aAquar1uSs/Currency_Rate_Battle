@@ -63,4 +63,9 @@ public sealed class User
 
         return new User(userId, emailDomain, passwordDomain, accOneId);
     }
+
+    public void AddAccount(AccountId accountId)
+    {
+        AccountId.Create(accountId.Id);
+    }
 }

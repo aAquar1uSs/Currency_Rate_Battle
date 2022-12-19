@@ -20,7 +20,7 @@ public class CurrencyStateController : ControllerBase
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
-    [HttpGet]
+    [HttpGet("get-currency-rates")]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> GetCurrencyRates(CancellationToken cancellationToken)

@@ -24,16 +24,16 @@ public class CurrencyStateService : ICurrencyStateService
         _options = options.Value;
     }
 
-    public async Task<List<CurrencyStateDto>> GetCurrencyRatesAsync()
+    public async Task<List<CurrencyDto>> GetCurrencyRatesAsync()
     {
         var response = await _httpClient.GetAsync(_options.GetCurrencyRatesURL ?? "");
 
-        List<CurrencyStateDto>? currencyStates = null;
+        List<CurrencyDto>? currencyStates = null;
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("Currency rate are loaded successfully");
             var content = await response.Content.ReadAsStringAsync();
-            currencyStates = JsonSerializer.Deserialize<List<CurrencyStateDto>>(content);
+            currencyStates = JsonSerializer.Deserialize<List<CurrencyDto>>(content);
         }
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
@@ -43,7 +43,7 @@ public class CurrencyStateService : ICurrencyStateService
         }
 
         if (currencyStates is null)
-            currencyStates = new List<CurrencyStateDto>();
+            currencyStates = new List<CurrencyDto>();
 
         return currencyStates;
     }
