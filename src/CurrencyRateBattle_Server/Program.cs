@@ -3,7 +3,6 @@ using CurrencyRateBattleServer.ApplicationServices.Infrastructure;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager.Interfaces;
 using CurrencyRateBattleServer.Dal;
-using CurrencyRateBattleServer.Dal.Services.HostedServices;
 using CurrencyRateBattleServer.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
