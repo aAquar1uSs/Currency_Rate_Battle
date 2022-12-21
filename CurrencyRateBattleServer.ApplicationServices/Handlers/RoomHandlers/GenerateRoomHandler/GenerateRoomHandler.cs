@@ -14,7 +14,7 @@ public class GenerateRoomHandler : IRequestHandler<GenerateRoomCommand>
         _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-    
+
     //Add settings to count of rooms can be generated
     public async Task<Unit> Handle(GenerateRoomCommand request, CancellationToken cancellationToken)
     {

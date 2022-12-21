@@ -27,7 +27,7 @@ public class RateController : ControllerBase
     }
 
     [HttpGet] //ToDo add isActive and CurrecyCode in DTO
-    public async Task<ActionResult<List<Room>>> GetRatesAsync([FromBody]bool? isActive, [FromBody]string? currencyCode, CancellationToken cancellationToken)
+    public async Task<ActionResult<List<Room>>> GetRatesAsync(bool? isActive, string? currencyCode, CancellationToken cancellationToken)
     {
         _logger.LogDebug("List of rates are retrieving.");
         var command = new GetRatesCommand {IsActive = isActive, CurrencyCode = currencyCode};

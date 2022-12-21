@@ -9,7 +9,7 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<CurrencyDal>
     public void Configure(EntityTypeBuilder<CurrencyDal> builder)
     {
         _ = builder.ToTable("Currency")
-            .HasKey(cur => cur.CurrencyCode);
+            .HasKey(cur => cur.CurrencyName);
     }
 }
 

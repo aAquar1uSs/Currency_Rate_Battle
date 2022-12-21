@@ -11,9 +11,5 @@ public class UserConfiguration : IEntityTypeConfiguration<UserDal>
     {
         _ = builder.ToTable("User").HasKey(user => user.Id);
         _ = builder.Property(user => user.Email).IsRequired();
-        _ = builder.ToTable("User")
-            .HasOne(user => user.Account)
-            .WithOne(acc => acc.User)
-            .HasForeignKey<AccountDal>(acc => acc.UserId);
     }
 }

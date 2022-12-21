@@ -5,10 +5,10 @@ namespace CurrencyRateBattleServer.Dal.Entities;
 
 public class CurrencyDal
 {
+    [Key]
     [Column(TypeName = "varchar(3)")]
     public string CurrencyName { get; set; }
     
-    [Key]
     [Column(TypeName = "varchar(3)")]
     public string CurrencyCode { get; set; }
     

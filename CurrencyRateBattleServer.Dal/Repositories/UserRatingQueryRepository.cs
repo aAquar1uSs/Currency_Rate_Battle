@@ -49,7 +49,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
     private IQueryable<BetDal> GetBetData(Guid accountId)
     {
         var result = from rate in _dbContext.Rates
-                     join curr in _dbContext.Currencies on rate.CurrencyCode equals curr.CurrencyCode
+                     join curr in _dbContext.Currencies on rate.CurrencyName equals curr.CurrencyCode
                      join room in _dbContext.Rooms on rate.RoomId equals room.Id
                      where rate.AccountId == accountId
                      select new BetDal
