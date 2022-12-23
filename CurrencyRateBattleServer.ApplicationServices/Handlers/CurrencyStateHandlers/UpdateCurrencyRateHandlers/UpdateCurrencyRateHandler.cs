@@ -10,21 +10,19 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
 {
     private readonly ILogger<UpdateCurrencyRateHandler> _logger;
     private readonly ICurrencyRepository _currencyRepository;
-    private readonly NbuApiClient _nbuApiClient;
-    private readonly ICurrencyStateRepository _currencyStateRepository;
+    private readonly INbuApiClient _nbuApiApiClient;
 
     public UpdateCurrencyRateHandler(ILogger<UpdateCurrencyRateHandler> logger,
-        ICurrencyRepository currencyRepository, NbuApiClient client, ICurrencyStateRepository currencyStateRepository)
+        ICurrencyRepository currencyRepository, INbuApiClient apiClient, ICurrencyStateRepository currencyStateRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _currencyRepository = currencyRepository ?? throw new ArgumentNullException(nameof(currencyRepository));
-        _nbuApiClient = client ?? throw new ArgumentNullException(nameof(client));
-        _currencyStateRepository = currencyStateRepository ?? throw new ArgumentNullException(nameof(currencyStateRepository));
+        _nbuApiApiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
     }
-    
+
     public async Task<Unit> Handle(UpdateCurrencyRateCommand request, CancellationToken cancellationToken)
     {
-        var updatedCurrencies = await _nbuApiClient.GetCurrencyRatesAsync(cancellationToken);
+        var updatedCurrencies = await _nbuApiApiClient.GetCurrencyRatesAsync(cancellationToken);
         if (updatedCurrencies is null)
         {
             _logger.LogWarning("Failed to get currency data form NBU api. Skip processing.");

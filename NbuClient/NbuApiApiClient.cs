@@ -4,12 +4,12 @@ using NbuClient.Dto;
 
 namespace NbuClient;
 
-public class NbuApiClient
+public class NbuApiApiClient : INbuApiClient
 {
     private const string Path = "NBUStatService/v1/statdirectory/exchange?json";
     private readonly HttpClient _client;
 
-    public NbuApiClient(HttpClient client)
+    public NbuApiApiClient(HttpClient client)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
     }

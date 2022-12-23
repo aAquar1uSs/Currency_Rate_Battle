@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyStateHandlers.UpdateCurrencyRateHandlers;
+using CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.GenerateRoomHandler;
 using CurrencyRateBattleServer.ApplicationServices.HostedServices;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager;
@@ -44,8 +46,10 @@ host.ConfigureAppConfiguration(app =>
         _ = service.AddDatabaseDeveloperPageExceptionFilter();
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+        _ = services.AddMediatR(typeof(GenerateRoomHandler), typeof(UpdateCurrencyRateHandler));
+
         service.ConfigureServices();
-        _ = services.AddMediatR(Assembly.GetExecutingAssembly());
+
         //Disable automatic model state validation.
         _ = service.Configure<ApiBehaviorOptions>(options =>
         {

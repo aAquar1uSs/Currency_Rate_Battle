@@ -1,5 +1,6 @@
 ﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyStateHandlers.UpdateCurrencyRateHandlers;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -10,13 +11,12 @@ public class CurrencyHostedService : IHostedService, IDisposable
     private readonly ILogger<CurrencyHostedService> _logger;
     private Timer? _timer;
     private static readonly object _sync = new();
-    private readonly IMediator _mediator;
+    private readonly IServiceScopeFactory _scopeFactory;
 
-    public CurrencyHostedService(ILogger<CurrencyHostedService> logger,
-        IMediator mediator)
+    public CurrencyHostedService(ILogger<CurrencyHostedService> logger, IServiceScopeFactory scopeFactory)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+        _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -48,8 +48,11 @@ public class CurrencyHostedService : IHostedService, IDisposable
     private async void Callback(object? state)
     {
         _logger.LogInformation("PrepareUpdateCurrencyRateAsync has been invoked.");
+        using var scope = _scopeFactory.CreateScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
         var command = new UpdateCurrencyRateCommand();
-        var response = await _mediator.Send(command);
+        _ = await mediator.Send(command);
         _logger.LogInformation("PrepareUpdateCurrencyRateAsync сompleted the execution.");
     }
 

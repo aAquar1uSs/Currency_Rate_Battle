@@ -1,5 +1,6 @@
 ﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.CalculationRateHandler;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -10,13 +11,12 @@ public class RateHostedService : IHostedService, IDisposable
     private Timer? _timer;
     private static readonly object _sync = new();
     private readonly ILogger<RateHostedService> _logger;
-    private readonly IMediator _mediator;
+    private readonly IServiceScopeFactory _scopeFactory;
 
-    public RateHostedService(ILogger<RateHostedService> logger,
-        IMediator mediator)
+    public RateHostedService(ILogger<RateHostedService> logger, IServiceScopeFactory scopeFactory)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+        _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -46,8 +46,11 @@ public class RateHostedService : IHostedService, IDisposable
     private async void Callback(object? state)
     {
         _logger.LogInformation("CheckRoomsStateAsync has been invoked.");
+        using var scope = _scopeFactory.CreateScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
         var command = new CalculationRateCommand();
-        _ = await _mediator.Send(command);
+        _ = await mediator.Send(command);
         _logger.LogInformation("CheckRoomsStateAsync сompleted the execution.");
     }
 

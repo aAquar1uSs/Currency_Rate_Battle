@@ -6,18 +6,18 @@ public static class ApplicationServiceExtension
 {
     public static IServiceCollection ConfigureClients(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
-        var uriConstrains = configuration.GetSection("NbuApiClient").GetValue<ApiUrlConstrains>("Uri");
+        var uriConstrains = configuration.GetSection("NbuApiClient:ApiUrlConstrains").Get<ApiUrlConstrains>();
         
-        serviceCollection.AddHttpClient<NbuApiClient>("NbuApiClient", config =>
+        serviceCollection.AddHttpClient<INbuApiClient, NbuApiApiClient>("NbuApiClient", config =>
         {
             config.BaseAddress = new Uri(uriConstrains.NbuApi);
         });
 
-        serviceCollection.AddScoped<NbuApiClient>(service =>
+        serviceCollection.AddScoped<NbuApiApiClient>(service =>
         {
             var factory = service.GetService<IHttpClientFactory>();
             var httpClient = factory.CreateClient("NbuApiClient");
-            return new NbuApiClient(httpClient);
+            return new NbuApiApiClient(httpClient);
         });
 
         return serviceCollection;

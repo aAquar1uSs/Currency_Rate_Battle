@@ -22,7 +22,7 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
 
     public RegistrationHandler(ILogger<RegistrationHandler> logger, IAccountRepository accountRepository, 
         IOptions<WebServerOptions> options, IAccountHistoryRepository historyRepository, IUserRepository userRepository,
-        JwtManager jwtManager)
+        IJwtManager jwtManager)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
