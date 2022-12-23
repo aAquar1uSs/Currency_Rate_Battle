@@ -59,13 +59,8 @@ public sealed class User
         if (accountId is null)
             return new User(userId, emailDomain, passwordDomain, null);
 
-        var accOneId = ValueObjects.AccountId.Create((Guid)accountId);
+        var accOneId = AccountId.Create((Guid)accountId);
 
         return new User(userId, emailDomain, passwordDomain, accOneId);
-    }
-
-    public void AddAccount(AccountId accountId)
-    {
-        AccountId.Create(accountId.Id);
     }
 }

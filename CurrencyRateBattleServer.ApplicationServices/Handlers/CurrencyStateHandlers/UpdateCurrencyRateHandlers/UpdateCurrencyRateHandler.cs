@@ -28,10 +28,16 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
             _logger.LogWarning("Failed to get currency data form NBU api. Skip processing.");
             return Unit.Value;
         }
-        
+
         var currencies = updatedCurrencies.Select(x => x.ToDomain()).ToArray();
 
-        await _currencyRepository.UpdateAsync(currencies, cancellationToken);
+        var availableCurrenciesIds = await _currencyRepository.GetAllIds(cancellationToken);
+
+        var currenciesToUpdate = currencies.Select(x => x)
+            .Where(x => availableCurrenciesIds.Contains(x.CurrencyName?.Value))
+            .ToArray();
+
+        await _currencyRepository.UpdateAsync(currenciesToUpdate, cancellationToken);
 
         return Unit.Value;
     }

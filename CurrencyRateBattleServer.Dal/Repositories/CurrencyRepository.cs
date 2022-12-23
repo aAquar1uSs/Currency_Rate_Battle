@@ -17,21 +17,32 @@ public class CurrencyRepository : ICurrencyRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
+    //ToDo Refactor this
     public async Task UpdateAsync(Currency[] currencies, CancellationToken cancellationToken)
     {
         foreach (var currency in currencies)
         {
-            var currencyToUpdate = await _dbContext.Currencies
-                .Where(x => x.CurrencyCode == currency.CurrencyCode.Value)
+             var entity = await _dbContext.Currencies
+                .Where(x => x.CurrencyName == currency.CurrencyName.Value)
                 .Select(x => new CurrencyDal()
                 {
                     CurrencyCode = x.CurrencyCode,
                     CurrencyName = x.CurrencyName,
                     Description = x.Description,
                     Rate = currency.Rate.Value
-                }).ToArrayAsync(cancellationToken);
+                }).FirstOrDefaultAsync(cancellationToken);
 
-            _dbContext.UpdateRange(currencyToUpdate, cancellationToken);
+             if (entity is not null)
+             {
+                 _dbContext.Update(entity);
+             }
         }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<string[]> GetAllIds(CancellationToken cancellationToken)
+    {
+        return await _dbContext.Currencies.Select(x => x.CurrencyName).ToArrayAsync(cancellationToken);
     }
 }

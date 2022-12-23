@@ -5,9 +5,9 @@ namespace CurrencyRateBattleServer.Domain.Entities;
 
 public class Currency
 {
-    public CurrencyName? CurrencyName { get; private set; }
+    public CurrencyName CurrencyName { get; private set; }
 
-    public CurrencyCode CurrencyCode { get; private set; }
+    public CurrencyCode? CurrencyCode { get; private set; }
     
     public Amount Rate { get; private set; }
 
@@ -24,10 +24,10 @@ public class Currency
         Description = description;
     }
     
-    private Currency(CurrencyCode currencyCode,
+    private Currency(CurrencyName currencyCode,
         Amount rate)
     {
-        CurrencyCode = currencyCode;
+        CurrencyName = currencyCode;
         Rate = rate;
     }
 
@@ -63,14 +63,14 @@ public class Currency
             currencyCodeDomain, amountDomain, description);
     }
     
-    public static Currency Create(string currencyCode,
+    public static Currency Create(string currencyName,
         decimal amount)
     {
-        var currencyCodeDomain = CurrencyCode.Create(currencyCode);
+        var currencyNameDomain = CurrencyName.Create(currencyName);
 
         var amountDomain = Amount.Create(amount);
         
-        return new Currency(currencyCodeDomain, amountDomain);
+        return new Currency(currencyNameDomain, amountDomain);
     }
 
 }

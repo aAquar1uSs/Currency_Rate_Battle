@@ -5,4 +5,6 @@ namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 public interface ICurrencyRepository
 {
     Task UpdateAsync(Currency[] currencies, CancellationToken cancellationToken);
+
+    Task<string[]> GetAllIds(CancellationToken cancellationToken);
 }

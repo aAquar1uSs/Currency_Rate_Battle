@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure;
-using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager.Interfaces;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
@@ -56,11 +55,9 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
             return Result.Failure<RegistrationResponse>(amountResult.Error);
 
         account.AddStartBalance(amountResult.Value);
-        user.AddAccount(account.Id);
-        
-        await _accountRepository.CreateAccountAsync(account, cancellationToken);
 
         await _userRepository.CreateAsync(user, cancellationToken);
+        await _accountRepository.CreateAccountAsync(account, cancellationToken);
 
         var accountHistoryId = AccountHistoryId.GenerateId();
         var accountHistory = AccountHistory.Create(accountHistoryId.Id, account.Id.Id, DateTime.Now, account.Amount.Value);
