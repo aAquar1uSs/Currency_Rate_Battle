@@ -40,7 +40,7 @@ public class CRBServerHttpClient : ICRBServerHttpClient, IDisposable
         return responseMessage;
     }
 
-    public async Task<HttpResponseMessage> PostAsync<T>(string requestUrl, T content)
+    public async Task<HttpResponseMessage> PostAsync<T>(string requestUrl, T content, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Sending request to {RequestUrl}...", requestUrl);
 
@@ -50,11 +50,11 @@ public class CRBServerHttpClient : ICRBServerHttpClient, IDisposable
                 new AuthenticationHeaderValue("Bearer", Session.GetString("token"));
         }
 
-        var response = await _httpClient.PostAsync(requestUrl, content, new JsonMediaTypeFormatter());
+        var response = await _httpClient.PostAsync(requestUrl, content, new JsonMediaTypeFormatter(), CancellationToken.None);
         return response;
     }
 
-    public async Task<HttpResponseMessage> GetAsync(string requestUrl)
+    public async Task<HttpResponseMessage> GetAsync(string requestUrl, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Sending request to {RequestUrl}...", requestUrl);
 

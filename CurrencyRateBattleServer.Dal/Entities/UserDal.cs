@@ -14,9 +14,4 @@ public sealed class UserDal
     public string Email { get; set; }
 
     public string Password { get; set; }
-    
-    public Guid AccountId { get; set; }
-
-    [ForeignKey("AccountId")]
-    public AccountDal Account { get; set; }
 }

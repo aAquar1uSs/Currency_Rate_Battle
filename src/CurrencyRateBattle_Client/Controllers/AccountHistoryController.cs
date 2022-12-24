@@ -21,15 +21,15 @@ public class AccountHistoryController : Controller
         _userService = userService;
     }
 
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index(int? page, CancellationToken cancellationToken)
         {
             var pageSize = 10;
             var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
-            ViewBag.Balance = await _userService.GetUserBalanceAsync();
+            ViewBag.Balance = await _userService.GetUserBalanceAsync(cancellationToken);
             ViewBag.Title = "Account History";
             try
             {
-                var accountHistoryInfo = await _userService.GetAccountHistoryAsync();
+                var accountHistoryInfo = await _userService.GetAccountHistoryAsync(cancellationToken);
                 var accountHistories = PagedListExtensions.ToPagedList(accountHistoryInfo, pageIndex, pageSize);
                 return View(accountHistories);
             }

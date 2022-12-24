@@ -23,17 +23,17 @@ public class BetController : Controller
         _userRateService = userRateService;
     }
 
-    public async Task<IActionResult> Index(int? page)
+    public async Task<IActionResult> Index(int? page, CancellationToken cancellationToken)
     {
         var pageSize = 10;
         var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
 
-        ViewBag.Balance = await _userService.GetUserBalanceAsync();
+        ViewBag.Balance = await _userService.GetUserBalanceAsync(cancellationToken);
         ViewBag.Title = "My Bets";
 
         try
         {
-            var betInfo = await _userRateService.GetUserRates();
+            var betInfo = await _userRateService.GetUserRates(cancellationToken);
             var bets = PagedListExtensions.ToPagedList(betInfo, pageIndex, pageSize);
             _logger.LogInformation("User betting page");
             return View(bets);

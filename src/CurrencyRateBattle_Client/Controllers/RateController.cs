@@ -22,10 +22,10 @@ public class RateController : Controller
         _userService = userService;
     }
 
-    public async Task<IActionResult> Index(Guid roomId, string currencyName)
+    public async Task<IActionResult> Index(Guid roomId, string currencyName, CancellationToken cancellationToken)
     {
         ViewBag.Title = "Make Bet";
-        ViewBag.Balance = await _userService.GetUserBalanceAsync();
+        ViewBag.Balance = await _userService.GetUserBalanceAsync(cancellationToken);
         ViewBag.CurrencyName = currencyName;
 
         var rateModel = new RateViewModel
@@ -36,15 +36,15 @@ public class RateController : Controller
         return View(rateModel);
     }
 
-    public async Task<IActionResult> MakeBet(RateViewModel rateViewModel, string currencyName)
+    public async Task<IActionResult> MakeBet(RateViewModel rateViewModel, string currencyName, CancellationToken cancellationToken)
     {
         ViewBag.Title = "Make Bet";
-        ViewBag.Balance = await _userService.GetUserBalanceAsync();
+        ViewBag.Balance = await _userService.GetUserBalanceAsync(cancellationToken);
 
         try
         {
             ViewBag.CurrencyName = currencyName;
-            ViewBag.BalanceDecimal = await _userService.GetUserBalanceDecimalAsync();
+            ViewBag.BalanceDecimal = await _userService.GetUserBalanceDecimalAsync(cancellationToken);
 
             if (rateViewModel.Amount > ViewBag.BalanceDecimal)
             {
@@ -60,13 +60,13 @@ public class RateController : Controller
                 return View("Index", rateViewModel);
             }
 
-            await _rateService.InsertUserRateAsync(rateViewModel);
+            await _rateService.InsertUserRateAsync(rateViewModel, cancellationToken);
         }
         catch (GeneralException ex)
         {
             _logger.LogDebug("{Msg}", ex.Message);
             ViewData["ErrorMsg"] = ex.Message;
-            ViewBag.Balance = await _userService.GetUserBalanceAsync();
+            ViewBag.Balance = await _userService.GetUserBalanceAsync(cancellationToken);
             return View("Index", rateViewModel);
         }
         catch (HttpRequestException ex)

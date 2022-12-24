@@ -36,7 +36,7 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
         _logger.LogInformation($"{nameof(RegistrationHandler)} was caused.");
 
         var customUserId = UserId.GenerateId();
-        var userResult = User.TryCreate(customUserId.Id, request.UserDto.Email, request.UserDto.Password, null);
+        var userResult = User.TryCreate(customUserId.Id, request.UserDto.Email, request.UserDto.Password);
 
         if (userResult.IsFailure)
             return Result.Failure<RegistrationResponse>(userResult.Error);
@@ -57,6 +57,9 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
         account.AddStartBalance(amountResult.Value);
 
         await _userRepository.CreateAsync(user, cancellationToken);
+
+        account.AddUser(user);
+
         await _accountRepository.CreateAccountAsync(account, cancellationToken);
 
         var accountHistoryId = AccountHistoryId.GenerateId();

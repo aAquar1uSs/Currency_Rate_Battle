@@ -27,7 +27,7 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    public async Task<ActionResult> LoginAsync(UserViewModel user)
+    public async Task<ActionResult> LoginAsync(UserViewModel user, CancellationToken cancellationToken)
     {
         ViewBag.ActiveTab = 1;
         if (!ModelState.IsValid)
@@ -47,7 +47,7 @@ public class AccountController : Controller
         }
         try
         {
-            await _userService.LoginUserAsync(user);
+            await _userService.LoginUserAsync(user, cancellationToken);
         }
         catch (GeneralException ex)
         {
@@ -72,7 +72,7 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    public async Task<ActionResult> RegistrationAsync(UserViewModel user)
+    public async Task<ActionResult> RegistrationAsync(UserViewModel user, CancellationToken cancellationToken)
     {
         ViewBag.ActiveTab = 2;
         if (!ModelState.IsValid)
@@ -92,7 +92,7 @@ public class AccountController : Controller
 
         try
         {
-            await _userService.RegisterUserAsync(user);
+            await _userService.RegisterUserAsync(user, cancellationToken);
         }
         catch (GeneralException ex)
         {

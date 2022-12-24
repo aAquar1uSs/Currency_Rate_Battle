@@ -20,13 +20,13 @@ public class UserRateService : IUserRateService
         _logger = logger;
     }
 
-    public async Task<List<BetViewModel>> GetUserRates()
+    public async Task<List<BetViewModel>> GetUserRates(CancellationToken cancellationToken)
     {
-        var response = await _httpClient.GetAsync(_options.GetUserBetsURL ?? "");
+        var response = await _httpClient.GetAsync(_options.GetUserBetsURL ?? "", cancellationToken);
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("User rates are loaded successfully");
-            return await response.Content.ReadAsAsync<List<BetViewModel>>();
+            return await response.Content.ReadAsAsync<List<BetViewModel>>(cancellationToken);
         }
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
@@ -37,9 +37,9 @@ public class UserRateService : IUserRateService
     }
 
 
-    public async Task InsertUserRateAsync(RateViewModel rateViewModel)
+    public async Task InsertUserRateAsync(RateViewModel rateViewModel,CancellationToken cancellationToken)
     {
-        var response = await _httpClient.PostAsync(_options.MakeBetURL ?? "", rateViewModel);
+        var response = await _httpClient.PostAsync(_options.MakeBetURL ?? "", rateViewModel, cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
@@ -47,7 +47,7 @@ public class UserRateService : IUserRateService
             return;
         }
 
-        var errorMsg = await response.Content.ReadAsStringAsync();
+        var errorMsg = await response.Content.ReadAsStringAsync(cancellationToken);
         _logger.LogError("Rate Insertion: {ErrorMsg}", errorMsg);
         if (response.StatusCode == HttpStatusCode.Conflict)
         {

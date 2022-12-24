@@ -11,25 +11,21 @@ public sealed class User
 
     public Password Password { get; }
 
-    public AccountId? AccountId { get; }
-
     private User(UserId id,
         Email email,
-        Password password,
-        AccountId? accountId)
+        Password password)
     {
         Id = id;
         Email = email;
         Password = password;
-        AccountId = accountId;
     }
 
-    public static Result<User> TryCreate(Guid id, string email, string password, Guid? accountId)
+    public static Result<User> TryCreate(Guid id, string email, string password)
     {
         var oneIdResult = UserId.TryCreate(id);
         if (oneIdResult.IsFailure)
             return Result.Failure<User>(oneIdResult.Error);
-        
+
         var emailResult = Email.TryCreate(email);
         if (emailResult.IsFailure)
             return Result.Failure<User>(emailResult.Error);
@@ -38,17 +34,10 @@ public sealed class User
         if (passwordResult.IsFailure)
             return Result.Failure<User>(passwordResult.Error);
 
-        if (accountId is null)
-            return new User(oneIdResult.Value, emailResult.Value, passwordResult.Value, null);
-
-        var accOneIdResult = ValueObjects.AccountId.TryCreate((Guid)accountId);
-        if (accOneIdResult.IsFailure)
-            return Result.Failure<User>(accOneIdResult.Error);
-        
-        return new User(oneIdResult.Value, emailResult.Value, passwordResult.Value, accOneIdResult.Value);
+        return new User(oneIdResult.Value, emailResult.Value, passwordResult.Value);
     }
 
-    public static User Create(Guid id, string email, string password, Guid? accountId)
+    public static User Create(Guid id, string email, string password)
     {
         var userId = UserId.Create(id);
 
@@ -56,11 +45,6 @@ public sealed class User
 
         var passwordDomain = Password.Create(password);
 
-        if (accountId is null)
-            return new User(userId, emailDomain, passwordDomain, null);
-
-        var accOneId = AccountId.Create((Guid)accountId);
-
-        return new User(userId, emailDomain, passwordDomain, accOneId);
+        return new User(userId, emailDomain, passwordDomain);
     }
 }

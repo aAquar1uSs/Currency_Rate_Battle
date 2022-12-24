@@ -10,19 +10,19 @@ public class RatingService : IRatingService
 {
     private readonly ICRBServerHttpClient _httpClient;
     private readonly WebServerOptions _options;
-    private readonly ILogger<UserRateService> _logger;
+    private readonly ILogger<RatingService> _logger;
 
     public RatingService(ICRBServerHttpClient httpClient,
-        IOptions<WebServerOptions> options, ILogger<UserRateService> logger)
+        IOptions<WebServerOptions> options, ILogger<RatingService> logger)
     {
         _httpClient = httpClient;
         _options = options.Value;
         _logger = logger;
     }
 
-    public async Task<List<RatingViewModel>> GetUserRatings()
+    public async Task<List<RatingViewModel>> GetUserRatings(CancellationToken cancellationToken)
     {
-        var response = await _httpClient.GetAsync(_options.GetUsersRatingURL ?? "");
+        var response = await _httpClient.GetAsync(_options.GetUsersRatingURL ?? "", cancellationToken);
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("User rating are loaded successfully");

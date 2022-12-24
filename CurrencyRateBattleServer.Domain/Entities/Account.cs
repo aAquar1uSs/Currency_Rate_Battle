@@ -75,7 +75,12 @@ public sealed class Account
             return Result.Failure<Account>("Payment processing error");
 
         Amount.ApportionMoney(money.Value);
-        
+
         return Result.Success();
+    }
+
+    public void AddUser(User user)
+    {
+        UserId = user.Id;
     }
 }

@@ -3,6 +3,7 @@ using System;
 using CurrencyRateBattleServer.Dal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CurrencyRateBattleServer.Dal.Migrations
 {
     [DbContext(typeof(CurrencyRateBattleContext))]
-    partial class CurrencyRateBattleContextModelSnapshot : ModelSnapshot
+    [Migration("20221224102749_AddedNullableForAccountId")]
+    partial class AddedNullableForAccountId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -234,6 +236,9 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("AccountId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
@@ -243,6 +248,8 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("Email")
                         .IsUnique();
@@ -314,6 +321,15 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                     b.Navigation("Currency");
 
                     b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("CurrencyRateBattleServer.Dal.Entities.UserDal", b =>
+                {
+                    b.HasOne("CurrencyRateBattleServer.Dal.Entities.AccountDal", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId");
+
+                    b.Navigation("Account");
                 });
 #pragma warning restore 612, 618
         }

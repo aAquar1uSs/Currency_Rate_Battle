@@ -27,10 +27,10 @@ public class HomeController : Controller
         _currencyStateService = currencyStateService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Home page with all rooms");
-        ViewBag.Balance = await _userService.GetUserBalanceAsync();
+        ViewBag.Balance = await _userService.GetUserBalanceAsync(cancellationToken);
 
         return View();
     }
@@ -38,12 +38,13 @@ public class HomeController : Controller
     public async Task<IActionResult> Main(string searchNameString,
         string searchStartDateString,
         string searchEndDateString,
-        int? page)
+        int? page,
+        CancellationToken cancellationToken)
     {
         try
         {
-            ViewBag.Balance = await _userService.GetUserBalanceAsync();
-            var currState = await _currencyStateService.GetCurrencyRatesAsync();
+            ViewBag.Balance = await _userService.GetUserBalanceAsync(cancellationToken);
+            var currState = await _currencyStateService.GetCurrencyRatesAsync(cancellationToken);
             ViewBag.CurrencyRates = currState;
             ViewBag.Title = "Main Page";
 
@@ -53,8 +54,8 @@ public class HomeController : Controller
 
             var filter = new FilterDto(searchNameString, searchStartDateString, searchEndDateString);
             _roomStorage = filter.CheckFilter()
-                ? await _roomService.GetFilteredCurrencyAsync(filter)
-                : await _roomService.GetRoomsAsync(false);
+                ? await _roomService.GetFilteredCurrencyAsync(filter, cancellationToken)
+                : await _roomService.GetRoomsAsync(false, cancellationToken);
         }
         catch (GeneralException)
         {
@@ -72,15 +73,15 @@ public class HomeController : Controller
         return View(await roomViewModels.CreateAsync(_roomStorage, page ?? 1, pageSize));
     }
 
-    public async Task<IActionResult> Profile()
+    public async Task<IActionResult> Profile(CancellationToken cancellationToken)
     {
         AccountInfoViewModel accountInfo;
         try
         {
-            ViewBag.Balance = await _userService.GetUserBalanceAsync();
+            ViewBag.Balance = await _userService.GetUserBalanceAsync(cancellationToken);
             ViewBag.Title = "User Profile";
 
-            accountInfo = await _userService.GetAccountInfoAsync();
+            accountInfo = await _userService.GetAccountInfoAsync(cancellationToken);
         }
         catch (GeneralException)
         {

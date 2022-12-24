@@ -25,7 +25,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
     public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var customId = UserId.GenerateId();
-        var userResult = User.TryCreate(customId.Id, request.UserDto.Email, request.UserDto.Password, null);
+        var userResult = User.TryCreate(customId.Id, request.UserDto.Email, request.UserDto.Password);
 
         if (userResult.IsFailure)
             return Result.Failure<LoginResponse>(userResult.Error);

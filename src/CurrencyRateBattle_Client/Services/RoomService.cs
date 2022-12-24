@@ -22,13 +22,13 @@ public class RoomService : IRoomService
         _logger = logger;
     }
 
-    public async Task<List<RoomViewModel>> GetRoomsAsync(bool isClosed)
+    public async Task<List<RoomViewModel>> GetRoomsAsync(bool isClosed, CancellationToken cancellationToken)
     {
-        var responseTask = await _httpClient.GetAsync(_options.RoomsURL + $"/{isClosed}");
+        var responseTask = await _httpClient.GetAsync(_options.RoomsURL + $"/{isClosed}", cancellationToken);
 
         if (responseTask.StatusCode == HttpStatusCode.OK)
         {
-            var result = await responseTask.Content.ReadAsStringAsync();
+            var result = await responseTask.Content.ReadAsStringAsync(cancellationToken);
             var rooms = JsonSerializer.Deserialize<IEnumerable<RoomViewModel>>(result);
 
             _logger.LogInformation("Rooms are loaded successfully.");
@@ -40,13 +40,13 @@ public class RoomService : IRoomService
             : new List<RoomViewModel>();
     }
 
-    public async Task<List<RoomViewModel>> GetFilteredCurrencyAsync(FilterDto filter)
+    public async Task<List<RoomViewModel>> GetFilteredCurrencyAsync(FilterDto filter, CancellationToken cancellationToken)
     {
-        var responseTask = await _httpClient.PostAsync(_options.FilterURL ?? "", filter);
+        var responseTask = await _httpClient.PostAsync(_options.FilterURL ?? "", filter, cancellationToken);
 
         if (responseTask.StatusCode == HttpStatusCode.OK)
         {
-            var result = await responseTask.Content.ReadAsStringAsync();
+            var result = await responseTask.Content.ReadAsStringAsync(cancellationToken);
             var rooms = JsonSerializer.Deserialize<IEnumerable<RoomViewModel>>(result);
 
             _logger.LogInformation("Rooms are loaded successfully.");

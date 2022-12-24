@@ -1,6 +1,5 @@
 ﻿@model PaginationList<CRBClient.Models.RoomViewModel>
 @using System.Globalization
-@using System.Reflection.Emit
 @using CRBClient.Dto
 
 @{
@@ -62,9 +61,11 @@
             List<CurrencyDto>? curRates = ViewBag.CurrencyRates as List<CurrencyDto>;
         }
         @if (curRates is not null)
-        foreach (var curr in curRates)
         {
-            <p>@curr.Currency (@Math.Round(curr.Rate, 2) -- @curr.Date)</p>
+            foreach (var curr in curRates)
+            {
+                <p>@curr.Currency (@Math.Round(curr.Rate, 2) -- @curr.Date)</p>
+            }   
         }
     </div>
 </div>

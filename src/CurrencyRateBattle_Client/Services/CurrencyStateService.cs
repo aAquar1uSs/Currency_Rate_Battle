@@ -24,15 +24,15 @@ public class CurrencyStateService : ICurrencyStateService
         _options = options.Value;
     }
 
-    public async Task<List<CurrencyDto>> GetCurrencyRatesAsync()
+    public async Task<List<CurrencyDto>> GetCurrencyRatesAsync(CancellationToken cancellationToken)
     {
-        var response = await _httpClient.GetAsync(_options.GetCurrencyRatesURL ?? "");
+        var response = await _httpClient.GetAsync(_options.GetCurrencyRatesURL ?? "", cancellationToken);
 
         List<CurrencyDto>? currencyStates = null;
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("Currency rate are loaded successfully");
-            var content = await response.Content.ReadAsStringAsync();
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
             currencyStates = JsonSerializer.Deserialize<List<CurrencyDto>>(content);
         }
 

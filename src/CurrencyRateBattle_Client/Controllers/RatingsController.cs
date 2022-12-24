@@ -25,19 +25,19 @@ public class RatingsController : Controller
         _userService = userService;
     }
 
-    public async Task<IActionResult> Index(int? page, string sortOrder)
+    public async Task<IActionResult> Index(int? page, string sortOrder, CancellationToken cancellationToken)
     {
         ViewBag.CurrentSortOrder = sortOrder;
         ViewBag.BetNoSortParm = sortOrder == "bets_no" ? "bets_no_asc" : "bets_no";
         ViewBag.WonBetNoSortParm = sortOrder == "won_bets_no" ? "won_bets_no_asc" : "won_bets_no";
         ViewBag.ProfitPercSortParm = sortOrder == "profitperc" ? "profitperc_asc" : "profitperc";
         ViewBag.WonBetsPercSortParm = sortOrder == "wonbetsperc" ? "wonbetsperc_acs" : "wonbetsperc";
-        ViewBag.Balance = await _userService.GetUserBalanceAsync();
+        ViewBag.Balance = await _userService.GetUserBalanceAsync(cancellationToken);
         ViewBag.Title = "Users Ratings";
 
         try
         {
-            var ratingInfo = await _ratingService.GetUserRatings();
+            var ratingInfo = await _ratingService.GetUserRatings(cancellationToken);
 
             _ratingService.RatingListSorting(ref ratingInfo, sortOrder);
 
