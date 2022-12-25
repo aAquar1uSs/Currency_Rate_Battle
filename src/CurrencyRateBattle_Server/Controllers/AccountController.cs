@@ -37,7 +37,7 @@ public class AccountController : ControllerBase
         if (response.IsFailure)
             return Unauthorized(response.Error);
 
-        return Ok(response.Value.Tokens);
+        return Ok(response.Value.Tokens.Token);
     }
 
     [HttpPost("registration")]
@@ -55,6 +55,6 @@ public class AccountController : ControllerBase
         if (isFailure)
             return BadRequest(error);
 
-        return Ok(value.Tokens);
+        return Ok(value.Tokens.Token);
     }
 }
