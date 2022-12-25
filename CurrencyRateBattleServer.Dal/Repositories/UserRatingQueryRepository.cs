@@ -18,7 +18,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-    
+
     public Task<UserRating[]> GetUsersRatingAsync()
     {
         _logger.LogInformation($"{nameof(GetUsersRatingAsync)} was caused.");

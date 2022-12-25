@@ -86,6 +86,9 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                     b.Property<decimal>("Rate")
                         .HasColumnType("decimal");
 
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.HasKey("CurrencyName");
 
                     b.ToTable("Currency", (string)null);
@@ -96,35 +99,40 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                             CurrencyName = "USD",
                             CurrencyCode = "$",
                             Description = "US Dollar",
-                            Rate = 0m
+                            Rate = 0m,
+                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             CurrencyName = "EUR",
                             CurrencyCode = "$",
                             Description = "Euro",
-                            Rate = 0m
+                            Rate = 0m,
+                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             CurrencyName = "PLN",
                             CurrencyCode = "zł",
                             Description = "Polish Zlotych",
-                            Rate = 0m
+                            Rate = 0m,
+                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             CurrencyName = "GBP",
                             CurrencyCode = "£",
                             Description = "British Pound",
-                            Rate = 0m
+                            Rate = 0m,
+                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             CurrencyName = "CHF",
                             CurrencyCode = "Fr",
                             Description = "Swiss Franc",
-                            Rate = 0m
+                            Rate = 0m,
+                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 

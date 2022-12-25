@@ -17,7 +17,6 @@ public class CurrencyRepository : ICurrencyRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    //ToDo Refactor this
     public async Task UpdateAsync(Currency[] currencies, CancellationToken cancellationToken)
     {
         foreach (var currency in currencies)
@@ -29,7 +28,8 @@ public class CurrencyRepository : ICurrencyRepository
                     CurrencyCode = x.CurrencyCode,
                     CurrencyName = x.CurrencyName,
                     Description = x.Description,
-                    Rate = currency.Rate.Value
+                    Rate = currency.Rate.Value,
+                    UpdateDate = x.UpdateDate
                 }).FirstOrDefaultAsync(cancellationToken);
 
              if (entity is not null)

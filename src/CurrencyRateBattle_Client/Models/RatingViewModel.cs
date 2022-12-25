@@ -1,4 +1,6 @@
-﻿namespace CRBClient.Models;
+﻿using Newtonsoft.Json;
+
+namespace CRBClient.Models;
 
 public class RatingViewModel
 {
@@ -8,18 +10,24 @@ public class RatingViewModel
     // 4 - Percentage of won bets
 
     // Basic rating by number of bets
+    [JsonProperty("BetsNo")]
     public long BetsNo { get; set; }
 
     // Number of won bets
+    [JsonProperty("WonBetsNo")]
     public long WonBetsNo { get; set; }
 
     //Percentage of payout/bets amount
+    [JsonProperty("ProfitPercentage")]
     public decimal ProfitPercentage { get; set; }
 
     //Percentage of won bets
+    [JsonProperty("WonBetsPercentage")]
     public decimal WonBetsPercentage { get; set; }
 
-    public string? Email { get; set; }
+    [JsonProperty("Email")]
+    public string Email { get; set; } = default!;
 
+    [JsonProperty("LastBetDate")]
     public DateTime LastBetDate { get; set; }
 }

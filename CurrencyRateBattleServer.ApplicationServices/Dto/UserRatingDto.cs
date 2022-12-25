@@ -1,4 +1,6 @@
-﻿namespace CurrencyRateBattleServer.ApplicationServices.Dto;
+﻿using Newtonsoft.Json;
+
+namespace CurrencyRateBattleServer.ApplicationServices.Dto;
 
 public class UserRatingDto
 {
@@ -8,19 +10,25 @@ public class UserRatingDto
     // 4 - Percentage of won bets
 
     // Basic rating by number of bets
+    [JsonProperty("BetsNo")]
     public long BetsNo { get; set; }
 
     // Number of won bets
+    [JsonProperty("WonBetsNo")]
     public long WonBetsNo { get; set; }
 
     //Percentage of payout/bets amount
+    [JsonProperty("ProfitPercentage")]
     public decimal ProfitPercentage { get; set; }
 
     //Percentage of won bets
+    [JsonProperty("WonBetsPercentage")]
     public decimal WonBetsPercentage { get; set; }
 
+    [JsonProperty("Email")]
     public string Email { get; set; } = default!;
 
+    [JsonProperty("LastBetDate")]
     public DateTime LastBetDate { get; set; }
 
 }

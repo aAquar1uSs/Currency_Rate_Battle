@@ -39,10 +39,10 @@ public class RatingsController : Controller
         {
             var ratingInfo = await _ratingService.GetUserRatings(cancellationToken);
 
-            _ratingService.RatingListSorting(ref ratingInfo, sortOrder);
+            var sortedRatingsList = _ratingService.RatingListSorting(ratingInfo, sortOrder);
 
             var pageIndex = page.HasValue ? Convert.ToInt32(page, new CultureInfo("uk-UA")) : 1;
-            var ratings = PagedListExtensions.ToPagedList(ratingInfo, pageIndex, PageSize);
+            var ratings = PagedListExtensions.ToPagedList(sortedRatingsList, pageIndex, PageSize);
             return View(ratings);
         }
         catch (GeneralException)

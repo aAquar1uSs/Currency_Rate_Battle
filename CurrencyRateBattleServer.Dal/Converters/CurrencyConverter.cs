@@ -14,6 +14,6 @@ public static class CurrencyConverter
 
     public static Currency ToDomain(this CurrencyDal dal)
     {
-        return Currency.Create(dal.CurrencyName, dal.CurrencyCode, dal.Rate, dal.Description);
+        return Currency.Create(dal.CurrencyName, dal.CurrencyCode, dal.Rate, dal.Description, dal.UpdateDate);
     }
 }

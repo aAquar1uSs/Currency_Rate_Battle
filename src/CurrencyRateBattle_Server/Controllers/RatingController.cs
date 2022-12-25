@@ -31,7 +31,7 @@ public class RatingController : ControllerBase
 
         var response = await _mediator.Send(command, cancellationToken);
 
-        return Ok(response.Value);
+        return Ok(response.Value.UserRating);
     }
 
 }

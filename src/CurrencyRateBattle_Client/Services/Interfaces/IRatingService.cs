@@ -3,7 +3,7 @@
 namespace CRBClient.Services.Interfaces;
 public interface IRatingService
 {
-    Task<List<RatingViewModel>> GetUserRatings(CancellationToken cancellationToken);
+    Task<RatingViewModel[]> GetUserRatings(CancellationToken cancellationToken);
 
-    void RatingListSorting(ref List<RatingViewModel> ratingInfo, string sortOrder);
+    RatingViewModel[] RatingListSorting(RatingViewModel[] ratingInfo, string sortOrder);
 }

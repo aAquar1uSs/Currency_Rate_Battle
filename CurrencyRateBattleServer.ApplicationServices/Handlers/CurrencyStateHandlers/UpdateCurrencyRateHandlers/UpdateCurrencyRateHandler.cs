@@ -31,6 +31,11 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
 
         var currencies = updatedCurrencies.Select(x => x.ToDomain()).ToArray();
 
+        if (currencies.Any(x => x == null))
+        {
+            _logger.LogWarning("Invalid data in response from NBU api. Skip processing");
+        }
+
         var availableCurrenciesIds = await _currencyRepository.GetAllIds(cancellationToken);
 
         var currenciesToUpdate = currencies.Select(x => x)
