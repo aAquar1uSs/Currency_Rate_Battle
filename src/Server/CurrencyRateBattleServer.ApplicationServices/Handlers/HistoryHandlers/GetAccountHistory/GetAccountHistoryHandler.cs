@@ -27,9 +27,9 @@ public class GetAccountHistoryHandler : IRequestHandler<GetAccountHistoryCommand
         if (userIdResult.IsFailure)
             return Result.Failure<GetAccountHistoryResponse>(userIdResult.Error);
         var userId = userIdResult.Value;
-        
+
         var account = await _accountRepository.GetAccountByUserIdAsync(userId, cancellationToken);
-        
+
         if (account is null)
             return Result.Failure<GetAccountHistoryResponse>("Account not found.");
 

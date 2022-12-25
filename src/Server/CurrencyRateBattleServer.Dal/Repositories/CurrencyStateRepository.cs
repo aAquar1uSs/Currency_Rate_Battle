@@ -25,7 +25,7 @@ public class CurrencyStateRepository : ICurrencyStateRepository
 
         var currId = await _dbContext.CurrencyStates
             .Where(currState => currState.Room.Id == roomId.Id)
-            .Select(currState => currState.CurrencyCode).FirstAsync(cancellationToken);
+            .Select(currState => currState.CurrencyName).FirstAsync(cancellationToken);
 
         return currId;
     }

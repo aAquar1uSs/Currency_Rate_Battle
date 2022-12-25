@@ -5,7 +5,7 @@ public class AccountHistoryDto
 {
     public Guid AccountHistoryId { get; set; }
     
-    public Guid RoomId { get; set; }
+    public Guid? RoomId { get; set; }
 
     public DateTime Date { get; set; }
 

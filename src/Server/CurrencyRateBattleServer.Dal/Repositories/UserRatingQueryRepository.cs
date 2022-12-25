@@ -1,5 +1,4 @@
-﻿using CurrencyRateBattleServer.Dal.Data;
-using CurrencyRateBattleServer.Dal.Entities;
+﻿using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Domain.Entities;
@@ -49,7 +48,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
     private IQueryable<BetDal> GetBetData(Guid accountId)
     {
         var result = from rate in _dbContext.Rates
-                     join curr in _dbContext.Currencies on rate.CurrencyName equals curr.CurrencyCode
+                     join curr in _dbContext.Currencies on rate.CurrencyName equals curr.CurrencyName
                      join room in _dbContext.Rooms on rate.RoomId equals room.Id
                      where rate.AccountId == accountId
                      select new BetDal
@@ -65,7 +64,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                          Payout = rate.Payout,
                          RoomDate = room.EndDate,
                          RoomId = rate.RoomId,
-                         CurrencyCode = curr.CurrencyCode,
+                         CurrencyName = curr.CurrencyCode,
                      };
         return result;
     }
@@ -74,7 +73,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
     {
         var query = from res in data
                     join currState in _dbContext.CurrencyStates
-                on new { res.RoomId, res.CurrencyCode } equals new { currState.RoomId, currState.CurrencyCode }
+                on new { res.RoomId, res.CurrencyName } equals new { currState.RoomId, currState.CurrencyName }
                 into gj
                     from subCurr in gj.DefaultIfEmpty()
                     select new BetDal
@@ -90,7 +89,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                         Payout = res.Payout,
                         RoomDate = res.RoomDate,
                         RoomId = res.RoomId,
-                        CurrencyCode = res.CurrencyCode,
+                        CurrencyName = res.CurrencyName,
                         CurrencyExchangeRate = subCurr == null ? 0 : subCurr.CurrencyExchangeRate
                     };
         return query;
@@ -186,7 +185,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                     data.CurrencyExchangeRate == 0 ? null : Math.Round((decimal)data.CurrencyExchangeRate, 2),
                 UserCurrencyExchange = Math.Round(data.RateCurrencyExchange, 2),
                 PayoutAmount = data.Payout,
-                CurrencyName = data.CurrencyCode,
+                CurrencyName = data.CurrencyName,
                 IsClosed = data.IsClosed,
                 RoomDate = data.RoomDate
             });

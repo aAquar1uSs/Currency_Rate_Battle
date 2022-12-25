@@ -48,10 +48,12 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
         var amountResult = Amount.TryCreate(rateToCreate.Amount);
         if (amountResult.IsFailure)
             return Result.Failure<MakeBetResponse>(amountResult.Error);
-        
+
         var result = account.WritingOffMoney(amountResult.Value);
         if (result.IsFailure)
             return Result.Failure<MakeBetResponse>(result.Error);
+
+        await _accountRepository.UpdateAsync(account, cancellationToken);
 
         var rate = Rate.Create(OneId.GenerateId().Id, DateTime.UtcNow, rateToCreate.UserCurrencyExchange,
             rateToCreate.Amount, null, null, false, false, roomIdResult.Value.Id,

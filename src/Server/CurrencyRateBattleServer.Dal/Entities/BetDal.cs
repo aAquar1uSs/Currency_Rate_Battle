@@ -1,4 +1,4 @@
-﻿namespace CurrencyRateBattleServer.Dal.Data;
+﻿namespace CurrencyRateBattleServer.Dal.Entities;
 
 public class BetDal
 {
@@ -24,7 +24,7 @@ public class BetDal
 
     public Guid RoomId { get; set; }
 
-    public string CurrencyCode { get; set; }
+    public string CurrencyName { get; set; }
 
     public decimal? CurrencyExchangeRate { get; set; }
 }

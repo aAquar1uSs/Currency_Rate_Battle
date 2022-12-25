@@ -8,12 +8,12 @@ public class RoomId : OneId
     {
     }
     
-    public static Result<RoomId> TryCreate(Guid id)
+    public static Result<RoomId> TryCreate(Guid? id)
     {
-        if (id == Guid.Empty)
+        if (id == Guid.Empty || id is null)
             Result.Failure<OneId>("Room id can not be empty");
 
-        return new RoomId(id);
+        return new RoomId(id.Value);
     }
     
     public static RoomId Create(Guid id) => new(id);

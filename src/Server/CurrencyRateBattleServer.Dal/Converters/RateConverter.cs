@@ -29,12 +29,13 @@ public static class RateConverter
         {
             AccountId = rate.AccountId.Id,
             Amount = rate.Amount.Value,
-            CurrencyName = rate.CurrencyCode.Value,
+            CurrencyName = rate.CurrencyName.Value,
             IsClosed = rate.IsClosed,
             IsWon = rate.IsWon,
             Id = rate.Id.Id,
             SetDate = rate.SetDate,
-            RateCurrencyExchange = rate.RateCurrencyExchange.Value
+            RateCurrencyExchange = rate.RateCurrencyExchange.Value,
+            RoomId = rate.RoomId.Id
         };
     }
 }

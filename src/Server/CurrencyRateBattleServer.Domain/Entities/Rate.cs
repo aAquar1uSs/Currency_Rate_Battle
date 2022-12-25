@@ -24,7 +24,7 @@ public class Rate
 
     public RoomId RoomId { get; }
 
-    public CurrencyCode CurrencyCode { get; }
+    public CurrencyName CurrencyName { get; }
 
     public AccountId AccountId { get; }
 
@@ -37,7 +37,7 @@ public class Rate
         bool isClosed,
         bool isWon,
         RoomId roomId,
-        CurrencyCode currencyCode,
+        CurrencyName currencyCode,
         AccountId accountId)
     {
         Id = id;
@@ -49,7 +49,7 @@ public class Rate
         IsClosed = isClosed;
         IsWon = isWon;
         RoomId = roomId;
-        CurrencyCode = currencyCode;
+        CurrencyName = currencyCode;
         AccountId = accountId;
     }
 
@@ -62,7 +62,7 @@ public class Rate
         bool isClosed,
         bool isWon,
         Guid roomId,
-        string currencyCode,
+        string currencyName,
         Guid accountId)
     {
         var oneIdResult = OneId.TryCreate(id);
@@ -81,9 +81,9 @@ public class Rate
         if (roomOneIdResult.IsFailure)
             return Result.Failure<Rate>(roomOneIdResult.Error);
 
-        var currencyCodeResult = CurrencyCode.TryCreate(currencyCode);
-        if (currencyCodeResult.IsFailure)
-            return Result.Failure<Rate>(currencyCodeResult.Error);
+        var currencyNameResult = CurrencyName.TryCreate(currencyName);
+        if (currencyNameResult.IsFailure)
+            return Result.Failure<Rate>(currencyNameResult.Error);
 
         var accountOneIdResult = AccountId.TryCreate(accountId);
         if (accountOneIdResult.IsFailure)
@@ -91,7 +91,7 @@ public class Rate
 
         if (payout is null)
             return new Rate(oneIdResult.Value, setDate, rateCurrencyExchangeResult.Value, amountResult.Value,
-                settleDate, null, isClosed, isWon, roomOneIdResult.Value, currencyCodeResult.Value,
+                settleDate, null, isClosed, isWon, roomOneIdResult.Value, currencyNameResult.Value,
                 accountOneIdResult.Value);
 
         var payoutResult = Payout.TryCreate((decimal)payout);
@@ -99,7 +99,7 @@ public class Rate
             return Result.Failure<Rate>(payoutResult.Error);
 
         return new Rate(oneIdResult.Value, setDate, rateCurrencyExchangeResult.Value, amountResult.Value,
-            settleDate, payoutResult.Value, isClosed, isWon, roomOneIdResult.Value, currencyCodeResult.Value,
+            settleDate, payoutResult.Value, isClosed, isWon, roomOneIdResult.Value, currencyNameResult.Value,
             accountOneIdResult.Value);
     }
 
@@ -120,18 +120,18 @@ public class Rate
         var amountDomain = Amount.Create(amount);
 
         var roomOneId = RoomId.Create(roomId);
-        var currencyCode = CurrencyCode.Create(currency);
+        var currencyName = CurrencyName.Create(currency);
 
         var accountOneId = AccountId.Create(accountId);
         if (payout is null)
             return new Rate(oneId, setDate, rateExchange, amountDomain,
-                settleDate, null, isClosed, isWon, roomOneId, currencyCode,
+                settleDate, null, isClosed, isWon, roomOneId, currencyName,
                 accountOneId);
 
         var payoutDomain = Payout.Create((decimal)payout);
 
         return new Rate(oneId, setDate, rateExchange, amountDomain,
-            settleDate, payoutDomain, isClosed, isWon, roomOneId, currencyCode,
+            settleDate, payoutDomain, isClosed, isWon, roomOneId, currencyName,
             accountOneId);
     }
 

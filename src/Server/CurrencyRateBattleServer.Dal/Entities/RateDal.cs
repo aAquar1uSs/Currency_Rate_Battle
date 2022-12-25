@@ -34,7 +34,7 @@ public sealed class RateDal
     public Guid RoomId { get; set; }
 
     public RoomDal Room { get; set; }
-    
+
     public string CurrencyName { get; set; }
 
     [ForeignKey("CurrencyName")]
