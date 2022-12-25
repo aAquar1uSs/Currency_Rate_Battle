@@ -11,7 +11,6 @@ public class WebServerOptions
 
     public string? RoomsURL { get; set; }
 
-    [Required]
     [DefaultValue("get-balance")]
     public string? GetBalanceURL { get; set; }
 

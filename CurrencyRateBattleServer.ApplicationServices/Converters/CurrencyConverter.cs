@@ -1,24 +1,22 @@
-﻿using System.Globalization;
-using CurrencyRateBattleServer.ApplicationServices.Dto;
+﻿using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Dto;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Converters;
 
 public static class CurrencyConverter
 {
-    public static CurrencyDto[] ToDto(this CurrencyState[] currencyStates)
+    public static CurrencyDto[] ToDto(this Currency[] currencyStates)
     {
         return currencyStates.Select(x => x.ToDto()).ToArray();
     }
 
-    private static CurrencyDto ToDto(this CurrencyState currencyState)
+    private static CurrencyDto ToDto(this Currency currency)
     {
         return new CurrencyDto
         {
-            Currency = currencyState.CurrencyCode.Value,
-            Date = currencyState.Date.ToString(CultureInfo.InvariantCulture),
-            Rate = currencyState.CurrencyExchangeRate.Value
+            Currency = currency.CurrencyCode?.Value,
+            Date = DateTime.UtcNow.ToString(),
+            Rate = currency.Rate.Value
         };
 
     }

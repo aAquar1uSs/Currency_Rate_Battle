@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyRateBattleServer.Controllers;
 
-[Route("profile")]
+[Route("api/profile")]
 [ApiController]
 [Authorize]
 public class ProfileController : ControllerBase

@@ -15,14 +15,5 @@ public interface ICurrencyStateRepository
     /// <returns>
     ///the task result contains <see cref="List{T}"/> of <see cref="CurrencyStateDto"/>;
     /// </returns>
-    Task<CurrencyState[]> GetAsync(CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Updates currency states in the database;
-    /// </summary>
-    /// <param name="currencyState"> updated currency state which update in database;</param>
-    /// <returns>
-    ///A task that represents the asynchronous operation. <see cref="Task"/>;
-    /// </returns>
-    Task UpdateCurrencyRateAsync(Currency currency, DateTime currenctDate, CancellationToken cancellationToken);
+    Task<Currency[]> GetAsync(CancellationToken cancellationToken);
 }

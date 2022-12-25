@@ -40,31 +40,15 @@ public class CurrencyStateRepository : ICurrencyStateRepository
         return currencyState?.ToDomain();
     }
 
-    public async Task<CurrencyState[]> GetAsync(CancellationToken cancellationToken)
+    //ToDo Move to CurrencyRepository
+    public async Task<Currency[]> GetAsync(CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetAsync)} was caused");
 
-        var currencyStates = await _dbContext.CurrencyStates
+        var currency = await _dbContext.Currencies
             .ToArrayAsync(cancellationToken);
 
-        return currencyStates.Select(x => x.ToDomain()).ToArray();
-    }
-
-    public async Task UpdateCurrencyRateAsync(Currency currency, DateTime currentDate, CancellationToken cancellationToken)
-    {
-        _logger.LogDebug($"{nameof(UpdateCurrencyRateAsync)} was caused");
-
-        var currencyState = (await _dbContext.CurrencyStates
-            .FirstOrDefaultAsync(curr => curr.CurrencyCode == currency.CurrencyCode.Value, cancellationToken: cancellationToken));
-        if (currencyState is null)
-            return;
-
-        currencyState.UpdateDate = currentDate;
-        currencyState.CurrencyExchangeRate = Math.Round(currency.Rate.Value, 2);
-
-        _ = _dbContext.CurrencyStates.Update(currencyState);
-
-        _ = await _dbContext.SaveChangesAsync(cancellationToken);
+        return currency.Select(x => x.ToDomain()).ToArray();
     }
 }
 

@@ -31,7 +31,7 @@ public class JwtManager : IJwtManager
         {
             Subject = new ClaimsIdentity(new Claim[]
             {
-                new("UserId", user.Id.ToString())
+                new("UserId", user.Id.Value)
             }),
             Expires = DateTime.UtcNow.AddMinutes(10),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey),

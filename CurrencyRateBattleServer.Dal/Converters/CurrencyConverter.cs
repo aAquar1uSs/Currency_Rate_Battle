@@ -11,4 +11,9 @@ public static class CurrencyConverter
         return CurrencyState.Create(dal.Id, dal.UpdateDate, dal.CurrencyExchangeRate, dal.RoomId, dal.CurrencyCode,
             dal.CurrencyName);
     }
+
+    public static Currency ToDomain(this CurrencyDal dal)
+    {
+        return Currency.Create(dal.CurrencyName, dal.CurrencyCode, dal.Rate, dal.Description);
+    }
 }

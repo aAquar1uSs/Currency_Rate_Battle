@@ -26,7 +26,7 @@ public class RateController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet] //ToDo add isActive and CurrecyCode in DTO
+    [HttpGet] //ToDo add isActive and CurrencyCode in DTO
     public async Task<ActionResult<List<Room>>> GetRatesAsync(bool? isActive, string? currencyCode, CancellationToken cancellationToken)
     {
         _logger.LogDebug("List of rates are retrieving.");
