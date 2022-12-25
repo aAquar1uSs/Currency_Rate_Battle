@@ -64,7 +64,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                          Payout = rate.Payout,
                          RoomDate = room.EndDate,
                          RoomId = rate.RoomId,
-                         CurrencyName = curr.CurrencyCode,
+                         CurrencyName = curr.CurrencyName,
                      };
         return result;
     }
