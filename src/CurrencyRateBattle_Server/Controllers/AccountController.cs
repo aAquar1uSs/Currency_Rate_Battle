@@ -32,12 +32,12 @@ public class AccountController : ControllerBase
 
         var command = new LoginCommand { UserDto = userData };
 
-        var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
+        var response= await _mediator.Send(command, cancellationToken);
 
-        if (isFailure)
-            Unauthorized(error);
+        if (response.IsFailure)
+            return Unauthorized(response.Error);
 
-        return Ok(value.Tokens);
+        return Ok(response.Value.Tokens);
     }
 
     [HttpPost("registration")]
