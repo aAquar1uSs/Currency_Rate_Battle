@@ -36,7 +36,7 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
 
         var rates = await _rateRepository.GetRateByRoomIdsAsync(roomIds, cancellationToken);
 
-        if (rates.Any(r => r.IsClosed))
+        if (rates.Any(r => r.IsClosed) || rates.Length == 0)
             return Unit.Value;
 
         var calculateRates = await Calculate(rates, cancellationToken);

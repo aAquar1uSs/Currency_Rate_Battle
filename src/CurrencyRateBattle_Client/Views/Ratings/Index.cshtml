@@ -1,6 +1,5 @@
 ﻿@model X.PagedList.IPagedList<CRBClient.Models.RatingViewModel>
 @using X.PagedList.Mvc.Core
-@using System.Globalization
 
 @{
     Layout = "~/Views/Shared/_BlackLayout.cshtml";
@@ -21,30 +20,30 @@
             <th style="width:30px; text-align:right">
                 @Html.ActionLink("Bets Number", "Index", new { sortOrder = ViewBag.BetNoSortParm })
                 @if (ViewBag.CurrentSortOrder == "bets_no_asc")
-                @("↓")
+                {@("↓")}
                 @if (ViewBag.CurrentSortOrder == "bets_no")
-                @("↑")
+                {@("↑")}
             </th>
             <th style="width:30px; text-align:right">
                 @Html.ActionLink("Won Bets Number", "Index", new { sortOrder = ViewBag.WonBetNoSortParm })
                 @if (ViewBag.CurrentSortOrder == "won_bets_no_asc")
-                @("↓")
+                {@("↓")}
                 @if (ViewBag.CurrentSortOrder == "won_bets_no")
-                @("↑")
+                {@("↑")}
             </th>
             <th style="width:30px; text-align:right">
                 @Html.ActionLink("Profit Percentage (%)", "Index", new { sortOrder = ViewBag.ProfitPercSortParm })
                 @if (ViewBag.CurrentSortOrder == "profitperc_asc")
-                @("↓")
+                {@("↓")}
                 @if (ViewBag.CurrentSortOrder == "profitperc")
-                @("↑")
+                {@("↑")}
             </th>
             <th style="width:30px; text-align:right">
                 @Html.ActionLink("Won Bets Percentage (%)", "Index", new { sortOrder = ViewBag.WonBetsPercSortParm })
                 @if (ViewBag.CurrentSortOrder == "wonbetsperc_acs")
-                @("↓")
+                {@("↓")}
                 @if (ViewBag.CurrentSortOrder == "wonbetsperc")
-                @("↑")
+                {@("↑")}
             </th>
         </tr>
 

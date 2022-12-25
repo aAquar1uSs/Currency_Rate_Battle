@@ -14,5 +14,5 @@ public interface IRateRepository
 
     Task UpdateRateByRoomIdAsync(Rate[] updatedRate, CancellationToken cancellationToken);
 
-    Task<Rate[]> FindAsync(bool? isActive, string? currencyCode, CancellationToken cancellationToken);
+    Task<Rate[]> FindAsync(bool? isActive, string? currencyName, CancellationToken cancellationToken);
 }

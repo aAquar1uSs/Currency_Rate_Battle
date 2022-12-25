@@ -34,8 +34,10 @@ public class RateRepository : IRateRepository
     {
         _logger.LogInformation($"{nameof(GetRateByRoomIdsAsync)} was caused.");
 
+        var roomGuidIds = roomIds.Select(x => x.Id); 
+        
         var rates = await _dbContext.Rates
-            .Where(dal => roomIds.Any(x => x.Id == dal.RoomId))
+            .Where(dal => roomGuidIds.Contains(dal.RoomId))
             .ToArrayAsync(cancellationToken);
 
         return rates.ToDomain();
@@ -51,21 +53,21 @@ public class RateRepository : IRateRepository
         _ = await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Rate[]> FindAsync(bool? isActive, string? currencyCode, CancellationToken cancellationToken)
+    public async Task<Rate[]> FindAsync(bool? isActive, string? currencyName, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(FindAsync)} was caused.");
 
         var currencyId = string.Empty;
-        if (currencyCode is not null)
+        if (currencyName is not null)
         {
             var currency =
-                await _dbContext.Currencies.FirstOrDefaultAsync(c => c.CurrencyName == currencyCode, cancellationToken);
-            currencyId = currency?.CurrencyCode;
+                await _dbContext.Currencies.FirstOrDefaultAsync(c => c.CurrencyName == currencyName, cancellationToken);
+            currencyId = currency?.CurrencyName;
         }
 
         RateDal[] result;
         if (currencyId is not null || currencyId != string.Empty)
-            result = await _dbContext.Rates.Where(dal => dal.Currency.CurrencyCode == currencyId)
+            result = await _dbContext.Rates.Where(dal => dal.Currency.CurrencyName == currencyId)
                 .ToArrayAsync(cancellationToken);
 
         result = isActive switch

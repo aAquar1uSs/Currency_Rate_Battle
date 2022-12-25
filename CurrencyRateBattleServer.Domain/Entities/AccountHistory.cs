@@ -16,8 +16,7 @@ public class AccountHistory
     public RoomId? RoomId { get; private set; }
 
     public AccountId AccountId { get; private set; }
-
-
+    
     private AccountHistory(AccountHistoryId id,
         bool isCredit,
         DateTime date,

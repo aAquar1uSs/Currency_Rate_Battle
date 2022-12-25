@@ -22,7 +22,7 @@ public class GetRatesHandler : IRequestHandler<GetRatesCommand, Result<GetRatesR
     {
         _logger.LogDebug($"{nameof(GetRoomHandler)} was caused. Start processing.");
 
-        var rates = await _rateRepository.FindAsync(request.IsActive, request.CurrencyCode, cancellationToken);
+        var rates = await _rateRepository.FindAsync(request.IsActive, request.CurrencyName, cancellationToken);
 
         return new GetRatesResponse { Rates = rates.ToDto() };
     }

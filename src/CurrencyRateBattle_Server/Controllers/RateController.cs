@@ -30,7 +30,7 @@ public class RateController : ControllerBase
     public async Task<ActionResult<List<Room>>> GetRatesAsync(bool? isActive, string? currencyCode, CancellationToken cancellationToken)
     {
         _logger.LogDebug("List of rates are retrieving.");
-        var command = new GetRatesCommand {IsActive = isActive, CurrencyCode = currencyCode};
+        var command = new GetRatesCommand {IsActive = isActive, CurrencyName = currencyCode};
 
         var response = await _mediator.Send(command, cancellationToken);
 

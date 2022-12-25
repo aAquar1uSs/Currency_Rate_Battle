@@ -7,6 +7,6 @@ public class GetRatesCommand : IRequest<Result<GetRatesResponse>>
 {
     public bool? IsActive { get; set; }
 
-    public string? CurrencyCode { get; set; }
+    public string? CurrencyName { get; set; }
 
 }
