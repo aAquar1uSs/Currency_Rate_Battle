@@ -28,9 +28,9 @@ public class RatingService : IRatingService
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("User rating are loaded successfully");
-           var ratingsJson =  await response.Content.ReadAsStreamAsync(cancellationToken);
-           var ratings = await JsonSerializer.DeserializeAsync<RatingViewModel[]>(ratingsJson, cancellationToken: cancellationToken);
-           return ratings;
+          // var ratingsJson =  await response.Content.ReadAsStreamAsync(cancellationToken);
+          // var ratings = await JsonSerializer.DeserializeAsync<RatingViewModel[]>(ratingsJson, cancellationToken: cancellationToken);
+           return await response.Content.ReadAsAsync<RatingViewModel[]>(cancellationToken);
         }
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
