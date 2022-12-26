@@ -30,7 +30,6 @@ public class RoomRepository : IRoomRepository
         {
             _ = await _dbContext.CurrencyStates.AddAsync(await CreateRoomWithCurrencyStateAsync(curr), cancellationToken);
         }
-
         _ = await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -80,7 +79,9 @@ public class RoomRepository : IRoomRepository
     public async Task<RoomDal?> FindAsync(Guid id, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(FindAsync)} was caused");
-        return await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == id, cancellationToken);;
+        return await _dbContext.Rooms
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);;
     }
 
     public async Task DeleteAsync(RoomId roomId, CancellationToken cancellationToken)

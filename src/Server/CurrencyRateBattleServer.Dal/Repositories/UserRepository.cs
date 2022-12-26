@@ -23,6 +23,7 @@ public class UserRepository : IUserRepository
         _logger.LogDebug($"{nameof(GetAsync)} was caused.");
 
         var userDal = await _dbContext.Users
+            .AsNoTracking()
             .FirstOrDefaultAsync(dal => dal.Email == userData.Email.Value && dal.Password == userData.Password.Value,
                 cancellationToken);
 
@@ -34,6 +35,7 @@ public class UserRepository : IUserRepository
         _logger.LogDebug($"{nameof(FindAsync)} was caused.");
 
         var userDal = await _dbContext.Users
+            .AsNoTracking()
             .FirstOrDefaultAsync(dal => dal.Id == id.Id, cancellationToken);
         return userDal?.ToDomain();
     }

@@ -45,9 +45,8 @@ host.ConfigureAppConfiguration(app =>
             option.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionDb")));
         _ = service.AddDatabaseDeveloperPageExceptionFilter();
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
+        
         _ = services.AddMediatR(typeof(GenerateRoomHandler), typeof(UpdateCurrencyRateHandler));
-
         service.ConfigureServices();
 
         //Disable automatic model state validation.

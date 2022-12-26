@@ -15,7 +15,7 @@ public interface IAccountRepository
     ///the task result contains <see cref="Tokens"/>;
     /// </returns>
     /// <exception cref="Helpers.GeneralException"> Throws if such user is already taken;</exception>
-    public Task CreateAccountAsync(Account account, CancellationToken cancellationToken);
+    public Task CreateAsync(Account account, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get account model from database by user id;

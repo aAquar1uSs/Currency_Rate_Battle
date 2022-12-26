@@ -24,6 +24,7 @@ public class CurrencyStateRepository : ICurrencyStateRepository
         _logger.LogDebug($"{nameof(GetCurrencyStateIdByRoomIdAsync)}, was caused.");
 
         var currId = await _dbContext.CurrencyStates
+            .AsNoTracking()
             .Where(currState => currState.Room.Id == roomId.Id)
             .Select(currState => currState.CurrencyName).FirstAsync(cancellationToken);
 
@@ -35,6 +36,7 @@ public class CurrencyStateRepository : ICurrencyStateRepository
         _logger.LogDebug($"{nameof(GetCurrencyStateByRoomIdAsync)}, was caused.");
 
         var currencyState = await _dbContext.CurrencyStates
+            .AsNoTracking()
             .FirstOrDefaultAsync(currState => currState.Room.Id == roomId.Id, cancellationToken);
 
         return currencyState?.ToDomain();

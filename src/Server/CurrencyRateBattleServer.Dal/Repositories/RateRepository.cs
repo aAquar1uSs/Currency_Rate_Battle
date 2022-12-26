@@ -37,6 +37,7 @@ public class RateRepository : IRateRepository
         var roomGuidIds = roomIds.Select(x => x.Id); 
         
         var rates = await _dbContext.Rates
+            .AsNoTracking()
             .Where(dal => roomGuidIds.Contains(dal.RoomId))
             .ToArrayAsync(cancellationToken);
 

@@ -43,6 +43,8 @@ public class CurrencyRepository : ICurrencyRepository
 
     public async Task<string[]> GetAllIds(CancellationToken cancellationToken)
     {
-        return await _dbContext.Currencies.Select(x => x.CurrencyName).ToArrayAsync(cancellationToken);
+        return await _dbContext.Currencies
+            .AsNoTracking()
+            .Select(x => x.CurrencyName).ToArrayAsync(cancellationToken);
     }
 }

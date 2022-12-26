@@ -60,10 +60,10 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
 
         account.AddUser(user);
 
-        await _accountRepository.CreateAccountAsync(account, cancellationToken);
+        await _accountRepository.CreateAsync(account, cancellationToken);
 
         var accountHistoryId = AccountHistoryId.GenerateId();
-        var accountHistory = AccountHistory.Create(accountHistoryId.Id, account.Id.Id, DateTime.Now, account.Amount.Value);
+        var accountHistory = AccountHistory.Create(accountHistoryId.Id, account.Id.Id, DateTime.Now, account.Amount.Value, isCredit: true);
         await _accountHistoryRepository.CreateAsync(accountHistory, cancellationToken);
 
         return new RegistrationResponse { Tokens = _jwtManager.Authenticate(user) };
