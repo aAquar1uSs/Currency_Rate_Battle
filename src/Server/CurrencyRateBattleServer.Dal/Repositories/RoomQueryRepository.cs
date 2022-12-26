@@ -24,7 +24,7 @@ public class RoomQueryRepository : IRoomQueryRepository
         _logger.LogInformation($"{nameof(FindAsync)} was caused");
         
         var result = from curr in _dbContext.Currencies
-            join currState in _dbContext.CurrencyStates on curr.CurrencyCode equals currState.CurrencyCode
+            join currState in _dbContext.CurrencyStates on curr.CurrencyName equals currState.CurrencyName
             join room in _dbContext.Rooms on currState.RoomId equals room.Id
             where room.IsClosed == isClosed
             select new RoomInfoDal
@@ -47,7 +47,7 @@ public class RoomQueryRepository : IRoomQueryRepository
         var filteredRooms =
             await (from currencyState in _dbContext.CurrencyStates
             join room in _dbContext.Rooms on currencyState.RoomId equals room.Id
-            join curr in _dbContext.Currencies on currencyState.CurrencyCode equals curr.CurrencyCode
+            join curr in _dbContext.Currencies on currencyState.CurrencyName equals curr.CurrencyName
             where room.IsClosed == false
             select new RoomInfoDal
             {
