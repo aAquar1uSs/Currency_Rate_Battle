@@ -11,7 +11,7 @@ public interface IRateRepository
 
     Task DeleteRateAsync(Rate rateToDelete);
 
-    Task UpdateRateByRoomIdAsync(Rate[] updatedRate, CancellationToken cancellationToken);
+    Task UpdateRangeAsync(Rate[] updatedRate, CancellationToken cancellationToken);
 
     Task<Rate[]> FindAsync(bool? isActive, string? currencyName, CancellationToken cancellationToken);
 }

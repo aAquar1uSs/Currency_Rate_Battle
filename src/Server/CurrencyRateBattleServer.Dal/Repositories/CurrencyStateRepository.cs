@@ -48,6 +48,7 @@ public class CurrencyStateRepository : ICurrencyStateRepository
         _logger.LogDebug($"{nameof(GetAsync)} was caused");
 
         var currency = await _dbContext.Currencies
+            .AsNoTracking()
             .ToArrayAsync(cancellationToken);
 
         return currency.Select(x => x.ToDomain()).ToArray();

@@ -24,8 +24,8 @@ public class AccountHistoryRepository : IAccountHistoryRepository
         _logger.LogDebug($"{nameof(GetAsync)} was caused.");
 
         var histories = await _dbContext.AccountHistory
-            .AsNoTracking()
             .Where(history => history.Account.Id == accountId.Id)
+            .AsNoTracking()
             .ToArrayAsync(cancellationToken);
 
         return histories.ToDomain();

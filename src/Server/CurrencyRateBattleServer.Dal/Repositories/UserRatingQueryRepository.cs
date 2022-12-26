@@ -3,6 +3,7 @@ using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Dal.Repositories;
@@ -111,7 +112,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                          RatePayout = rate.Payout
                      };
 
-        return query1;
+        return query1.AsNoTracking();
     }
 
     private IQueryable<UserRatingDal> GetUserRatingDataTotalQuery(IQueryable<UserRatingDal> data)
@@ -129,7 +130,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                              TotalBetCount = grp.Count()
                          };
 
-        return totalQuery;
+        return totalQuery.AsNoTracking();
     }
 
     private IQueryable<UserRatingDal> GetUserRatingDataWonQuery(IQueryable<UserRatingDal> data)
@@ -146,7 +147,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                            WonPayout = grp.Sum(s => s.RatePayout),
                            WonBetCount = grp.Count()
                        };
-        return wonQuery;
+        return wonQuery.AsNoTracking();
     }
 
     private IQueryable<ResultUserRatingDal> GetUserRatingDataTotalWonQuery(IQueryable<UserRatingDal> data,
@@ -161,9 +162,9 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                         WonQ = wonQ
                     };
 
-        return query;
+        return query.AsNoTracking();
     }
-    
+
     public Task<Bet[]> FindAsync(AccountId accountId, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(FindAsync)} was caused.");

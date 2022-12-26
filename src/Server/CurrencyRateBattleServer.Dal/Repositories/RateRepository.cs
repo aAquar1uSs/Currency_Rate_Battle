@@ -35,18 +35,18 @@ public class RateRepository : IRateRepository
         _logger.LogInformation($"{nameof(GetRateByRoomIdsAsync)} was caused.");
 
         var roomGuidIds = roomIds.Select(x => x.Id); 
-        
+
         var rates = await _dbContext.Rates
-            .AsNoTracking()
             .Where(dal => roomGuidIds.Contains(dal.RoomId))
+            .AsNoTracking()
             .ToArrayAsync(cancellationToken);
 
         return rates.ToDomain();
     }
 
-    public async Task UpdateRateByRoomIdAsync(Rate[] updatedRate, CancellationToken cancellationToken)
+    public async Task UpdateRangeAsync(Rate[] updatedRate, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(UpdateRateByRoomIdAsync)} was caused.");
+        _logger.LogInformation($"{nameof(UpdateRangeAsync)} was caused.");
 
         var updatedRateDal = updatedRate.ToDal();
 
@@ -61,21 +61,24 @@ public class RateRepository : IRateRepository
         var currencyId = string.Empty;
         if (currencyName is not null)
         {
-            var currency =
-                await _dbContext.Currencies.FirstOrDefaultAsync(c => c.CurrencyName == currencyName, cancellationToken);
+            var currency = await _dbContext.Currencies
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.CurrencyName == currencyName, cancellationToken);
             currencyId = currency?.CurrencyName;
         }
 
         RateDal[] result;
         if (currencyId is not null || currencyId != string.Empty)
-            result = await _dbContext.Rates.Where(dal => dal.Currency.CurrencyName == currencyId)
+            result = await _dbContext.Rates
+                .Where(dal => dal.Currency.CurrencyName == currencyId)
+                .AsNoTracking()
                 .ToArrayAsync(cancellationToken);
 
         result = isActive switch
         {
-            null => await _dbContext.Rates.ToArrayAsync(cancellationToken),
-            true => await _dbContext.Rates.Where(r => !r.IsClosed).ToArrayAsync(cancellationToken),
-            _ => await _dbContext.Rates.Where(r => r.IsClosed).ToArrayAsync(cancellationToken)
+            null => await _dbContext.Rates.AsNoTracking().ToArrayAsync(cancellationToken),
+            true => await _dbContext.Rates.Where(r => !r.IsClosed).AsNoTracking().ToArrayAsync(cancellationToken),
+            _ => await _dbContext.Rates.Where(r => r.IsClosed).AsNoTracking().ToArrayAsync(cancellationToken)
         };
 
         return result.ToDomain();

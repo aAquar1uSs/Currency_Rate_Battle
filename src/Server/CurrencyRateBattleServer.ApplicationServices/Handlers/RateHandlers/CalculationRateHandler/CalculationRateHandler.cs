@@ -11,20 +11,20 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
     private readonly ILogger<CalculationRateHandler> _logger;
     private readonly IRateRepository _rateRepository;
     private readonly IRoomRepository _roomRepository;
-    private readonly ICurrencyStateRepository _currencyStateRepository;
+    private readonly ICurrencyRepository _currencyRepository;
     private readonly IAccountRepository _accountRepository;
     private readonly IAccountHistoryRepository _accountHistoryRepository;
 
     public CalculationRateHandler(ILogger<CalculationRateHandler> logger,
         IRateRepository rateRepository, IRoomRepository roomRepository,
-        ICurrencyStateRepository currencyStateRepository,
+        ICurrencyRepository currencyRepository,
         IAccountRepository accountRepository,
         IAccountHistoryRepository accountHistoryRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _rateRepository = rateRepository ?? throw new ArgumentNullException(nameof(rateRepository));
         _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
-        _currencyStateRepository = currencyStateRepository ?? throw new ArgumentNullException(nameof(currencyStateRepository));
+        _currencyRepository = currencyRepository ?? throw new ArgumentNullException(nameof(currencyRepository));
         _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
         _accountHistoryRepository = accountHistoryRepository ?? throw new ArgumentNullException(nameof(accountHistoryRepository));
     }
@@ -41,7 +41,7 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
 
         var calculateRates = await Calculate(rates, cancellationToken);
 
-        await _rateRepository.UpdateRateByRoomIdAsync(calculateRates, cancellationToken);
+        await _rateRepository.UpdateRangeAsync(calculateRates, cancellationToken);
 
         foreach (var rate in calculateRates)
         {
@@ -83,8 +83,8 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
 
         foreach (var rate in rates)
         {
-            var currencyState = await _currencyStateRepository.GetCurrencyStateByRoomIdAsync(rate.RoomId, cancellationToken);
-            if (currencyState != null && rate.RateCurrencyExchange == currencyState.CurrencyExchangeRate)
+            var currencyRate = await _currencyRepository.GetCurrencyByCurrencyName(rate.CurrencyName.Value, cancellationToken);
+            if (currencyRate != null && rate.RateCurrencyExchange.Value == currencyRate)
             {
                 rate.IsWonBet();
             }

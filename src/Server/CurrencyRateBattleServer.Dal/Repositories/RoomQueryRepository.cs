@@ -18,11 +18,11 @@ public class RoomQueryRepository : IRoomQueryRepository
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
-    
+
     public async Task<RoomInfo[]> FindAsync(bool isClosed, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(FindAsync)} was caused");
-        
+
         var result = from curr in _dbContext.Currencies
             join currState in _dbContext.CurrencyStates on curr.CurrencyName equals currState.CurrencyName
             join room in _dbContext.Rooms on currState.RoomId equals room.Id
@@ -37,10 +37,10 @@ public class RoomQueryRepository : IRoomQueryRepository
                 UpdateRateTime = currState.UpdateDate,
                 CountRates = _dbContext.Rates.Count(r => r.RoomId == room.Id)
             };
-        var roomInfos = await result.ToArrayAsync(cancellationToken);
+        var roomInfos = await result.AsNoTracking().ToArrayAsync(cancellationToken);
         return roomInfos.Select(x => x.ToDomain()).ToArray();
     }
-    
+
     public async Task<RoomInfo[]> GetActiveRoomsWithFilterAsync(Filter filter, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(GetActiveRoomsWithFilterAsync)} was caused");
@@ -58,7 +58,7 @@ public class RoomQueryRepository : IRoomQueryRepository
                 CurrencyName = curr.CurrencyName,
                 UpdateRateTime = currencyState.UpdateDate,
                 CountRates = _dbContext.Rates.Count(r => r.RoomId == room.Id)
-            }).ToArrayAsync(cancellationToken);
+            }).AsNoTracking().ToArrayAsync(cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(filter.CurrencyName))
             filteredRooms = filteredRooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant()).ToArray();

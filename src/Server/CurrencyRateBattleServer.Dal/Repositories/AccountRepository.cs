@@ -52,8 +52,11 @@ public class AccountRepository : IAccountRepository
     public async Task UpdateAsync(Account account, CancellationToken cancellationToken)
     {
         var accountDal = account.ToDal();
-
-        _dbContext.Accounts.Update(accountDal);
+        
+        //ToDo Do somethings with this shit || If remove this exception was thrown
+        _dbContext.Accounts.Attach(accountDal);
+        _dbContext.Entry(accountDal).Property(x => x.Amount).IsModified = true;
         await _dbContext.SaveChangesAsync(cancellationToken);
+        _dbContext.Entry(accountDal).State = EntityState.Detached;
     }
 }
