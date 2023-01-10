@@ -34,9 +34,9 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
         var closedRooms = await _roomRepository.RoomClosureCheckAsync(cancellationToken);
         var roomIds = closedRooms.Select(x => x.Id).ToArray();
 
-        var rates = await _rateRepository.GetRateByRoomIdsAsync(roomIds, cancellationToken);
+        var rates = await _rateRepository.GetActiveRateByRoomIdsAsync(roomIds, cancellationToken);
 
-        if (rates.Any(r => r.IsClosed) || rates.Length == 0)
+        if (rates.Length == 0)
             return Unit.Value;
 
         var calculateRates = await Calculate(rates, cancellationToken);
@@ -85,8 +85,10 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
         {
             var currencyRate = await _currencyRepository.GetCurrencyByCurrencyName(rate.CurrencyName.Value, cancellationToken);
             if (currencyRate != null && rate.RateCurrencyExchange.Value == currencyRate)
-            {
                 rate.IsWonBet();
+            else
+            {
+                rate.IsLoseBet();
             }
         }
 

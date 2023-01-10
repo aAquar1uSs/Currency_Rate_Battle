@@ -150,6 +150,12 @@ public class Rate
         IsClosed = true;
     }
 
+    public void IsLoseBet()
+    {
+        IsWon = false;
+        IsClosed = true;
+    }
+
     public void CreatePayout(decimal payout, DateTime settledDate)
     {
         Payout = Payout.Create(payout);

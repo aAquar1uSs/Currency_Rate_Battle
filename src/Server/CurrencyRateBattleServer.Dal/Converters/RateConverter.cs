@@ -30,6 +30,7 @@ public static class RateConverter
             AccountId = rate.AccountId.Id,
             Amount = rate.Amount.Value,
             CurrencyName = rate.CurrencyName.Value,
+            Payout = rate.Payout?.Value,
             IsClosed = rate.IsClosed,
             IsWon = rate.IsWon,
             Id = rate.Id.Id,

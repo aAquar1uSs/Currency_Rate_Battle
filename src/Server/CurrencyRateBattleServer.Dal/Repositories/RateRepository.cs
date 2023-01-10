@@ -30,14 +30,15 @@ public class RateRepository : IRateRepository
         _ = await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Rate[]> GetRateByRoomIdsAsync(RoomId[] roomIds, CancellationToken cancellationToken)
+    public async Task<Rate[]> GetActiveRateByRoomIdsAsync(RoomId[] roomIds, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(GetRateByRoomIdsAsync)} was caused.");
+        _logger.LogInformation($"{nameof(GetActiveRateByRoomIdsAsync)} was caused.");
 
         var roomGuidIds = roomIds.Select(x => x.Id); 
 
         var rates = await _dbContext.Rates
             .Where(dal => roomGuidIds.Contains(dal.RoomId))
+            .Where(dal => !dal.IsClosed)
             .AsNoTracking()
             .ToArrayAsync(cancellationToken);
 
