@@ -35,6 +35,7 @@ public static class RateConverter
             IsWon = rate.IsWon,
             Id = rate.Id.Id,
             SetDate = rate.SetDate,
+            SettleDate = DateTime.UtcNow,
             RateCurrencyExchange = rate.RateCurrencyExchange.Value,
             RoomId = rate.RoomId.Id
         };

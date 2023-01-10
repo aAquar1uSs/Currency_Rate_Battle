@@ -73,10 +73,9 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
     private IQueryable<BetDal> GetBetSubQuery(IQueryable<BetDal> data)
     {
         var query = from res in data
-                    join currState in _dbContext.CurrencyStates
-                on new { res.RoomId, res.CurrencyName } equals new { currState.RoomId, currState.CurrencyName }
-                into gj
-                    from subCurr in gj.DefaultIfEmpty()
+                    join rates in _dbContext.Rates
+                on new { res.RoomId, res.CurrencyName } equals new { rates.RoomId, rates.CurrencyName }
+                into gj from subCurr in gj.DefaultIfEmpty()
                     select new BetDal
                     {
                         RateId = res.RateId,
@@ -91,7 +90,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                         RoomDate = res.RoomDate,
                         RoomId = res.RoomId,
                         CurrencyName = res.CurrencyName,
-                        CurrencyExchangeRate = subCurr == null ? 0 : subCurr.CurrencyExchangeRate
+                        CurrencyExchangeRate = subCurr.RateCurrencyExchange
                     };
         return query;
     }
@@ -182,9 +181,8 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                 SetDate = data.RateSetDate,
                 BetAmount = (decimal)data.Amount,
                 SettleDate = data.RateSettleDate,
-                WonCurrencyExchange =
-                    data.CurrencyExchangeRate == 0 ? null : Math.Round((decimal)data.CurrencyExchangeRate, 2),
-                UserCurrencyExchange = Math.Round(data.RateCurrencyExchange, 2),
+                WonCurrencyExchange = Math.Round(data.RateCurrencyExchange, 2),
+                UserCurrencyExchange = Math.Round((decimal)data.CurrencyExchangeRate, 2),
                 PayoutAmount = data.Payout,
                 CurrencyName = data.CurrencyName,
                 IsClosed = data.IsClosed,
