@@ -16,7 +16,7 @@ public class BetDal
 
     public Guid AccountId { get; set; }
 
-    public decimal RateCurrencyExchange { get; set; }
+    public decimal UserRateCurrencyExchange { get; set; }
 
     public decimal? Payout { get; set; }
 
@@ -26,5 +26,5 @@ public class BetDal
 
     public string CurrencyName { get; set; }
 
-    public decimal? CurrencyExchangeRate { get; set; }
+    public decimal? RealCurrencyExchangeRate { get; set; }
 }

@@ -61,7 +61,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                          IsWon = rate.IsWon,
                          IsClosed = rate.IsClosed,
                          AccountId = rate.AccountId,
-                         RateCurrencyExchange = rate.RateCurrencyExchange,
+                         UserRateCurrencyExchange = rate.RateCurrencyExchange,
                          Payout = rate.Payout,
                          RoomDate = room.EndDate,
                          RoomId = rate.RoomId,
@@ -74,7 +74,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
     {
         var query = from res in data
                     join rates in _dbContext.Rates
-                on new { res.RoomId, res.CurrencyName } equals new { rates.RoomId, rates.CurrencyName }
+                on new { res.RoomId, res.CurrencyName, res.AccountId } equals new { rates.RoomId, rates.CurrencyName, rates.AccountId }
                 into gj from subCurr in gj.DefaultIfEmpty()
                     select new BetDal
                     {
@@ -85,12 +85,12 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                         IsWon = res.IsWon,
                         IsClosed = res.IsClosed,
                         AccountId = res.AccountId,
-                        RateCurrencyExchange = res.RateCurrencyExchange,
+                        UserRateCurrencyExchange = res.UserRateCurrencyExchange,
                         Payout = res.Payout,
                         RoomDate = res.RoomDate,
                         RoomId = res.RoomId,
                         CurrencyName = res.CurrencyName,
-                        CurrencyExchangeRate = subCurr.RateCurrencyExchange
+                        RealCurrencyExchangeRate = subCurr.RateCurrencyExchange
                     };
         return query;
     }
@@ -181,8 +181,8 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                 SetDate = data.RateSetDate,
                 BetAmount = (decimal)data.Amount,
                 SettleDate = data.RateSettleDate,
-                WonCurrencyExchange = Math.Round(data.RateCurrencyExchange, 2),
-                UserCurrencyExchange = Math.Round((decimal)data.CurrencyExchangeRate, 2),
+                WonCurrencyExchange = Math.Round((decimal)data.RealCurrencyExchangeRate, 2),
+                UserCurrencyExchange = Math.Round(data.UserRateCurrencyExchange, 2),
                 PayoutAmount = data.Payout,
                 CurrencyName = data.CurrencyName,
                 IsClosed = data.IsClosed,
