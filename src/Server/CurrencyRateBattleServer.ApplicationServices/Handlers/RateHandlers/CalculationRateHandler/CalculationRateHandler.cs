@@ -63,7 +63,7 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
 
             await _accountRepository.UpdateAsync(account, cancellationToken);
 
-            var accountHistoryId = OneId.GenerateId();
+            var accountHistoryId = CustomId.GenerateId();
             var accountHistory = AccountHistory.Create(accountHistoryId.Id, account.Id.Id,
                 DateTime.UtcNow, moneyCreatedResult.Value.Value, true, rate.RoomId.Id);
             await _accountHistoryRepository.CreateAsync(accountHistory, cancellationToken);

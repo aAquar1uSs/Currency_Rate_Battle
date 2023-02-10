@@ -5,7 +5,7 @@ namespace CurrencyRateBattleServer.Domain.Entities;
 
 public class CurrencyState
 {
-    public OneId Id { get; }
+    public CustomId Id { get; }
 
     public DateTime Date { get; set; }
 
@@ -17,7 +17,7 @@ public class CurrencyState
     
     public CurrencyName CurrencyName { get; set; }
 
-    private CurrencyState(OneId id,
+    private CurrencyState(CustomId id,
         DateTime date,
         Amount currencyExchangeRate,
         RoomId roomId,
@@ -39,7 +39,7 @@ public class CurrencyState
         string currencyCode,
         string currencyName)
     {
-        var oneIdResult = OneId.TryCreate(id);
+        var oneIdResult = CustomId.TryCreate(id);
         if (oneIdResult.IsFailure)
             return Result.Failure<CurrencyState>(oneIdResult.Error);
 
@@ -74,7 +74,7 @@ public class CurrencyState
         string currencyCode,
         string currencyName)
     {
-        var oneId = OneId.Create(id);
+        var oneId = CustomId.Create(id);
 
         var currencyExchangeRate = Amount.Create(currencyExchange);
 

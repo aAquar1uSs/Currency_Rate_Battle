@@ -2,7 +2,7 @@
 
 namespace CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 
-public class UserId : OneId
+public class UserId : CustomId
 {
     protected UserId(Guid id) : base(id)
     {
@@ -12,7 +12,7 @@ public class UserId : OneId
     public static Result<UserId> TryCreate(Guid? id)
     {
         if (id == Guid.Empty || id is null)
-            Result.Failure<OneId>("User Id can not be empty or null");
+            Result.Failure<CustomId>("User Id can not be empty or null");
 
         return new UserId(id.Value);
     }

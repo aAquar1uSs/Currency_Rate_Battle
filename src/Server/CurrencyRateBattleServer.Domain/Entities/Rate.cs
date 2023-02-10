@@ -5,7 +5,7 @@ namespace CurrencyRateBattleServer.Domain.Entities;
 
 public class Rate
 {
-    public OneId Id { get; }
+    public CustomId Id { get; }
 
     public DateTime SetDate { get; }
 
@@ -28,7 +28,7 @@ public class Rate
 
     public AccountId AccountId { get; }
 
-    public Rate(OneId id,
+    public Rate(CustomId id,
         DateTime setDate,
         RateCurrencyExchange rateCurrencyExchange,
         Amount amount,
@@ -65,7 +65,7 @@ public class Rate
         string currencyName,
         Guid accountId)
     {
-        var oneIdResult = OneId.TryCreate(id);
+        var oneIdResult = CustomId.TryCreate(id);
         if (oneIdResult.IsFailure)
             return Result.Failure<Rate>(oneIdResult.Error);
 
@@ -115,7 +115,7 @@ public class Rate
         string currency,
         Guid accountId)
     {
-        var oneId = OneId.Create(id);
+        var oneId = CustomId.Create(id);
         var rateExchange = RateCurrencyExchange.Create(rateCurrencyExchange);
         var amountDomain = Amount.Create(amount);
 

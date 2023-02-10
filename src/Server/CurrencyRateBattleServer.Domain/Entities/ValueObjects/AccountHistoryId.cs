@@ -2,16 +2,16 @@
 
 namespace CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 
-public class AccountHistoryId : OneId
+public class AccountHistoryId : CustomId
 {
-    protected AccountHistoryId(Guid id) : base(id)
+    private AccountHistoryId(Guid id) : base(id)
     {
     }
     
     public static Result<AccountHistoryId> TryCreate(Guid id)
     {
         if (id == Guid.Empty)
-            Result.Failure<OneId>("account history id can not be empty");
+            Result.Failure<CustomId>("account history id can not be empty");
 
         return new AccountHistoryId(id);
     }

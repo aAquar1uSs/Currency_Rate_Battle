@@ -2,7 +2,7 @@
 
 namespace CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 
-public class AccountId : OneId
+public class AccountId : CustomId
 {
     private AccountId(Guid id) : base(id)
     {

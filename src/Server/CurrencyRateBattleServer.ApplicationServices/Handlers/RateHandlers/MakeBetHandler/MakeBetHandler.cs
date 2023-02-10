@@ -55,7 +55,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
 
         await _accountRepository.UpdateAsync(account, cancellationToken);
 
-        var rate = Rate.Create(OneId.GenerateId().Id, DateTime.UtcNow, rateToCreate.UserCurrencyExchange,
+        var rate = Rate.Create(CustomId.GenerateId().Id, DateTime.UtcNow, rateToCreate.UserCurrencyExchange,
             rateToCreate.Amount, null, null, false, false, roomIdResult.Value.Id,
             currencyIdResult.Value.Value, account.Id.Id);
 
