@@ -18,8 +18,6 @@ public class CurrencyRateBattleContext : DbContext
 
     public DbSet<CurrencyDal> Currencies { get; set; } = default!;
 
-    public DbSet<CurrencyStateDal> CurrencyStates { get; set; } = default!;
-
     public CurrencyRateBattleContext(DbContextOptions<CurrencyRateBattleContext> options)
     : base(options)
     {
@@ -31,7 +29,6 @@ public class CurrencyRateBattleContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        _ = modelBuilder.ApplyConfiguration(new CurrencyStateConfiguration());
         _ = modelBuilder.ApplyConfiguration(new RoomConfiguration());
         _ = modelBuilder.ApplyConfiguration(new UserConfiguration());
         _ = modelBuilder.ApplyConfiguration(new AccountConfiguration());
@@ -71,10 +68,5 @@ public class CurrencyRateBattleContext : DbContext
                 CurrencyCode = "Fr",
                 Description = "Swiss Franc"
             });
-
-        //unique constraints
-        _ = modelBuilder.Entity<CurrencyStateDal>()
-            .HasIndex(cs => new { cs.RoomId, cs.CurrencyCode })
-            .IsUnique(true);
     }
 }

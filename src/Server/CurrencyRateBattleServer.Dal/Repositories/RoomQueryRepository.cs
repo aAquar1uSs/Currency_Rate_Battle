@@ -23,7 +23,7 @@ public class RoomQueryRepository : IRoomQueryRepository
     {
         _logger.LogInformation($"{nameof(FindAsync)} was caused");
 
-        var result = from curr in _dbContext.Currencies
+        /*var result = from curr in _dbContext.Currencies
             join currState in _dbContext.CurrencyStates on curr.CurrencyName equals currState.CurrencyName
             join room in _dbContext.Rooms on currState.RoomId equals room.Id
             where room.IsClosed == isClosed
@@ -36,8 +36,23 @@ public class RoomQueryRepository : IRoomQueryRepository
                 CurrencyExchangeRate = currState.CurrencyExchangeRate,
                 UpdateRateTime = currState.UpdateDate,
                 CountRates = _dbContext.Rates.Count(r => r.RoomId == room.Id)
-            };
-        var roomInfos = await result.AsNoTracking().ToArrayAsync(cancellationToken);
+            };*/
+
+        var rooms = _dbContext.Rooms
+            .Where(dal => dal.IsClosed != isClosed)
+            .Include(dal => dal.Currency)
+            .Select(dal => new RoomInfoDal
+            {
+                Id = dal.Id,
+                CurrencyName = dal.CurrencyName,
+                Date = dal.EndDate,
+                IsClosed = dal.IsClosed,
+                CurrencyExchangeRate = dal.Currency.Rate,
+                UpdateRateTime = currState.UpdateDate,
+                CountRates = _dbContext.Rates.Count(r => r.RoomId == room.Id)
+            })
+
+        //var roomInfos = await result.AsNoTracking().ToArrayAsync(cancellationToken);
         return roomInfos.Select(x => x.ToDomain()).ToArray();
     }
 
@@ -62,12 +77,12 @@ public class RoomQueryRepository : IRoomQueryRepository
 
         if (!string.IsNullOrWhiteSpace(filter.CurrencyName))
             filteredRooms = filteredRooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant()).ToArray();
-        
+
         if (filter.DateTryParse(filter.StartDate, out var startDate))
             filteredRooms = filteredRooms.Where(room => room.Date >= startDate).ToArray();
         if (filter.DateTryParse(filter.EndDate, out var endDate))
             filteredRooms = filteredRooms.Where(room => room.Date <= endDate).ToArray();
-        
+
 
         return filteredRooms.Select(x => x.ToDomain()).ToArray();
     }

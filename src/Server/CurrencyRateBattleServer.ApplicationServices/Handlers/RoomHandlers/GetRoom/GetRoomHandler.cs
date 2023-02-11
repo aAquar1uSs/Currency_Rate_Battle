@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.GetRoom;
 
+//ToDo Maybe make new method in Rate Repository for calculating count of bets
 public class GetRoomHandler : IRequestHandler<GetRoomCommand, Result<GetRoomResponse>>
 {
     private readonly ILogger<GetRoomHandler> _logger;

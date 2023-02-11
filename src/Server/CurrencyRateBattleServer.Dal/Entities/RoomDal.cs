@@ -12,5 +12,9 @@ public class RoomDal
     public DateTime EndDate { get; set; }
 
     public bool IsClosed { get; set; }
-    
+
+    public string CurrencyName { get; set; }
+
+    [ForeignKey("CurrencyName")]
+    public CurrencyDal Currency { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿using CurrencyRateBattleServer.Dal.Entities;
+﻿using CurrencyRateBattleServer.Dal.Converters;
+using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -56,5 +57,16 @@ public class CurrencyRepository : ICurrencyRepository
             .FirstOrDefaultAsync(cancellationToken);
 
         return Math.Round(value, 2);
+    }
+    
+    public async Task<Currency[]> GetAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogDebug($"{nameof(GetAsync)} was caused");
+
+        var currency = await _dbContext.Currencies
+            .AsNoTracking()
+            .ToArrayAsync(cancellationToken);
+
+        return currency.Select(x => x.ToDomain()).ToArray();
     }
 }

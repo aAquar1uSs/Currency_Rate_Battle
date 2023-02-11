@@ -9,4 +9,6 @@ public interface ICurrencyRepository
     Task<string[]> GetAllIds(CancellationToken cancellationToken);
 
     Task<decimal> GetCurrencyByCurrencyName(string currencyName, CancellationToken cancellationToken);
+
+    Task<Currency[]> GetAsync(CancellationToken cancellationToken);
 }

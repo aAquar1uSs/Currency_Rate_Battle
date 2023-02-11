@@ -20,7 +20,6 @@ public static class DbConfiguration
         _ = service.AddScoped<IAccountRepository, AccountRepository>()
                  .AddScoped<IRoomRepository, RoomRepository>()
                  .AddScoped<IRateRepository, RateRepository>()
-                 .AddScoped<ICurrencyStateRepository, CurrencyStateRepository>()
                  .AddScoped<IAccountHistoryRepository, AccountHistoryRepository>()
                  .AddScoped<IUserRatingQueryRepository, UserRatingQueryRepository>()
                  .AddScoped<IUserRepository, UserRepository>()
