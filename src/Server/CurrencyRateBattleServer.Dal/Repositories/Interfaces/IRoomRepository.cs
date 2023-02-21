@@ -8,11 +8,11 @@ public interface IRoomRepository
 {
     Task CreateAsync(CancellationToken cancellationToken);
 
-    Task UpdateAsync(RoomDal updatedRoomDal, CancellationToken cancellationToken);
+    Task UpdateAsync(Room updatedRoom, CancellationToken cancellationToken);
 
     Task<Room[]> RoomClosureCheckAsync(CancellationToken cancellationToken);
 
-    Task<RoomDal?> FindAsync(Guid id, CancellationToken cancellationToken);
+    Task<Room?> FindAsync(Guid id, CancellationToken cancellationToken);
 
-    Task DeleteAsync(RoomId roomId, CancellationToken cancellationToken);
+    Task<Room[]> FindAsync(bool isClosed, CancellationToken cancellationToken);
 }

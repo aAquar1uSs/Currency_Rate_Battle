@@ -1,5 +1,4 @@
 ﻿using CurrencyRateBattleServer.Dal.Converters;
-using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Domain.Infrastructure;
@@ -19,71 +18,23 @@ public class RoomQueryRepository : IRoomQueryRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task<RoomInfo[]> FindAsync(bool isClosed, CancellationToken cancellationToken)
-    {
-        _logger.LogInformation($"{nameof(FindAsync)} was caused");
-
-        /*var result = from curr in _dbContext.Currencies
-            join currState in _dbContext.CurrencyStates on curr.CurrencyName equals currState.CurrencyName
-            join room in _dbContext.Rooms on currState.RoomId equals room.Id
-            where room.IsClosed == isClosed
-            select new RoomInfoDal
-            {
-                Id = room.Id,
-                CurrencyName = curr.CurrencyName,
-                Date = room.EndDate,
-                IsClosed = room.IsClosed,
-                CurrencyExchangeRate = currState.CurrencyExchangeRate,
-                UpdateRateTime = currState.UpdateDate,
-                CountRates = _dbContext.Rates.Count(r => r.RoomId == room.Id)
-            };*/
-
-        var rooms = _dbContext.Rooms
-            .Where(dal => dal.IsClosed != isClosed)
-            .Include(dal => dal.Currency)
-            .Select(dal => new RoomInfoDal
-            {
-                Id = dal.Id,
-                CurrencyName = dal.CurrencyName,
-                Date = dal.EndDate,
-                IsClosed = dal.IsClosed,
-                CurrencyExchangeRate = dal.Currency.Rate,
-                UpdateRateTime = currState.UpdateDate,
-                CountRates = _dbContext.Rates.Count(r => r.RoomId == room.Id)
-            })
-
-        //var roomInfos = await result.AsNoTracking().ToArrayAsync(cancellationToken);
-        return roomInfos.Select(x => x.ToDomain()).ToArray();
-    }
-
-    public async Task<RoomInfo[]> GetActiveRoomsWithFilterAsync(Filter filter, CancellationToken cancellationToken)
+    public async Task<Room[]> GetActiveRoomsWithFilterAsync(Filter filter, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(GetActiveRoomsWithFilterAsync)} was caused");
-        var filteredRooms =
-            await (from currencyState in _dbContext.CurrencyStates
-            join room in _dbContext.Rooms on currencyState.RoomId equals room.Id
-            join curr in _dbContext.Currencies on currencyState.CurrencyName equals curr.CurrencyName
-            where room.IsClosed == false
-            select new RoomInfoDal
-            {
-                Id = room.Id,
-                Date = room.EndDate,
-                CurrencyExchangeRate = currencyState.CurrencyExchangeRate,
-                IsClosed = room.IsClosed,
-                CurrencyName = curr.CurrencyName,
-                UpdateRateTime = currencyState.UpdateDate,
-                CountRates = _dbContext.Rates.Count(r => r.RoomId == room.Id)
-            }).AsNoTracking().ToArrayAsync(cancellationToken);
+        var rooms = await _dbContext.Rooms
+            .AsNoTracking()
+            .Where(dal => dal.IsClosed == false)
+            .ToArrayAsync(cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(filter.CurrencyName))
-            filteredRooms = filteredRooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant()).ToArray();
+            rooms = rooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant()).ToArray();
 
         if (filter.DateTryParse(filter.StartDate, out var startDate))
-            filteredRooms = filteredRooms.Where(room => room.Date >= startDate).ToArray();
+            rooms = rooms.Where(room => room.EndDate >= startDate).ToArray();
         if (filter.DateTryParse(filter.EndDate, out var endDate))
-            filteredRooms = filteredRooms.Where(room => room.Date <= endDate).ToArray();
+            rooms = rooms.Where(room => room.EndDate <= endDate).ToArray();
 
 
-        return filteredRooms.Select(x => x.ToDomain()).ToArray();
+        return rooms.Select(x => x.ToDomain()).ToArray();
     }
 }

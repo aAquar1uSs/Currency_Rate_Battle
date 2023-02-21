@@ -12,6 +12,8 @@ public class RoomDal
     public DateTime EndDate { get; set; }
 
     public bool IsClosed { get; set; }
+    
+    public int CountRates { get; set; }
 
     public string CurrencyName { get; set; }
 

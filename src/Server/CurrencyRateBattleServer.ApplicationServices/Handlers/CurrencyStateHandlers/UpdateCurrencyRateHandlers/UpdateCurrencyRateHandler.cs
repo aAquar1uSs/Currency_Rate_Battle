@@ -13,7 +13,7 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
     private readonly INbuApiClient _nbuApiApiClient;
 
     public UpdateCurrencyRateHandler(ILogger<UpdateCurrencyRateHandler> logger,
-        ICurrencyRepository currencyRepository, INbuApiClient apiClient, ICurrencyStateRepository currencyStateRepository)
+        ICurrencyRepository currencyRepository, INbuApiClient apiClient)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _currencyRepository = currencyRepository ?? throw new ArgumentNullException(nameof(currencyRepository));
@@ -34,6 +34,7 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
         if (currencies.Any(x => x == null))
         {
             _logger.LogWarning("Invalid data in response from NBU api. Skip processing");
+            return Unit.Value;
         }
 
         var availableCurrenciesIds = await _currencyRepository.GetAllIds(cancellationToken);
@@ -42,7 +43,10 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
             .Where(x => availableCurrenciesIds.Contains(x.CurrencyName?.Value))
             .ToArray();
 
-        await _currencyRepository.UpdateAsync(currenciesToUpdate, cancellationToken);
+        foreach (var currency in currenciesToUpdate)
+        {
+            await _currencyRepository.UpdateAsync(currency, cancellationToken);   
+        }
 
         return Unit.Value;
     }

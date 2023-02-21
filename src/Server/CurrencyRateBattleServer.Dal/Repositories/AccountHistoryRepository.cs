@@ -12,8 +12,7 @@ public class AccountHistoryRepository : IAccountHistoryRepository
     private readonly ILogger<AccountHistoryRepository> _logger;
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public AccountHistoryRepository(ILogger<AccountHistoryRepository> logger,
-        CurrencyRateBattleContext dbContext)
+    public AccountHistoryRepository(ILogger<AccountHistoryRepository> logger, CurrencyRateBattleContext dbContext)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));

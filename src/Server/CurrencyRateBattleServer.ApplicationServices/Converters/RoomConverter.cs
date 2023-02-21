@@ -21,4 +21,16 @@ public static class RoomConverter
             UpdateRateTime = domain.UpdateRateTime
         };
     }
+
+    public static RoomDto ToDto(this Room room)
+    {
+        return new()
+        {
+            CountRates = room.CountRates,
+            CurrencyExchangeRate = room.CountRates,
+            СurrencyName = room.CurrencyName.Value,
+            Date = room.EndDate,
+            UpdateRateTime = DateTime.UtcNow //ToDo think about it
+        };
+    }
 }

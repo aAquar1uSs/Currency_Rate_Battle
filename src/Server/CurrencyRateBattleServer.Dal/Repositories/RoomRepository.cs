@@ -3,7 +3,6 @@ using CurrencyRateBattleServer.Dal.Converters;
 using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -14,8 +13,7 @@ public class RoomRepository : IRoomRepository
     private readonly ILogger<RoomRepository> _logger;
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public RoomRepository(ILogger<RoomRepository> logger,
-        CurrencyRateBattleContext dbContext)
+    public RoomRepository(ILogger<RoomRepository> logger, CurrencyRateBattleContext dbContext)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
@@ -51,11 +49,12 @@ public class RoomRepository : IRoomRepository
         });
     }
 
-    public async Task UpdateAsync(RoomDal updatedRoomDal, CancellationToken cancellationToken)
+    public async Task UpdateAsync(Room updatedRoom, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(UpdateAsync)} was caused");
 
-        _ = _dbContext.Rooms.Update(updatedRoomDal);
+        var roomDal = updatedRoom.ToDal();
+        _ = _dbContext.Rooms.Update(roomDal);
         _ = await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -76,23 +75,25 @@ public class RoomRepository : IRoomRepository
         return closedRooms.ToDomain();
     }
 
-    public async Task<RoomDal?> FindAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Room?> FindAsync(Guid id, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(FindAsync)} was caused");
-        return await _dbContext.Rooms
+        var room = await _dbContext.Rooms
             .AsNoTracking()
-            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);;
+            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+        
+        return room.ToDomain();
     }
-
-    public async Task DeleteAsync(RoomId roomId, CancellationToken cancellationToken)
+    
+    public async Task<Room[]> FindAsync(bool isClosed, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(DeleteAsync)} was caused");
-        var room = await _dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == roomId.Id, cancellationToken);
-
-        if (room is null)
-            return;
-
-        _ = _dbContext.Remove(room);
-        _ = await _dbContext.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation($"{nameof(FindAsync)} was caused");
+        
+        var rooms = await _dbContext.Rooms
+            .Where(dal => dal.IsClosed == isClosed)
+            .Include(dal => dal.Currency)
+            .ToArrayAsync(cancellationToken);
+        
+        return rooms.Select(dal => dal.ToDomain()).ToArray();
     }
 }

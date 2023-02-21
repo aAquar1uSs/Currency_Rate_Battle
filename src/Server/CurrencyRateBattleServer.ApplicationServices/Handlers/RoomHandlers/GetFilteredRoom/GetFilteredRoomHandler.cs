@@ -25,6 +25,6 @@ public class GetFilteredRoomHandler : IRequestHandler<GetFilteredRoomCommand, Re
         
         var rooms = await _roomQueryRepository.GetActiveRoomsWithFilterAsync(filter, cancellationToken);
 
-        return new GetFilteredRoomResponse {Rooms = rooms.ToDto()};
+        return new GetFilteredRoomResponse { Rooms = rooms.Select(x => x.ToDto()).ToArray() };
     }
 }

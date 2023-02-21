@@ -15,7 +15,7 @@ public class CurrencyName
 
     public static Result<CurrencyName> TryCreate(string value)
     {
-        if (string.IsNullOrEmpty(value))
+        if (string.IsNullOrWhiteSpace(value))
             return Result.Failure<CurrencyName>("Currency symbols can not be null or empty");
         
         if (value.Length != 3)

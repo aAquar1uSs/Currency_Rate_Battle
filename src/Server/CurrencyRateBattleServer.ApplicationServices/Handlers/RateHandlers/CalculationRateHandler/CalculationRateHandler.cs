@@ -83,7 +83,7 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
 
         foreach (var rate in rates)
         {
-            var currencyRate = await _currencyRepository.GetCurrencyByCurrencyName(rate.CurrencyName.Value, cancellationToken);
+            var currencyRate = await _currencyRepository.GetRateByCurrencyName(rate.CurrencyName.Value, cancellationToken);
             if (currencyRate != null && rate.RateCurrencyExchange.Value == Math.Round(currencyRate, 2))
                 rate.IsWonBet();
             else

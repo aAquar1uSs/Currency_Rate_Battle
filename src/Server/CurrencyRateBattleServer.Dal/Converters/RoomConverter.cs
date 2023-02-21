@@ -12,7 +12,7 @@ public static class RoomConverter
 
     public static Room ToDomain(this RoomDal roomDal)
     {
-        return Room.Create(roomDal.Id, roomDal.EndDate, roomDal.IsClosed);
+        return Room.Create(roomDal.Id, roomDal.EndDate, roomDal.IsClosed, roomDal.CountRates, roomDal.CurrencyName);
     }
 
     public static RoomInfo ToDomain(this RoomInfoDal dal)
@@ -26,6 +26,17 @@ public static class RoomConverter
             Date = dal.Date,
             IsClosed = dal.IsClosed,
             UpdateRateTime = dal.UpdateRateTime
+        };
+    }
+
+    public static RoomDal ToDal(this Room room)
+    {
+        return new RoomDal
+        {
+            CountRates = room.CountRates,
+            CurrencyName = room.CurrencyName.Value,
+            EndDate = room.EndDate,
+            IsClosed = room.IsClosed
         };
     }
 }
