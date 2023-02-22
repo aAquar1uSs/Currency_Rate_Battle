@@ -1,12 +1,10 @@
-﻿using CurrencyRateBattleServer.Dal.Entities;
-using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
+﻿using CurrencyRateBattleServer.Domain.Entities;
 
 namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
 public interface IRoomRepository
 {
-    Task CreateAsync(CancellationToken cancellationToken);
+    Task CreateAsync(Room room, CancellationToken cancellationToken);
 
     Task UpdateAsync(Room updatedRoom, CancellationToken cancellationToken);
 

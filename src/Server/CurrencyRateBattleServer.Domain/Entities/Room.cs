@@ -28,7 +28,7 @@ public class Room
         CurrencyName = currencyName;
     }
 
-    public Result<Room> TryCreate(Guid id, DateTime date, bool isClosed, int countRates, string currencyName)
+    public Result<Room> TryCreate(Guid id, DateTime endDate, bool isClosed, int countRates, string currencyName)
     {
         var oneIdResult = RoomId.TryCreate(id);
         if (oneIdResult.IsFailure)
@@ -41,16 +41,16 @@ public class Room
         if (countRates < 0)
             return Result.Failure<Room>("Count of rates can not be null");
 
-        return new Room(oneIdResult.Value, date, isClosed, countRates, currencyNameResult.Value);
+        return new Room(oneIdResult.Value, endDate, isClosed, countRates, currencyNameResult.Value);
     }
 
-    public static Room Create(Guid id, DateTime date, bool isClosed, int countRates, string currencyName)
+    public static Room Create(Guid id, DateTime endDate, bool isClosed, int countRates, string currencyName)
     {
         var oneId = RoomId.Create(id);
 
         var currencyNameDomain = CurrencyName.Create(currencyName);
         
-        return new Room(oneId, date, isClosed, countRates, currencyNameDomain);
+        return new Room(oneId, endDate, isClosed, countRates, currencyNameDomain);
     }
 
     public Result IncrementCountRates()

@@ -1,4 +1,6 @@
 ﻿using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
+using CurrencyRateBattleServer.Domain.Entities;
+using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -24,10 +26,12 @@ public class GenerateRoomHandler : IRequestHandler<GenerateRoomCommand>
 
         foreach (var currency in currencies)
         {
-            
+            var roomId = RoomId.GenerateId();
+            var room = Room.Create(roomId.Id, DateTime.UtcNow.AddDays(1), false, 0, currency);
+
+            await _roomRepository.CreateAsync(room, cancellationToken);
         }
         
-        await _roomRepository.CreateAsync(cancellationToken);
         return Unit.Value;
     }
 }

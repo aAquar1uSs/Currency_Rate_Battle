@@ -14,8 +14,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
     private readonly IUserRepository _userRepository;
     private readonly IJwtManager _jwtManager;
 
-    public LoginHandler(ILogger<LoginHandler> logger, IAccountRepository accountRepository,
-        IUserRepository userRepository, IJwtManager jwtManager)
+    public LoginHandler(ILogger<LoginHandler> logger, IUserRepository userRepository, IJwtManager jwtManager)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));

@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using CurrencyRateBattleServer.Dal.Converters;
+﻿using CurrencyRateBattleServer.Dal.Converters;
 using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
@@ -19,36 +18,14 @@ public class RoomRepository : IRoomRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    //Add Settings to count of rooms
-    public async Task CreateAsync(CancellationToken cancellationToken)
+    public async Task CreateAsync(Room room, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(CreateAsync)} was caused");
+        var roomDal = room.ToDal();
 
-        foreach (var curr in _dbContext.Currencies)
-        {
-            _ = await _dbContext.CurrencyStates.AddAsync(await CreateRoomWithCurrencyStateAsync(curr), cancellationToken);
-        }
-        _ = await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.Rooms.AddAsync(roomDal, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
-
-
-    private Task<CurrencyStateDal> CreateRoomWithCurrencyStateAsync(CurrencyDal curr)
-    {
-        _logger.LogInformation($"{nameof(CreateRoomWithCurrencyStateAsync)} was caused");
-        var currentDate = DateTime.ParseExact(
-            DateTime.UtcNow.ToString("MM.dd.yyyy HH:00:00", CultureInfo.InvariantCulture),
-            "MM.dd.yyyy HH:mm:ss", null);
-
-        return Task.FromResult(new CurrencyStateDal
-        {
-            UpdateDate = currentDate,
-            CurrencyExchangeRate = 0,
-            CurrencyName = curr.CurrencyName,
-            CurrencyCode = curr.CurrencyCode,
-            Room = new RoomDal { EndDate = currentDate.AddDays(1), IsClosed = false }
-        });
-    }
-
+    
     public async Task UpdateAsync(Room updatedRoom, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(UpdateAsync)} was caused");
