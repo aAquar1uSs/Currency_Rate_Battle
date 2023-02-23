@@ -9,12 +9,12 @@ namespace CurrencyRateBattleServer.Controllers;
 [Route("api/currency")]
 [ApiController]
 [Authorize]
-public class CurrencyStateController : ControllerBase
+public class CurrencyController : ControllerBase
 {
-    private readonly ILogger<CurrencyStateController> _logger;
+    private readonly ILogger<CurrencyController> _logger;
     private readonly IMediator _mediator;
 
-    public CurrencyStateController(ILogger<CurrencyStateController> logger, IMediator mediator)
+    public CurrencyController(ILogger<CurrencyController> logger, IMediator mediator)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
@@ -27,7 +27,7 @@ public class CurrencyStateController : ControllerBase
     {
         _logger.LogDebug($"{nameof(GetCurrencyRates)}, was caused.");
 
-        var command = new GetCurrencyStateCommand();
+        var command = new GetCurrencyCommand();
 
         var response = await _mediator.Send(command, cancellationToken);
 
