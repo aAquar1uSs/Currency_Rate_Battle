@@ -33,7 +33,8 @@ public class CurrencyRepository : ICurrencyRepository
 
     public async Task<decimal> GetRateByCurrencyName(string currencyName, CancellationToken cancellationToken)
     {
-        var value = await _dbContext.Currencies.AsNoTracking()
+        var value = await _dbContext.Currencies
+            .AsNoTracking()
             .Where(x => x.CurrencyName == currencyName)
             .Select(x => x.Rate)
             .FirstOrDefaultAsync(cancellationToken);

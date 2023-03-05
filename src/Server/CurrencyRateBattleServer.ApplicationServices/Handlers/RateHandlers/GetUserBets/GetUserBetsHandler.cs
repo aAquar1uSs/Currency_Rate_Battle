@@ -25,13 +25,13 @@ public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<Get
     {
         _logger.LogDebug($"{nameof(GetUserBetsHandler)},  was caused. Start processing.");
 
-        var userIdResult = UserId.TryCreate(request.UserId);
-        if (userIdResult.IsFailure)
-            return Result.Failure<GetUserBetsResponse>(userIdResult.Error);
+        var userEmailResult = Email.TryCreate(request.UserEmail);
+        if (userEmailResult.IsFailure)
+            return Result.Failure<GetUserBetsResponse>(userEmailResult.Error);
         
-        var account = await _accountRepository.GetAccountByUserIdAsync(userIdResult.Value, cancellationToken);
+        var account = await _accountRepository.GetAccountByUserIdAsync(userEmailResult.Value, cancellationToken);
         if (account is null)
-            return Result.Failure<GetUserBetsResponse>($"Account with such user id {request.UserId} does not exist");
+            return Result.Failure<GetUserBetsResponse>($"Account with such user id {request.UserEmail} does not exist");
 
         var bets = await _userRatingQueryRepository.FindAsync(account.Id, cancellationToken);
 

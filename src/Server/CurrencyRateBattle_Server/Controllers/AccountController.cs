@@ -3,6 +3,8 @@ using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.AccountHandlers.Login;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.AccountHandlers.Registration;
+using CurrencyRateBattleServer.Domain.Entities.Errors;
+using CurrencyRateBattleServer.Domain.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,33 +24,38 @@ public class AccountController : ControllerBase
 
     [HttpPost("login")]
     [AllowAnonymous]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType(typeof(Tokens), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(Error), (int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> LoginAsync([FromBody] UserDto userData, CancellationToken cancellationToken)
     {
-        var command = new LoginCommand { UserDto = userData };
+        var command = new LoginCommand { Email = userData.Email, Password = userData.Password};
 
         var response= await _mediator.Send(command, cancellationToken);
 
-        if (response.IsFailure)
-            return Unauthorized(response.Error);
-
-        return Ok(response.Value.Tokens.Token);
+        return response.IsSuccess
+            ? Ok(response.Value)
+            : ToErrorResponse(response.Error);
     }
 
     [HttpPost("registration")]
     [AllowAnonymous]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(Tokens), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(Error), (int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> CreateUserAsync([FromBody] UserDto userData, CancellationToken cancellationToken)
     {
-        var command = new RegistrationCommand { UserDto = userData };
+        var command = new RegistrationCommand { Email = userData.Email, Password = userData.Password };
 
-        var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
+        var response = await _mediator.Send(command, cancellationToken);
 
-        if (isFailure)
-            return BadRequest(error);
-
-        return Ok(value.Tokens.Token);
+        return response.IsSuccess
+            ? Ok(response.Value)
+            : ToErrorResponse(response.Error);
     }
+
+    private IActionResult ToErrorResponse(Error error) => error switch
+    {
+        PlayerValidationError => BadRequest(error),
+        MoneyValidationError => BadRequest(error),
+        _ => throw new NotSupportedException($"Unknown type of error {error.GetType()}")
+    };
 }

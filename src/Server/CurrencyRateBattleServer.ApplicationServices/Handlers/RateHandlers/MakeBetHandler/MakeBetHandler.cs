@@ -28,11 +28,11 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
     public async Task<Result<MakeBetResponse>> Handle(MakeBetCommand request, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(MakeBetHandler)} was caused.");
-        var userIdResult = UserId.TryCreate(request.UserId);
-        if (userIdResult.IsFailure)
-            return Result.Failure<MakeBetResponse>(userIdResult.Error);
+        var userEmailResult = Email.TryCreate(request.UserId);
+        if (userEmailResult.IsFailure)
+            return Result.Failure<MakeBetResponse>(userEmailResult.Error);
         
-        var account = await _accountRepository.GetAccountByUserIdAsync(userIdResult.Value, cancellationToken);
+        var account = await _accountRepository.GetAccountByUserIdAsync(userEmailResult.Value, cancellationToken);
         if (account is null)
             return Result.Failure<MakeBetResponse>($"Account with such user id: {request.UserId} does not exist.");
         

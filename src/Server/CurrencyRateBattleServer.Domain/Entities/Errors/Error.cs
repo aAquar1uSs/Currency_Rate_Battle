@@ -8,7 +8,7 @@ public abstract record Error
         Message = message;
     }
     
-    protected string ErrorCode { get; }
+    public string ErrorCode { get; }
     
-    protected string Message { get; }
+    public string Message { get; }
 }

@@ -1,4 +1,5 @@
 ﻿using CurrencyRateBattleServer.ApplicationServices.Dto;
+using CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.CreateAccountHistory;
 using CurrencyRateBattleServer.Domain.Entities;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Converters;
@@ -20,5 +21,10 @@ public static class AccountHistoriesConverter
             IsCredit = accountHistory.IsCredit,
             RoomId = accountHistory.RoomId?.Id
         };
+    }
+
+    public static CreateHistoryCommand ToCreateCommand(this AccountHistoryDto dto, string userEmail)
+    {
+        return new CreateHistoryCommand(userEmail, dto.RoomId, dto.Date, dto.Amount, dto.IsCredit);
     }
 }

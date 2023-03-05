@@ -7,14 +7,14 @@ public static class AccountConverter
 {
     public static Account ToDomain(this AccountDal accountDal)
     {
-        return Account.Create(accountDal.Id, accountDal.Amount, accountDal.UserId);
+        return Account.Create(accountDal.Id, accountDal.Amount, accountDal.Email);
     }
 
     public static AccountDal ToDal(this Account account)
     {
         return new AccountDal
         {
-            UserId = account.UserId.Id,
+            Email = account.UserEmail.Value,
             Id = account.Id.Id,
             Amount = account.Amount.Value
         };

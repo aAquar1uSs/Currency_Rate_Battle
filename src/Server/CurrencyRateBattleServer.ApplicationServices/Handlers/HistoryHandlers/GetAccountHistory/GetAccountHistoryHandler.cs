@@ -1,13 +1,14 @@
 ﻿using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
+using CurrencyRateBattleServer.Domain.Entities.Errors;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.GetAccountHistory;
 
-public class GetAccountHistoryHandler : IRequestHandler<GetAccountHistoryCommand, Result<GetAccountHistoryResponse>>
+public class GetAccountHistoryHandler : IRequestHandler<GetAccountHistoryCommand, Result<GetAccountHistoryResponse, Error>>
 {
     private readonly ILogger<GetAccountHistoryHandler> _logger;
     private readonly IAccountRepository _accountRepository;
@@ -21,17 +22,17 @@ public class GetAccountHistoryHandler : IRequestHandler<GetAccountHistoryCommand
         _accountHistoryRepository = accountHistoryRepository ?? throw new ArgumentNullException(nameof(accountHistoryRepository));
     }
 
-    public async Task<Result<GetAccountHistoryResponse>> Handle(GetAccountHistoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result<GetAccountHistoryResponse, Error>> Handle(GetAccountHistoryCommand request, CancellationToken cancellationToken)
     {
-        var userIdResult = UserId.TryCreate(request.UserId);
-        if (userIdResult.IsFailure)
-            return Result.Failure<GetAccountHistoryResponse>(userIdResult.Error);
-        var userId = userIdResult.Value;
+        var emailResult = Email.TryCreate(request.UserEmail);
+        if (emailResult.IsFailure)
+            return new PlayerValidationError("email_not_valid", emailResult.Error);
+        var email = emailResult.Value;
 
-        var account = await _accountRepository.GetAccountByUserIdAsync(userId, cancellationToken);
+        var account = await _accountRepository.GetAccountByUserIdAsync(email, cancellationToken);
 
         if (account is null)
-            return Result.Failure<GetAccountHistoryResponse>("Account not found.");
+            return PlayerValidationError.AccountNotFound;
 
         var history = await _accountHistoryRepository.GetAsync(account.Id, cancellationToken);
 

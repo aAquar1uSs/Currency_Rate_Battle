@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using CSharpFunctionalExtensions;
+using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.ApplicationServices.Dto;
-using CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.CreateAccountHistory;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.GetAccountHistory;
 using CurrencyRateBattleServer.Infrastructure;
 using MediatR;
@@ -27,11 +27,11 @@ public class AccountHistoryController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> GetAccountHistoryAsync(CancellationToken cancellationToken)
     {
-        var userId = GuidHelper.GetGuidFromRequest(HttpContext);
-        if (userId is null)
+        var userEmail = GuidHelper.GetGuidFromRequest(HttpContext);
+        if (userEmail is null)
             return BadRequest();
         
-        var command = new GetAccountHistoryCommand { UserId = userId.Value };
+        var command = new GetAccountHistoryCommand { UserEmail = userEmail };
 
         var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
 
@@ -50,7 +50,7 @@ public class AccountHistoryController : ControllerBase
         if (userId is null)
             return BadRequest();
 
-        var command = new CreateHistoryCommand { UserId = userId.Value, AccountHistory = historyDto };
+        var command = historyDto.ToCreateCommand(userId);
 
         var (_, isFailure, _, error) = await _mediator.Send(command, cancellationToken);
 

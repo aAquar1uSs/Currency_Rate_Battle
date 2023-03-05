@@ -31,12 +31,13 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("Email");
 
                     b.ToTable("Account", (string)null);
                 });
@@ -84,10 +85,14 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                         .HasColumnType("varchar(128)");
 
                     b.Property<decimal>("Rate")
-                        .HasColumnType("decimal");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal")
+                        .HasDefaultValue(0m);
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("timestamp without time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValue(new DateTime(2023, 3, 5, 13, 33, 8, 334, DateTimeKind.Utc).AddTicks(2752));
 
                     b.HasKey("CurrencyName");
 
@@ -216,22 +221,14 @@ namespace CurrencyRateBattleServer.Dal.Migrations
 
             modelBuilder.Entity("CurrencyRateBattleServer.Dal.Entities.UserDal", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
+                    b.HasKey("Email");
 
                     b.ToTable("User", (string)null);
                 });
@@ -240,7 +237,7 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                 {
                     b.HasOne("CurrencyRateBattleServer.Dal.Entities.UserDal", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("Email")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

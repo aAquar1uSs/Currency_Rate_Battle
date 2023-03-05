@@ -37,14 +37,22 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
             return Unit.Value;
         }
 
-        var availableCurrenciesIds = await _currencyRepository.GetAllIds(cancellationToken);
+        var availableCurrenciesIds = await _currencyRepository.GetAsync(cancellationToken);
+        
 
-        var currenciesToUpdate = currencies.Select(x => x)
-            .Where(x => availableCurrenciesIds.Contains(x.CurrencyName.Value))
-            .ToArray();
-
-        foreach (var currency in currenciesToUpdate)
+        foreach (var currency in availableCurrenciesIds)
         {
+            var currencyToUpdate = updatedCurrencies.FirstOrDefault(x => x.Currency == currency.CurrencyName.Value);
+            if (currencyToUpdate is null)
+                continue;
+
+            var updatedResult = currency.TryUpdateCurrency(currencyToUpdate.Rate, currencyToUpdate.Date);
+            if (updatedResult.IsFailure)
+            {
+                _logger.LogError(updatedResult.Error);
+                continue;    
+            }
+            
             await _currencyRepository.UpdateAsync(currency, cancellationToken);   
         }
 

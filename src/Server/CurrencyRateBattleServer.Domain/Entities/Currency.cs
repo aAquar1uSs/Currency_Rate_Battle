@@ -13,7 +13,7 @@ public class Currency
 
     public string? Description { get; private set; }
 
-    public DateTime UpdateDate { get; set; }
+    public DateTime UpdateDate { get; private set; }
 
     private Currency(CurrencyName currencyName,
         CurrencySymbol? currencySymbol,
@@ -78,4 +78,18 @@ public class Currency
         return new Currency(currencyNameDomain, amountDomain, updateDate);
     }
 
+    public Result TryUpdateCurrency(decimal rate, string? date)
+    {
+        var rateResult = Amount.TryCreate(rate);
+        if (rateResult.IsFailure)
+            return Result.Failure(rateResult.Error);
+        
+        if (date is null || !DateTime.TryParse(date, out var dateTime))
+            return Result.Failure("Can not parse the curreny updated date");
+
+        Rate = rateResult.Value;
+        UpdateDate = dateTime;
+        
+        return Result.Success();
+    } 
 }

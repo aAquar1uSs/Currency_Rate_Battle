@@ -99,7 +99,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
     {
         var query1 = from rate in _dbContext.Rates
                      join acc in _dbContext.Accounts on rate.AccountId equals acc.Id
-                     join user in _dbContext.Users on acc.UserId equals user.Id
+                     join user in _dbContext.Users on acc.Email equals user.Email
                      where rate.IsClosed == true
                      select new UserRatingDal
                      {

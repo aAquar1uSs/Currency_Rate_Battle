@@ -21,11 +21,11 @@ public class GetUserBalanceHandler : IRequestHandler<GetUserBalanceCommand, Resu
     {
         _logger.LogDebug($"{nameof(GetUserBalanceHandler)} was caused.");
 
-        var userIdResult = UserId.TryCreate(request.UserId);
-        if (userIdResult.IsFailure)
-            return Result.Failure<GetUserBalanceResponse>(userIdResult.Error);
+        var userEmailResult = Email.TryCreate(request.UserId);
+        if (userEmailResult.IsFailure)
+            return Result.Failure<GetUserBalanceResponse>(userEmailResult.Error);
         
-        var account = await _accountRepository.GetAccountByUserIdAsync(userIdResult.Value, cancellationToken);
+        var account = await _accountRepository.GetAccountByUserIdAsync(userEmailResult.Value, cancellationToken);
         
         if (account is null)
             return Result.Failure<GetUserBalanceResponse>($"Account with id: {request.UserId} didn't found.");

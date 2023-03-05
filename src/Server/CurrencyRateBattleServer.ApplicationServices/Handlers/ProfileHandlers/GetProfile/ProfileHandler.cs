@@ -24,17 +24,17 @@ public class ProfileHandler : IRequestHandler<GetProfileCommand, Result<GetProfi
     {
         _logger.LogDebug($"{nameof(ProfileHandler)} was caused.");
 
-        var userIdResult = UserId.TryCreate(request.UserId);
-        if (userIdResult.IsFailure)
-            return Result.Failure<GetProfileResponse>(userIdResult.Error);
+        var userEmailResult = Email.TryCreate(request.UserEmail);
+        if (userEmailResult.IsFailure)
+            return Result.Failure<GetProfileResponse>(userEmailResult.Error);
         
-        var user = await _userRepository.FindAsync(userIdResult.Value, cancellationToken);
+        var user = await _userRepository.FindAsync(userEmailResult.Value, cancellationToken);
         if (user is null)
-            return Result.Failure<GetProfileResponse>($"User with suh id: {request.UserId} didn't found,");
+            return Result.Failure<GetProfileResponse>($"User with suh id: {request.UserEmail} didn't found,");
         
-        var account = await _accountRepository.GetAccountByUserIdAsync(userIdResult.Value, cancellationToken);
+        var account = await _accountRepository.GetAccountByUserIdAsync(userEmailResult.Value, cancellationToken);
         if (account is null)
-            return Result.Failure<GetProfileResponse>($"Account with such user id: {request.UserId} didn't found,");
+            return Result.Failure<GetProfileResponse>($"Account with such user id: {request.UserEmail} didn't found,");
 
         return new GetProfileResponse
         {

@@ -42,7 +42,7 @@ public class RateController : ControllerBase
         if (userId is null)
             return BadRequest();
 
-        var command = new GetUserBetsCommand {UserId = (Guid)userId};
+        var command = new GetUserBetsCommand { UserEmail = userId };
 
         var response = await _mediator.Send(command);
 
@@ -64,7 +64,7 @@ public class RateController : ControllerBase
         if (userId is null)
             return BadRequest("Incorrect data");
 
-        var command = new MakeBetCommand { UserRateToCreate = userRateToCreate, UserId = (Guid)userId };
+        var command = new MakeBetCommand { UserRateToCreate = userRateToCreate, UserId = userId };
 
         var response = await _mediator.Send(command);
 

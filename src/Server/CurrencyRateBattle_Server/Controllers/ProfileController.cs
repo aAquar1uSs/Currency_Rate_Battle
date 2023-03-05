@@ -30,7 +30,7 @@ public class ProfileController : ControllerBase
         if (userId is null)
             return BadRequest();
 
-        var command = new GetUserBalanceCommand { UserId = userId.Value };
+        var command = new GetUserBalanceCommand { UserId = userId };
 
         var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
 
@@ -45,11 +45,11 @@ public class ProfileController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> GetUserInfoAsync(CancellationToken cancellationToken)
     {
-        var userId = GuidHelper.GetGuidFromRequest(HttpContext);
-        if (userId is null)
+        var userEmail = GuidHelper.GetGuidFromRequest(HttpContext);
+        if (userEmail is null)
             return BadRequest();
 
-        var command = new GetProfileCommand { UserId = userId.Value };
+        var command = new GetProfileCommand { UserEmail = userEmail };
 
         var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
 

@@ -7,7 +7,7 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.Mak
 
 public class MakeBetCommand : IRequest<Result<MakeBetResponse>>
 {
-    public Guid UserId { get; set; }
+    public string UserId { get; set; }
     
     public UserRateDto UserRateToCreate { get; set; }
 }

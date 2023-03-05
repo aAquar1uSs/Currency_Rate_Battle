@@ -9,18 +9,18 @@ public sealed class Account
 
     public Amount Amount { get; private set; }
 
-    public UserId UserId { get; private set; }
+    public Email UserEmail { get; private set; }
 
     private Account(AccountId id,
         Amount amount,
-        UserId userId)
+        Email userEmail)
     {
         Id = id;
         Amount = amount;
-        UserId = userId;
+        UserEmail = userEmail;
     }
 
-    public static Result<Account> TryCreate(Guid id, decimal amount, Guid userId)
+    public static Result<Account> TryCreate(Guid id, decimal amount, string userEmail)
     {
         var amountResult = Amount.TryCreate(amount);
         if (amountResult.IsFailure)
@@ -30,25 +30,25 @@ public sealed class Account
         if(amountResult.IsFailure)
             return Result.Failure<Account>(amountResult.Error);
 
-        var userIdResult = UserId.TryCreate(userId);
+        var userIdResult = Email.TryCreate(userEmail);
         if(amountResult.IsFailure)
             return Result.Failure<Account>(amountResult.Error);
 
         return new Account(accIdResult.Value, amountResult.Value, userIdResult.Value);
     }
 
-    public static Account Create(Guid id, decimal amount, Guid userId)
+    public static Account Create(Guid id, decimal amount, string userEmail)
     {
         var accOneId = AccountId.Create(id);
         var amountDomain = Amount.Create(amount);
-        var userOneId = UserId.Create(userId);
+        var userOneId = Email.Create(userEmail);
 
         return new Account (accOneId, amountDomain, userOneId);
     }
 
-    public static Account TryCreateNewAccount(AccountId id, UserId userId)
+    public static Account TryCreateNewAccount(AccountId id, Email userEmail)
     {
-        return new Account(id, Amount.Create(0), userId);
+        return new Account(id, Amount.Create(0), userEmail);
     }
 
     public void AddStartBalance(Amount startBalance)
@@ -79,8 +79,8 @@ public sealed class Account
         return Result.Success();
     }
 
-    public void AddUser(User user)
+    public void AddUser(Email userEmail)
     {
-        UserId = user.Id;
+        UserEmail = userEmail;
     }
 }

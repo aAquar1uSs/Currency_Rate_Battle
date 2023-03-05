@@ -29,13 +29,13 @@ public class AccountRepository : IAccountRepository
         _logger.LogInformation($"{nameof(CreateAsync)} successfully added new account");
     }
 
-    public async Task<Account?> GetAccountByUserIdAsync(UserId userId, CancellationToken cancellationToken)
+    public async Task<Account?> GetAccountByUserIdAsync(Email email, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetAccountByUserIdAsync)} was caused.");
 
         var account = await _dbContext.Accounts
             .AsNoTracking()
-            .FirstOrDefaultAsync(acc => acc.User.Id == userId.Id, cancellationToken);
+            .FirstOrDefaultAsync(acc => acc.User.Email == email.Value, cancellationToken);
 
         return account?.ToDomain();
     }
