@@ -7,7 +7,7 @@ public class Currency
 {
     public CurrencyName CurrencyName { get; private set; }
 
-    public CurrencyCode? CurrencyCode { get; private set; }
+    public CurrencySymbol? CurrencySymbol { get; private set; }
 
     public Amount Rate { get; private set; }
 
@@ -16,13 +16,13 @@ public class Currency
     public DateTime UpdateDate { get; set; }
 
     private Currency(CurrencyName currencyName,
-        CurrencyCode currencyCode,
+        CurrencySymbol? currencySymbol,
         Amount rate,
         string? description,
         DateTime updateDate)
     {
         CurrencyName = currencyName;
-        CurrencyCode = currencyCode;
+        CurrencySymbol = currencySymbol;
         Rate = rate;
         Description = description;
         UpdateDate = updateDate;
@@ -36,14 +36,14 @@ public class Currency
         UpdateDate = updateDate;
     }
 
-    public static Result<Currency> TryCreate(string currencyName, string currencyCode,
+    public static Result<Currency> TryCreate(string currencyName, string currencySymbol,
         decimal amount, string description, DateTime updateDate)
     {
         var currencyNameResult = CurrencyName.TryCreate(currencyName);
         if (currencyNameResult.IsFailure)
             return Result.Failure<Currency>(currencyNameResult.Error);
 
-        var currencyCodeResult = CurrencyCode.TryCreate(currencyCode);
+        var currencyCodeResult = CurrencySymbol.TryCreate(currencySymbol);
         if (currencyCodeResult.IsFailure)
             return Result.Failure<Currency>(currencyCodeResult.Error);
 
@@ -55,12 +55,12 @@ public class Currency
             currencyCodeResult.Value, amountResult.Value, description, updateDate);
     }
 
-    public static Currency Create(string currencyName, string currencyCode,
+    public static Currency Create(string currencyName, string currencySymbol,
         decimal amount, string? description, DateTime updateDate)
     {
         var currencyNameDomain = CurrencyName.Create(currencyName);
 
-        var currencyCodeDomain = CurrencyCode.Create(currencyCode);
+        var currencyCodeDomain = CurrencySymbol.Create(currencySymbol);
 
         var amountDomain = Amount.Create(amount);
 

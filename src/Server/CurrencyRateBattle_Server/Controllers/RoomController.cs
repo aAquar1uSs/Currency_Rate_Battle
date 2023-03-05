@@ -15,12 +15,10 @@ namespace CurrencyRateBattleServer.Controllers;
 [Authorize]
 public class RoomController : ControllerBase
 {
-    private readonly ILogger<RoomController> _logger;
     private readonly IMediator _mediator;
 
-    public RoomController(ILogger<RoomController> logger, IMediator mediator)
+    public RoomController(IMediator mediator)
     {
-        _logger = logger;
         _mediator = mediator;
     }
 
@@ -29,7 +27,6 @@ public class RoomController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<ActionResult<IEnumerable<Room>>> GetRoomsAsync([FromRoute] bool isClosed, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("List of rooms are retrieving.");
         var command = new GetRoomCommand {IsClosed = isClosed};
 
         var response = await _mediator.Send(command, cancellationToken);
@@ -43,8 +40,6 @@ public class RoomController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromBody] FilterDto filter, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Filtered room list.");
-
         var command = new GetFilteredRoomCommand { Filter = filter };
 
         var (_, isFailure, value) = await _mediator.Send(command, cancellationToken);

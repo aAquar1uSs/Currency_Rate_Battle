@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyStateHandlers.GetCurrencyRates;
+using CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyHandlers.GetCurrencyRates;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +11,10 @@ namespace CurrencyRateBattleServer.Controllers;
 [Authorize]
 public class CurrencyController : ControllerBase
 {
-    private readonly ILogger<CurrencyController> _logger;
     private readonly IMediator _mediator;
 
-    public CurrencyController(ILogger<CurrencyController> logger, IMediator mediator)
+    public CurrencyController(IMediator mediator)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
@@ -25,8 +23,6 @@ public class CurrencyController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> GetCurrencyRates(CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(GetCurrencyRates)}, was caused.");
-
         var command = new GetCurrencyCommand();
 
         var response = await _mediator.Send(command, cancellationToken);

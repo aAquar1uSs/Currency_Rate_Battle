@@ -7,10 +7,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["src/CurrencyRateBattle_Client/CRBClient.csproj", "src/CurrencyRateBattle_Client/"]
-RUN dotnet restore "src/CurrencyRateBattle_Client/CRBClient.csproj"
+COPY ["src/Client/CurrencyRateBattle_Client/CRBClient.csproj", "src/Client/CurrencyRateBattle_Client/"]
+RUN dotnet restore "src/Client/CurrencyRateBattle_Client/CRBClient.csproj"
 COPY . .
-WORKDIR "/src/src/CurrencyRateBattle_Client"
+WORKDIR "/src/src/Client/CurrencyRateBattle_Client"
 RUN dotnet build "CRBClient.csproj" -c Release -o /app/build
 
 FROM build AS publish

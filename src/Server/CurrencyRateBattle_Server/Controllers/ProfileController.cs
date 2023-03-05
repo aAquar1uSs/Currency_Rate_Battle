@@ -14,13 +14,11 @@ namespace CurrencyRateBattleServer.Controllers;
 [Authorize]
 public class ProfileController : ControllerBase
 {
-    private readonly ILogger<ProfileController> _logger;
     private readonly IMediator _mediator;
 
     public ProfileController(IMediator mediator, ILogger<ProfileController> logger)
     {
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     [HttpGet("get-balance")]
@@ -28,8 +26,6 @@ public class ProfileController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> GetUserBalanceAsync(CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(GetUserBalanceAsync)} was triggered.");
-
         var userId = GuidHelper.GetGuidFromRequest(HttpContext);
         if (userId is null)
             return BadRequest();
@@ -49,8 +45,6 @@ public class ProfileController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> GetUserInfoAsync(CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(GetUserInfoAsync)} was triggered.");
-
         var userId = GuidHelper.GetGuidFromRequest(HttpContext);
         if (userId is null)
             return BadRequest();

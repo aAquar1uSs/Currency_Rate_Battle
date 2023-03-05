@@ -14,7 +14,7 @@ public static class CurrencyConverter
     {
         return new CurrencyDto
         {
-            Currency = currency.CurrencyCode?.Value,
+            Currency = currency.CurrencySymbol?.Value,
             Date = DateTime.UtcNow.ToString(),
             Rate = currency.Rate.Value
         };

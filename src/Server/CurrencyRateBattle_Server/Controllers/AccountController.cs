@@ -14,12 +14,10 @@ namespace CurrencyRateBattleServer.Controllers;
 public class AccountController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly ILogger<AccountController> _logger;
 
-    public AccountController(IMediator mediator, ILogger<AccountController> logger)
+    public AccountController(IMediator mediator)
     {
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     [HttpPost("login")]
@@ -28,8 +26,6 @@ public class AccountController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> LoginAsync([FromBody] UserDto userData, CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(LoginAsync)} was triggered.");
-
         var command = new LoginCommand { UserDto = userData };
 
         var response= await _mediator.Send(command, cancellationToken);
@@ -46,8 +42,6 @@ public class AccountController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> CreateUserAsync([FromBody] UserDto userData, CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(CreateUserAsync)} was triggered.");
-
         var command = new RegistrationCommand { UserDto = userData };
 
         var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);

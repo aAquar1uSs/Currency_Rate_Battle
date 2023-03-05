@@ -1,4 +1,4 @@
-﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyStateHandlers.UpdateCurrencyRateHandlers;
+﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyHandlers.UpdateCurrencyRateHandlers;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

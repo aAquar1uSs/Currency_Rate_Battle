@@ -4,7 +4,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using NbuClient;
 
-namespace CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyStateHandlers.UpdateCurrencyRateHandlers;
+namespace CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyHandlers.UpdateCurrencyRateHandlers;
 
 public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateCommand>
 {
@@ -40,7 +40,7 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
         var availableCurrenciesIds = await _currencyRepository.GetAllIds(cancellationToken);
 
         var currenciesToUpdate = currencies.Select(x => x)
-            .Where(x => availableCurrenciesIds.Contains(x.CurrencyName?.Value))
+            .Where(x => availableCurrenciesIds.Contains(x.CurrencyName.Value))
             .ToArray();
 
         foreach (var currency in currenciesToUpdate)

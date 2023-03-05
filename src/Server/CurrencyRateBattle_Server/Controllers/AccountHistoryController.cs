@@ -15,13 +15,11 @@ namespace CurrencyRateBattleServer.Controllers;
 [Authorize]
 public class AccountHistoryController : ControllerBase
 {
-    private readonly ILogger<AccountHistoryController> _logger;
     private readonly IMediator _mediator;
 
-    public AccountHistoryController(ILogger<AccountHistoryController> logger, IMediator mediator)
+    public AccountHistoryController(IMediator mediator)
     {
-        _logger = logger;
-        _mediator = mediator;
+        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
     [HttpGet]
@@ -29,7 +27,6 @@ public class AccountHistoryController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> GetAccountHistoryAsync(CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(GetAccountHistoryAsync)} was triggered.");
         var userId = GuidHelper.GetGuidFromRequest(HttpContext);
         if (userId is null)
             return BadRequest();
@@ -49,8 +46,6 @@ public class AccountHistoryController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> CreateNewAccountHistory([FromBody] AccountHistoryDto historyDto, CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(CreateNewAccountHistory)}, was caused");
-
         var userId = GuidHelper.GetGuidFromRequest(HttpContext);
         if (userId is null)
             return BadRequest();
@@ -61,8 +56,7 @@ public class AccountHistoryController : ControllerBase
 
         if (isFailure)
             return BadRequest(error);
-
-        _logger.LogDebug("Account history successfully added.");
+        
         return Ok();
     }
 }

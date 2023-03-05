@@ -136,37 +136,6 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                         });
                 });
 
-            modelBuilder.Entity("CurrencyRateBattleServer.Dal.Entities.CurrencyStateDal", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("CurrencyCode")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("CurrencyExchangeRate")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("CurrencyName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("RoomId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoomId", "CurrencyCode")
-                        .IsUnique();
-
-                    b.ToTable("CurrencyState", (string)null);
-                });
-
             modelBuilder.Entity("CurrencyRateBattleServer.Dal.Entities.RateDal", b =>
                 {
                     b.Property<Guid>("Id")
@@ -223,6 +192,13 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("CountRates")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CurrencyName")
+                        .IsRequired()
+                        .HasColumnType("varchar(3)");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -232,6 +208,8 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                         .HasDefaultValue(false);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CurrencyName");
 
                     b.ToTable("Room", (string)null);
                 });
@@ -286,17 +264,6 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                     b.Navigation("Room");
                 });
 
-            modelBuilder.Entity("CurrencyRateBattleServer.Dal.Entities.CurrencyStateDal", b =>
-                {
-                    b.HasOne("CurrencyRateBattleServer.Dal.Entities.RoomDal", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Room");
-                });
-
             modelBuilder.Entity("CurrencyRateBattleServer.Dal.Entities.RateDal", b =>
                 {
                     b.HasOne("CurrencyRateBattleServer.Dal.Entities.AccountDal", "Account")
@@ -322,6 +289,17 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                     b.Navigation("Currency");
 
                     b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("CurrencyRateBattleServer.Dal.Entities.RoomDal", b =>
+                {
+                    b.HasOne("CurrencyRateBattleServer.Dal.Entities.CurrencyDal", "Currency")
+                        .WithMany()
+                        .HasForeignKey("CurrencyName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Currency");
                 });
 #pragma warning restore 612, 618
         }

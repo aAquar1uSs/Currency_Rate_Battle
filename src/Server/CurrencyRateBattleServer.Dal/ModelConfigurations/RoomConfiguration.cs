@@ -12,7 +12,7 @@ public class RoomConfiguration : IEntityTypeConfiguration<RoomDal>
             .HasKey(room => room.Id);
         _ = builder.ToTable("Room")
             .Property(r => r.IsClosed)
-            .HasDefaultValue(0);
+            .HasDefaultValue(false);
     }
 }
 

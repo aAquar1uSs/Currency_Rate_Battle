@@ -15,7 +15,7 @@ public static class CurrencyConverter
     {
         return new CurrencyDal
         {
-            CurrencyCode = currency.CurrencyCode.Value,
+            CurrencyCode = currency.CurrencySymbol.Value,
             CurrencyName = currency.CurrencyName.Value,
             Description = currency.Description,
             Rate = currency.Rate.Value,

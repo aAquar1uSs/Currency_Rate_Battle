@@ -4,7 +4,6 @@ using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.GetRate
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.GetUserBets;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.MakeBetHandler;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -17,19 +16,16 @@ namespace CurrencyRateBattleServer.Controllers;
 [Authorize]
 public class RateController : ControllerBase
 {
-    private readonly ILogger<RateController> _logger;
     private readonly IMediator _mediator;
 
-    public RateController(ILogger<RateController> logger, IMediator mediator)
+    public RateController(IMediator mediator)
     {
-        _logger = logger;
-        _mediator = mediator;
+        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
     [HttpGet] //ToDo add isActive and CurrencyCode in DTO
     public async Task<ActionResult<List<Room>>> GetRatesAsync(bool? isActive, string? currencyCode, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("List of rates are retrieving.");
         var command = new GetRatesCommand {IsActive = isActive, CurrencyName = currencyCode};
 
         var response = await _mediator.Send(command, cancellationToken);
@@ -42,7 +38,6 @@ public class RateController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> GetUserBetsAsync()
     {
-        _logger.LogDebug($"{nameof(GetUserBetsAsync)},  was caused.");
         var userId = GuidHelper.GetGuidFromRequest(HttpContext);
         if (userId is null)
             return BadRequest();
@@ -64,8 +59,6 @@ public class RateController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> CreateRateAsync([FromBody] UserRateDto userRateToCreate)
     {
-        _logger.LogDebug("New rate creation is triggerred.");
-
         var userId = GuidHelper.GetGuidFromRequest(HttpContext);
 
         if (userId is null)
