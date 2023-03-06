@@ -2,7 +2,6 @@
 using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyHandlers.GetCurrencyRates;
 
@@ -10,7 +9,7 @@ public class GetCurrencyHandler : IRequestHandler<GetCurrencyCommand, Result<Get
 {
     private readonly ICurrencyRepository _currencyRepository;
 
-    public GetCurrencyHandler(ILogger<GetCurrencyHandler> logger, ICurrencyRepository currencyRepository)
+    public GetCurrencyHandler(ICurrencyRepository currencyRepository)
     {
         _currencyRepository = currencyRepository ?? throw new ArgumentNullException(nameof(currencyRepository));
     }
@@ -19,6 +18,6 @@ public class GetCurrencyHandler : IRequestHandler<GetCurrencyCommand, Result<Get
     {
         var currencyRates = await _currencyRepository.GetAsync(cancellationToken);
 
-        return new GetCurrencyResponse { CurrencyStates = currencyRates.ToDto()};
+        return new GetCurrencyResponse { CurrencyStates = currencyRates.Select(x => x.ToDto()).ToArray()};
     }
 }

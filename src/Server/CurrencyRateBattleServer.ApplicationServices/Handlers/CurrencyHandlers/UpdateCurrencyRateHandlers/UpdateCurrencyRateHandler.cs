@@ -39,7 +39,6 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
 
         var availableCurrenciesIds = await _currencyRepository.GetAsync(cancellationToken);
         
-
         foreach (var currency in availableCurrenciesIds)
         {
             var currencyToUpdate = updatedCurrencies.FirstOrDefault(x => x.Currency == currency.CurrencyName.Value);
@@ -49,7 +48,7 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
             var updatedResult = currency.TryUpdateCurrency(currencyToUpdate.Rate, currencyToUpdate.Date);
             if (updatedResult.IsFailure)
             {
-                _logger.LogError(updatedResult.Error);
+                _logger.LogError("Error was occured when tried to update currency rate. Reason {Reason}", updatedResult.Error);
                 continue;    
             }
             

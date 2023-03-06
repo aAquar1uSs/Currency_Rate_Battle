@@ -23,18 +23,19 @@ public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<Get
 
     public async Task<Result<GetUserBetsResponse>> Handle(GetUserBetsCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(GetUserBetsHandler)},  was caused. Start processing.");
-
         var userEmailResult = Email.TryCreate(request.UserEmail);
         if (userEmailResult.IsFailure)
             return Result.Failure<GetUserBetsResponse>(userEmailResult.Error);
         
         var account = await _accountRepository.GetAccountByUserIdAsync(userEmailResult.Value, cancellationToken);
         if (account is null)
-            return Result.Failure<GetUserBetsResponse>($"Account with such user id {request.UserEmail} does not exist");
+        {
+            _logger.LogWarning("Account with such user email: {Email} not found.", userEmailResult.Value);
+            return Result.Failure<GetUserBetsResponse>($"Account with such user email {request.UserEmail} does not exist");   
+        }
 
         var bets = await _userRatingQueryRepository.FindAsync(account.Id, cancellationToken);
 
-        return new GetUserBetsResponse { Bets = bets.ToDto() };
+        return new GetUserBetsResponse { Bets = bets.Select(x => x.ToDto()).ToArray() };
     }
 }

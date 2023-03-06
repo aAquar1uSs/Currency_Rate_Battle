@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.CreateAccountHistory;
 
-public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result<CreateHistoryResponse, Error>>
+public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result<Unit, Error>>
 {
     private readonly ILogger<CreateHistoryHandler> _logger;
     private readonly IAccountRepository _accountRepository;
@@ -24,7 +24,7 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
         _accountHistoryRepository = accountHistoryRepository ?? throw new ArgumentNullException(nameof(accountHistoryRepository));
     }
 
-    public async Task<Result<CreateHistoryResponse, Error>> Handle(CreateHistoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Unit, Error>> Handle(CreateHistoryCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"{nameof(CreateHistoryHandler)} was caused... Start proccesing");
 
@@ -38,19 +38,34 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Result
             return PlayerValidationError.AccountNotFound;
         
         var customAccountHistoryId = AccountHistoryId.GenerateId();
-        AccountHistory accountHistory;
-        if (request.RoomId is null)
-            accountHistory = AccountHistory.Create(customAccountHistoryId.Id, account.Id.Id, DateTime.Now, account.Amount.Value);
-        else
-        {
-            var room = await _roomRepository.FindAsync(request.RoomId.Value, cancellationToken);
-            if (room is null)
-                return RoomValidationError.RoomNotFound;
-            accountHistory = AccountHistory.Create(customAccountHistoryId.Id, account.Id.Id, DateTime.Now, account.Amount.Value, request.IsCredit, room.Id.Id);
-        }
 
+        var result = request.RoomId is null
+            ? await CreateWithoutRoom(customAccountHistoryId.Id, account.Id.Id, account.Amount.Value, request.IsCredit, cancellationToken)
+            : await CreateWithRoom(customAccountHistoryId.Id, account.Id.Id, account.Amount.Value, request.IsCredit, request.RoomId.Value,
+                cancellationToken);
+        
+        return result.IsFailure 
+            ? Result.Failure<Unit, Error>(result.Error) 
+            : Unit.Value;
+    }
+
+    private async Task<Result<Unit, Error>> CreateWithoutRoom(Guid historyId, Guid accId, decimal amount, bool isCredit, CancellationToken cancellationToken)
+    {
+       var accountHistory = AccountHistory.Create(historyId, accId, DateTime.UtcNow, amount, isCredit);
+       await _accountHistoryRepository.CreateAsync(accountHistory, cancellationToken);
+       
+       return Unit.Value;
+    }
+    
+    private async Task<Result<Unit, Error>> CreateWithRoom(Guid historyId, Guid accId, decimal amount, bool isCredit, Guid roomId, CancellationToken cancellationToken)
+    {
+        var room = await _roomRepository.FindAsync(roomId, cancellationToken);
+        if (room is null)
+            return RoomValidationError.RoomNotFound;
+        
+        var accountHistory = AccountHistory.Create(historyId, accId, DateTime.Now, amount, isCredit, room.Id.Id);
         await _accountHistoryRepository.CreateAsync(accountHistory, cancellationToken);
 
-        return new CreateHistoryResponse();
+        return Unit.Value;
     }
 }

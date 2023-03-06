@@ -21,9 +21,4 @@ public static class BetInfoConverter
             WonCurrencyExchange = bet.WonCurrencyExchange
         };
     }
-
-    public static BetInfoDto[] ToDto(this Bet[] betInfos)
-    {
-        return betInfos.Select(x => x.ToDto()).ToArray();
-    }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.AccountHandlers.Login;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.AccountHandlers.Registration;

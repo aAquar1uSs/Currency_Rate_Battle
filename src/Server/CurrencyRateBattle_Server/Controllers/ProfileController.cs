@@ -16,7 +16,7 @@ public class ProfileController : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public ProfileController(IMediator mediator, ILogger<ProfileController> logger)
+    public ProfileController(IMediator mediator)
     {
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }

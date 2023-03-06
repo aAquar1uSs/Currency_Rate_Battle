@@ -19,7 +19,7 @@ public class CurrencyController : ControllerBase
     }
 
     [HttpGet("get-currency-rates")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GetCurrencyResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> GetCurrencyRates(CancellationToken cancellationToken)
     {
@@ -27,6 +27,6 @@ public class CurrencyController : ControllerBase
 
         var response = await _mediator.Send(command, cancellationToken);
 
-        return Ok(response.Value.CurrencyStates);
+        return Ok(response.Value);
     }
 }

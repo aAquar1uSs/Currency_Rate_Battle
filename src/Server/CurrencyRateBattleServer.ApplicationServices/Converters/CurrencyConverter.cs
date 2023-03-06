@@ -5,12 +5,7 @@ namespace CurrencyRateBattleServer.ApplicationServices.Converters;
 
 public static class CurrencyConverter
 {
-    public static CurrencyDto[] ToDto(this Currency[] currencyStates)
-    {
-        return currencyStates.Select(x => x.ToDto()).ToArray();
-    }
-
-    private static CurrencyDto ToDto(this Currency currency)
+    public static CurrencyDto ToDto(this Currency currency)
     {
         return new CurrencyDto
         {

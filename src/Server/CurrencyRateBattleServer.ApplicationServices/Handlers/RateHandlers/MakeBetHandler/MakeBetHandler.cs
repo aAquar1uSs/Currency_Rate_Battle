@@ -34,7 +34,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
         
         var account = await _accountRepository.GetAccountByUserIdAsync(userEmailResult.Value, cancellationToken);
         if (account is null)
-            return Result.Failure<MakeBetResponse>($"Account with such user id: {request.UserId} does not exist.");
+            return Result.Failure<MakeBetResponse>($"Account with such user email: {request.UserId} does not exist.");
         
         var rateToCreate = request.UserRateToCreate;
         var roomIdResult = RoomId.TryCreate(rateToCreate.RoomId);
