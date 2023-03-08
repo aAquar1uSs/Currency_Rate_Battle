@@ -4,7 +4,7 @@ using MediatR;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.CreateAccountHistory;
 
-public class CreateHistoryCommand : IRequest<Result<Unit, Error>>
+public class CreateHistoryCommand : IRequest<Maybe<Error>>
 {
     public CreateHistoryCommand(string userEmail, Guid? roomId, DateTime date, decimal amount,
         bool isCredit)

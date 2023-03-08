@@ -10,14 +10,12 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.
 
 public class GetAccountHistoryHandler : IRequestHandler<GetAccountHistoryCommand, Result<GetAccountHistoryResponse, Error>>
 {
-    private readonly ILogger<GetAccountHistoryHandler> _logger;
     private readonly IAccountRepository _accountRepository;
     private readonly IAccountHistoryRepository _accountHistoryRepository;
 
     public GetAccountHistoryHandler(ILogger<GetAccountHistoryHandler> logger, IAccountRepository accountRepository,
         IAccountHistoryRepository accountHistoryRepository)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
         _accountHistoryRepository = accountHistoryRepository ?? throw new ArgumentNullException(nameof(accountHistoryRepository));
     }

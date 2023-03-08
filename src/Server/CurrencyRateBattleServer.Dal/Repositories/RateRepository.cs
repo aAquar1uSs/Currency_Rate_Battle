@@ -84,12 +84,4 @@ public class RateRepository : IRateRepository
 
         return result.ToDomain();
     }
-
-    public async Task DeleteRateAsync(Rate rateToDelete)
-    {
-        _logger.LogInformation($"{nameof(DeleteRateAsync)} was caused.");
-
-        _ = _dbContext.Rates.Remove(rateToDelete.ToDal());
-        _ = await _dbContext.SaveChangesAsync();
-    }
 }

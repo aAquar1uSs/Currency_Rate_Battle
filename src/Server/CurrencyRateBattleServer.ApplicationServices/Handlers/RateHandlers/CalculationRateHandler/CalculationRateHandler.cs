@@ -1,4 +1,5 @@
-﻿using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
+﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.CreateAccountHistory;
+using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;
@@ -13,20 +14,20 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
     private readonly IRoomRepository _roomRepository;
     private readonly ICurrencyRepository _currencyRepository;
     private readonly IAccountRepository _accountRepository;
-    private readonly IAccountHistoryRepository _accountHistoryRepository;
+    private readonly IMediator _mediator;
 
     public CalculationRateHandler(ILogger<CalculationRateHandler> logger,
         IRateRepository rateRepository, IRoomRepository roomRepository,
         ICurrencyRepository currencyRepository,
         IAccountRepository accountRepository,
-        IAccountHistoryRepository accountHistoryRepository)
+        IMediator mediator)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _rateRepository = rateRepository ?? throw new ArgumentNullException(nameof(rateRepository));
         _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
         _currencyRepository = currencyRepository ?? throw new ArgumentNullException(nameof(currencyRepository));
         _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
-        _accountHistoryRepository = accountHistoryRepository ?? throw new ArgumentNullException(nameof(accountHistoryRepository));
+        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
     public async Task<Unit> Handle(CalculationRateCommand request, CancellationToken cancellationToken)
@@ -62,11 +63,9 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
             account.ApportionCash(moneyCreatedResult.Value);
 
             await _accountRepository.UpdateAsync(account, cancellationToken);
-
-            var accountHistoryId = CustomId.GenerateId();
-            var accountHistory = AccountHistory.Create(accountHistoryId.Id, account.Id.Id,
-                DateTime.UtcNow, moneyCreatedResult.Value.Value, true, rate.RoomId.Id);
-            await _accountHistoryRepository.CreateAsync(accountHistory, cancellationToken);
+            
+            var command = new CreateHistoryCommand(account.UserEmail.Value, rate.RoomId.Id, DateTime.UtcNow, account.Amount.Value, true);
+            _ = await _mediator.Send(command, cancellationToken);
         }
 
         return Unit.Value;

@@ -7,13 +7,13 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.ProfileHandlers.GetProfile;
 
-public class ProfileHandler : IRequestHandler<GetProfileCommand, Result<GetProfileResponse>>
+public class GetProfileHandler : IRequestHandler<GetProfileCommand, Result<GetProfileResponse>>
 {
-    private readonly ILogger<ProfileHandler> _logger;
+    private readonly ILogger<GetProfileHandler> _logger;
     private readonly IAccountRepository _accountRepository;
     private readonly IUserRepository _userRepository;
 
-    public ProfileHandler(ILogger<ProfileHandler> logger, IAccountRepository accountRepository, IUserRepository userRepository)
+    public GetProfileHandler(ILogger<GetProfileHandler> logger, IAccountRepository accountRepository, IUserRepository userRepository)
     {
         _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
@@ -22,7 +22,7 @@ public class ProfileHandler : IRequestHandler<GetProfileCommand, Result<GetProfi
 
     public async Task<Result<GetProfileResponse>> Handle(GetProfileCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(ProfileHandler)} was caused.");
+        _logger.LogDebug($"{nameof(GetProfileHandler)} was caused.");
 
         var userEmailResult = Email.TryCreate(request.UserEmail);
         if (userEmailResult.IsFailure)

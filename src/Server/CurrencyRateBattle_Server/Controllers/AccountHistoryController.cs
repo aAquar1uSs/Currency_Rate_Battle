@@ -3,6 +3,7 @@ using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.GetAccountHistory;
+using CurrencyRateBattleServer.Domain.Entities.Errors;
 using CurrencyRateBattleServer.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,6 +45,7 @@ public class AccountHistoryController : ControllerBase
     [HttpPost]
     [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType(typeof(Error),(int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> CreateNewAccountHistory([FromBody] AccountHistoryDto historyDto, CancellationToken cancellationToken)
     {
         var userId = GuidHelper.GetGuidFromRequest(HttpContext);
@@ -52,11 +54,10 @@ public class AccountHistoryController : ControllerBase
 
         var command = historyDto.ToCreateCommand(userId);
 
-        var (_, isFailure, _, error) = await _mediator.Send(command, cancellationToken);
+        var response = await _mediator.Send(command, cancellationToken);
 
-        if (isFailure)
-            return BadRequest(error);
-        
-        return Ok();
+        return response.HasValue
+            ? BadRequest(response.Value)
+            : Ok();
     }
 }
