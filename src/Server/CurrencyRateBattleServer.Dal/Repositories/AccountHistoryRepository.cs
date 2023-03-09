@@ -18,9 +18,9 @@ public class AccountHistoryRepository : IAccountHistoryRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task<AccountHistory[]> GetAsync(AccountId accountId, CancellationToken cancellationToken)
+    public async Task<AccountHistory[]> Get(AccountId accountId, CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(GetAsync)} was caused.");
+        _logger.LogDebug($"{nameof(Get)} was caused.");
 
         var histories = await _dbContext.AccountHistory
             .AsNoTracking()
@@ -30,7 +30,7 @@ public class AccountHistoryRepository : IAccountHistoryRepository
         return histories.ToDomain();
     }
 
-    public async Task CreateAsync(AccountHistory accountHistory, CancellationToken cancellationToken)
+    public async Task Create(AccountHistory accountHistory, CancellationToken cancellationToken)
     {
         var historyDal = accountHistory.ToDal();
 

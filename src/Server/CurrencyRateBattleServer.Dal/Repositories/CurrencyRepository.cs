@@ -17,34 +17,16 @@ public class CurrencyRepository : ICurrencyRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task UpdateAsync(Currency currency, CancellationToken cancellationToken)
+    public async Task Update(Currency currency, CancellationToken cancellationToken)
     {
         var currencyDal = currency.ToDal();
         _ = _dbContext.Currencies.Update(currencyDal);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<string[]> GetAllIds(CancellationToken cancellationToken)
+    public async Task<Currency[]> Get(CancellationToken cancellationToken)
     {
-        return await _dbContext.Currencies
-            .AsNoTracking()
-            .Select(x => x.CurrencyName).ToArrayAsync(cancellationToken);
-    }
-
-    public async Task<decimal> GetRateByCurrencyName(string currencyName, CancellationToken cancellationToken)
-    {
-        var value = await _dbContext.Currencies
-            .AsNoTracking()
-            .Where(x => x.CurrencyName == currencyName)
-            .Select(x => x.Rate)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return Math.Round(value, 2);
-    }
-    
-    public async Task<Currency[]> GetAsync(CancellationToken cancellationToken)
-    {
-        _logger.LogDebug($"{nameof(GetAsync)} was caused");
+        _logger.LogDebug($"{nameof(Get)} was caused");
 
         var currency = await _dbContext.Currencies
             .AsNoTracking()

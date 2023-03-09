@@ -10,19 +10,19 @@ public class GenerateRoomHandler : IRequestHandler<GenerateRoomCommand>
 {
     private readonly ILogger<GenerateRoomHandler> _logger;
     private readonly IRoomRepository _roomRepository;
-    private readonly ICurrencyRepository _currencyRepository;
+    private readonly ICurrencyQueryRepository _currencyQueryRepository;
 
-    public GenerateRoomHandler(ILogger<GenerateRoomHandler> logger, IRoomRepository roomRepository, ICurrencyRepository currencyRepository)
+    public GenerateRoomHandler(ILogger<GenerateRoomHandler> logger, IRoomRepository roomRepository, ICurrencyQueryRepository currencyQueryRepository)
     {
         _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _currencyRepository = currencyRepository ?? throw new ArgumentNullException(nameof(currencyRepository));
+        _currencyQueryRepository = currencyQueryRepository ?? throw new ArgumentNullException(nameof(currencyQueryRepository));
     }
 
     //Add settings to count of rooms can be generated
     public async Task<Unit> Handle(GenerateRoomCommand request, CancellationToken cancellationToken)
     {
-        var currencies = await _currencyRepository.GetAllIds(cancellationToken);
+        var currencies = await _currencyQueryRepository.GetAllIds(cancellationToken);
 
         foreach (var currency in currencies)
         {

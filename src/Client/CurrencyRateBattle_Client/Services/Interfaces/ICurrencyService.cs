@@ -2,7 +2,7 @@
 
 namespace CRBClient.Services.Interfaces;
 
-public interface ICurrencyStateService
+public interface ICurrencyService
 {
     Task<List<CurrencyDto>> GetCurrencyRatesAsync(CancellationToken cancellationToken);
 }

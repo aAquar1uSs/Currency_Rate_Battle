@@ -12,7 +12,7 @@ public interface IAccountHistoryRepository
     /// <returns>
     /// the list <see cref="List{T}"/> of AccountHistory models <see cref="AccountHistory"/>;
     /// </returns>
-    Task<AccountHistory[]> GetAsync(AccountId id, CancellationToken cancellationToken);
+    Task<AccountHistory[]> Get(AccountId id, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new account history;
@@ -21,5 +21,5 @@ public interface IAccountHistoryRepository
     /// <returns>
     ///A task that represents the asynchronous operation. <see cref="Task"/>;
     /// </returns>
-    Task CreateAsync(AccountHistory accountHistory, CancellationToken cancellationToken);
+    Task Create(AccountHistory accountHistory, CancellationToken cancellationToken);
 }

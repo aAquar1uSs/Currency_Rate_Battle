@@ -10,11 +10,11 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.ProfileHandlers.
 public class GetUserBalanceHandler : IRequestHandler<GetUserBalanceCommand, Result<GetUserBalanceResponse, Error>>
 {
     private readonly ILogger<GetUserBalanceHandler> _logger;
-    private readonly IAccountRepository _accountRepository;
+    private readonly IAccountQueryRepository _accountQueryRepository;
 
-    public GetUserBalanceHandler(ILogger<GetUserBalanceHandler> logger, IAccountRepository accountRepository)
+    public GetUserBalanceHandler(ILogger<GetUserBalanceHandler> logger, IAccountQueryRepository accountQueryRepository)
     {
-        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+        _accountQueryRepository = accountQueryRepository ?? throw new ArgumentNullException(nameof(accountQueryRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
     
@@ -26,7 +26,7 @@ public class GetUserBalanceHandler : IRequestHandler<GetUserBalanceCommand, Resu
         if (userEmailResult.IsFailure)
             return new PlayerValidationError("Invalid_email", userEmailResult.Error);
         
-        var account = await _accountRepository.GetAccountByUserIdAsync(userEmailResult.Value, cancellationToken);
+        var account = await _accountQueryRepository.GetAccountByUserId(userEmailResult.Value, cancellationToken);
 
         if (account is null)
             return PlayerValidationError.AccountNotFound;

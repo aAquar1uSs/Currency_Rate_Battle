@@ -13,17 +13,19 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.Mak
 public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResponse, Error>>
 {
     private readonly ILogger<MakeBetHandler> _logger;
+    private readonly IAccountQueryRepository _accountQueryRepository;
     private readonly IAccountRepository _accountRepository;
     private readonly IRateRepository _rateRepository;
     private readonly IRoomRepository _roomRepository;
 
-    public MakeBetHandler(ILogger<MakeBetHandler> logger, IAccountRepository accountRepository,
-        IRoomRepository roomRepository, IRateRepository rateRepository)
+    public MakeBetHandler(ILogger<MakeBetHandler> logger, IAccountQueryRepository accountQueryRepository,
+        IRoomRepository roomRepository, IRateRepository rateRepository, IAccountRepository accountRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+        _accountQueryRepository = accountQueryRepository ?? throw new ArgumentNullException(nameof(accountQueryRepository));
         _rateRepository = rateRepository ?? throw new ArgumentNullException(nameof(rateRepository));
         _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
     }
 
     public async Task<Result<MakeBetResponse, Error>> Handle(MakeBetCommand request, CancellationToken cancellationToken)
@@ -33,7 +35,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
         if (userEmailResult.IsFailure)
             return new PlayerValidationError("email_not_valid", userEmailResult.Error); 
         
-        var account = await _accountRepository.GetAccountByUserIdAsync(userEmailResult.Value, cancellationToken);
+        var account = await _accountQueryRepository.GetAccountByUserId(userEmailResult.Value, cancellationToken);
         if (account is null)
             return PlayerValidationError.AccountNotFound;
         
@@ -56,7 +58,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
 
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        await _accountRepository.UpdateAsync(account, cancellationToken);
+        await _accountRepository.Update(account, cancellationToken);
 
         var incrementResult = room.IncrementCountRates();
         if (incrementResult.IsFailure)

@@ -7,11 +7,9 @@ namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
 public interface IAccountRepository
 {
-    public Task CreateAsync(Account account, CancellationToken cancellationToken);
-    
-    public Task<Account?> GetAccountByUserIdAsync(Email userEmail, CancellationToken cancellationToken);
+    public Task Create(Account account, CancellationToken cancellationToken);
 
-    public Task<Account?> GetAsync(AccountId accountId, CancellationToken cancellationToken);
+    public Task<Account?> Get(AccountId accountId, CancellationToken cancellationToken);
 
-    public Task UpdateAsync(Account account, CancellationToken cancellationToken);
+    public Task Update(Account account, CancellationToken cancellationToken);
 }

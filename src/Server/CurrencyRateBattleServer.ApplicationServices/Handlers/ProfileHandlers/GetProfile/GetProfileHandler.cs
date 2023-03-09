@@ -11,12 +11,12 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.ProfileHandlers.
 public class GetProfileHandler : IRequestHandler<GetProfileCommand, Result<GetProfileResponse, Error>>
 {
     private readonly ILogger<GetProfileHandler> _logger;
-    private readonly IAccountRepository _accountRepository;
+    private readonly IAccountQueryRepository _accountQueryRepository;
     private readonly IUserRepository _userRepository;
 
-    public GetProfileHandler(ILogger<GetProfileHandler> logger, IAccountRepository accountRepository, IUserRepository userRepository)
+    public GetProfileHandler(ILogger<GetProfileHandler> logger, IAccountQueryRepository accountQueryRepository, IUserRepository userRepository)
     {
-        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+        _accountQueryRepository = accountQueryRepository ?? throw new ArgumentNullException(nameof(accountQueryRepository));
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -33,7 +33,7 @@ public class GetProfileHandler : IRequestHandler<GetProfileCommand, Result<GetPr
         if (user is null)
             return PlayerValidationError.UserNotFound;
         
-        var account = await _accountRepository.GetAccountByUserIdAsync(userEmailResult.Value, cancellationToken);
+        var account = await _accountQueryRepository.GetAccountByUserId(userEmailResult.Value, cancellationToken);
         if (account is null)
             return PlayerValidationError.AccountNotFound;
 

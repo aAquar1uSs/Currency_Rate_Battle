@@ -62,7 +62,7 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
         
         await _userRepository.CreateAsync(user, cancellationToken);
 
-        await _accountRepository.CreateAsync(account, cancellationToken);
+        await _accountRepository.Create(account, cancellationToken);
         
         var command = new CreateHistoryCommand(user.Email.Value, null, DateTime.UtcNow, amountResult.Value.Value, true);
         _ = await _mediator.Send(command, cancellationToken);

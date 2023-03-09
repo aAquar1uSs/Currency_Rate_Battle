@@ -37,7 +37,7 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
             return Unit.Value;
         }
 
-        var availableCurrenciesIds = await _currencyRepository.GetAsync(cancellationToken);
+        var availableCurrenciesIds = await _currencyRepository.Get(cancellationToken);
         
         foreach (var currency in availableCurrenciesIds)
         {
@@ -52,7 +52,7 @@ public class UpdateCurrencyRateHandler : IRequestHandler<UpdateCurrencyRateComma
                 continue;    
             }
             
-            await _currencyRepository.UpdateAsync(currency, cancellationToken);   
+            await _currencyRepository.Update(currency, cancellationToken);   
         }
 
         return Unit.Value;

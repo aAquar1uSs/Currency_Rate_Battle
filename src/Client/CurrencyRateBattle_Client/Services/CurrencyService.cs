@@ -7,15 +7,15 @@ using System.Text.Json;
 
 namespace CRBClient.Services;
 
-public class CurrencyStateService : ICurrencyStateService
+public class CurrencyService : ICurrencyService
 {
-    private readonly ILogger<CurrencyStateService> _logger;
+    private readonly ILogger<CurrencyService> _logger;
 
     private readonly ICRBServerHttpClient _httpClient;
 
     private readonly WebServerOptions _options;
 
-    public CurrencyStateService(ILogger<CurrencyStateService> logger,
+    public CurrencyService(ILogger<CurrencyService> logger,
         ICRBServerHttpClient httpClient,
         IOptions<WebServerOptions> options)
     {

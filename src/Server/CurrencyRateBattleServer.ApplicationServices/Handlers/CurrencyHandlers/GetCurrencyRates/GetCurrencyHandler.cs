@@ -16,7 +16,7 @@ public class GetCurrencyHandler : IRequestHandler<GetCurrencyCommand, Result<Get
 
     public async Task<Result<GetCurrencyResponse>> Handle(GetCurrencyCommand request, CancellationToken cancellationToken)
     {
-        var currencyRates = await _currencyRepository.GetAsync(cancellationToken);
+        var currencyRates = await _currencyRepository.Get(cancellationToken);
 
         return new GetCurrencyResponse { CurrencyStates = currencyRates.Select(x => x.ToDto()).ToArray()};
     }

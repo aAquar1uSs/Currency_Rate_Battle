@@ -12,20 +12,20 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
     private readonly ILogger<CalculationRateHandler> _logger;
     private readonly IRateRepository _rateRepository;
     private readonly IRoomRepository _roomRepository;
-    private readonly ICurrencyRepository _currencyRepository;
+    private readonly ICurrencyQueryRepository _currencyQueryRepository;
     private readonly IAccountRepository _accountRepository;
     private readonly IMediator _mediator;
 
     public CalculationRateHandler(ILogger<CalculationRateHandler> logger,
         IRateRepository rateRepository, IRoomRepository roomRepository,
-        ICurrencyRepository currencyRepository,
+        ICurrencyQueryRepository currencyQueryRepository,
         IAccountRepository accountRepository,
         IMediator mediator)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _rateRepository = rateRepository ?? throw new ArgumentNullException(nameof(rateRepository));
         _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
-        _currencyRepository = currencyRepository ?? throw new ArgumentNullException(nameof(currencyRepository));
+        _currencyQueryRepository = currencyQueryRepository ?? throw new ArgumentNullException(nameof(currencyQueryRepository));
         _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
@@ -46,7 +46,7 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
 
         foreach (var rate in calculateRates)
         {
-            var account = await _accountRepository.GetAsync(rate.AccountId, cancellationToken);
+            var account = await _accountRepository.Get(rate.AccountId, cancellationToken);
             if (account is null)
             {
                 _logger.LogWarning("Account not found when rate was processed. Skip processing for account id {Id}", rate.AccountId.Value);
@@ -62,7 +62,7 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
 
             account.ApportionCash(moneyCreatedResult.Value);
 
-            await _accountRepository.UpdateAsync(account, cancellationToken);
+            await _accountRepository.Update(account, cancellationToken);
             
             var command = new CreateHistoryCommand(account.UserEmail.Value, rate.RoomId.Id, DateTime.UtcNow, account.Amount.Value, true);
             _ = await _mediator.Send(command, cancellationToken);
@@ -82,7 +82,7 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
 
         foreach (var rate in rates)
         {
-            var currencyRate = await _currencyRepository.GetRateByCurrencyName(rate.CurrencyName.Value, cancellationToken);
+            var currencyRate = await _currencyQueryRepository.GetRateByCurrencyName(rate.CurrencyName.Value, cancellationToken);
             if (currencyRate != null && rate.RateCurrencyExchange.Value == Math.Round(currencyRate, 2))
                 rate.IsWonBet();
             else

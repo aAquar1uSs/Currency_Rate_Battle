@@ -11,14 +11,14 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.Get
 public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<GetUserBetsResponse, Error>>
 {
     private readonly ILogger<GetUserBetsHandler> _logger;
-    private readonly IAccountRepository _accountRepository;
+    private readonly IAccountQueryRepository _accountQueryRepository;
     private readonly IUserRatingQueryRepository _userRatingQueryRepository;
 
-    public GetUserBetsHandler(ILogger<GetUserBetsHandler> logger, IAccountRepository accountRepository,
+    public GetUserBetsHandler(ILogger<GetUserBetsHandler> logger, IAccountQueryRepository accountQueryRepository,
         IUserRatingQueryRepository userRatingQueryRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+        _accountQueryRepository = accountQueryRepository ?? throw new ArgumentNullException(nameof(accountQueryRepository));
         _userRatingQueryRepository = userRatingQueryRepository ?? throw new ArgumentNullException(nameof(userRatingQueryRepository));
     }
 
@@ -28,7 +28,7 @@ public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<Get
         if (userEmailResult.IsFailure)
             return new PlayerValidationError("email_not_valid", userEmailResult.Error); 
         
-        var account = await _accountRepository.GetAccountByUserIdAsync(userEmailResult.Value, cancellationToken);
+        var account = await _accountQueryRepository.GetAccountByUserId(userEmailResult.Value, cancellationToken);
         if (account is null)
         {
             _logger.LogWarning("Account with such user email: {Email} not found.", userEmailResult.Value);

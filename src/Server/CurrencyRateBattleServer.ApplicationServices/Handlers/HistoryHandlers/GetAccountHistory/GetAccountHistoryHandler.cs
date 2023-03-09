@@ -10,13 +10,13 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.
 
 public class GetAccountHistoryHandler : IRequestHandler<GetAccountHistoryCommand, Result<GetAccountHistoryResponse, Error>>
 {
-    private readonly IAccountRepository _accountRepository;
+    private readonly IAccountQueryRepository _accountQueryRepository;
     private readonly IAccountHistoryRepository _accountHistoryRepository;
 
-    public GetAccountHistoryHandler(ILogger<GetAccountHistoryHandler> logger, IAccountRepository accountRepository,
+    public GetAccountHistoryHandler(IAccountQueryRepository accountQueryRepository,
         IAccountHistoryRepository accountHistoryRepository)
     {
-        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+        _accountQueryRepository = accountQueryRepository ?? throw new ArgumentNullException(nameof(accountQueryRepository));
         _accountHistoryRepository = accountHistoryRepository ?? throw new ArgumentNullException(nameof(accountHistoryRepository));
     }
 
@@ -27,12 +27,12 @@ public class GetAccountHistoryHandler : IRequestHandler<GetAccountHistoryCommand
             return new PlayerValidationError("email_not_valid", emailResult.Error);
         var email = emailResult.Value;
 
-        var account = await _accountRepository.GetAccountByUserIdAsync(email, cancellationToken);
+        var account = await _accountQueryRepository.GetAccountByUserId(email, cancellationToken);
 
         if (account is null)
             return PlayerValidationError.AccountNotFound;
 
-        var history = await _accountHistoryRepository.GetAsync(account.Id, cancellationToken);
+        var history = await _accountHistoryRepository.Get(account.Id, cancellationToken);
 
         return new GetAccountHistoryResponse { AccountHistories = history.Select(x => x.ToDto()).ToArray() };
     }
