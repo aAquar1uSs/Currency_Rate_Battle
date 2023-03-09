@@ -40,8 +40,8 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Maybe<
         var customAccountHistoryId = AccountHistoryId.GenerateId();
 
         var result = request.RoomId is null
-            ? await CreateWithoutRoom(customAccountHistoryId.Id, account.Id.Id, account.Amount.Value, request.IsCredit, cancellationToken)
-            : await CreateWithRoom(customAccountHistoryId.Id, account.Id.Id, account.Amount.Value, request.IsCredit, request.RoomId.Value,
+            ? await CreateWithoutRoom(customAccountHistoryId.Id, account.Id.Id, request.Amount, request.IsCredit, cancellationToken)
+            : await CreateWithRoom(customAccountHistoryId.Id, account.Id.Id, request.Amount, request.IsCredit, request.RoomId.Value,
                 cancellationToken);
         
         return result.HasValue 
