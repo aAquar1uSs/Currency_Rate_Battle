@@ -26,7 +26,7 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Maybe<
 
     public async Task<Maybe<Error>> Handle(CreateHistoryCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(CreateHistoryHandler)} was caused... Start proccesing");
+        _logger.LogInformation($"{nameof(CreateHistoryHandler)} was caused... Start processing");
 
         var emailResult = Email.TryCreate(request.UserEmail);
         if (emailResult.IsFailure)
@@ -61,7 +61,7 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Maybe<
     {
         var room = await _roomRepository.FindAsync(roomId, cancellationToken);
         if (room is null)
-            return RoomValidationError.RoomNotFound;
+            return RoomValidationError.NotFound;
         
         var accountHistory = AccountHistory.Create(historyId, accId, DateTime.Now, amount, isCredit, room.Id.Id);
         await _accountHistoryRepository.CreateAsync(accountHistory, cancellationToken);

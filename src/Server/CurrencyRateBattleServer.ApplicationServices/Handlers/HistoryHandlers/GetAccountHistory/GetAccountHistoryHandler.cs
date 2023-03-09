@@ -34,6 +34,6 @@ public class GetAccountHistoryHandler : IRequestHandler<GetAccountHistoryCommand
 
         var history = await _accountHistoryRepository.GetAsync(account.Id, cancellationToken);
 
-        return new GetAccountHistoryResponse { AccountHistories = history.ToArray().ToDto() };
+        return new GetAccountHistoryResponse { AccountHistories = history.Select(x => x.ToDto()).ToArray() };
     }
 }

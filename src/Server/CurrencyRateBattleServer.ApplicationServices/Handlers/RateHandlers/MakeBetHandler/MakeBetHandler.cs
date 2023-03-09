@@ -3,13 +3,14 @@ using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
+using CurrencyRateBattleServer.Domain.Entities.Errors;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.MakeBetHandler;
 
-public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResponse>>
+public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResponse, Error>>
 {
     private readonly ILogger<MakeBetHandler> _logger;
     private readonly IAccountRepository _accountRepository;
@@ -25,33 +26,33 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
         _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
     }
 
-    public async Task<Result<MakeBetResponse>> Handle(MakeBetCommand request, CancellationToken cancellationToken)
+    public async Task<Result<MakeBetResponse, Error>> Handle(MakeBetCommand request, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(MakeBetHandler)} was caused.");
-        var userEmailResult = Email.TryCreate(request.UserId);
+        var userEmailResult = Email.TryCreate(request.UserEmail);
         if (userEmailResult.IsFailure)
-            return Result.Failure<MakeBetResponse>(userEmailResult.Error);
+            return new PlayerValidationError("email_not_valid", userEmailResult.Error); 
         
         var account = await _accountRepository.GetAccountByUserIdAsync(userEmailResult.Value, cancellationToken);
         if (account is null)
-            return Result.Failure<MakeBetResponse>($"Account with such user email: {request.UserId} does not exist.");
+            return PlayerValidationError.AccountNotFound;
         
         var rateToCreate = request.UserRateToCreate;
         var roomIdResult = RoomId.TryCreate(rateToCreate.RoomId);
         if (roomIdResult.IsFailure)
-            return Result.Failure<MakeBetResponse>(roomIdResult.Error);
+            return new RateValidationError("invalid_rate" ,roomIdResult.Error);
 
         var room = await _roomRepository.FindAsync(roomIdResult.Value.Id, cancellationToken);
         if (room is null)
-            return Result.Failure<MakeBetResponse>("Room not found.");
+            return RoomValidationError.NotFound;
 
         var amountResult = Amount.TryCreate(rateToCreate.Amount);
         if (amountResult.IsFailure)
-            return Result.Failure<MakeBetResponse>(amountResult.Error);
+            return new MoneyValidationError("invalid_amount" ,amountResult.Error);
 
         var result = account.WritingOffMoney(amountResult.Value);
         if (result.IsFailure)
-            return Result.Failure<MakeBetResponse>(result.Error);
+            return new MoneyValidationError("writing_off_error" ,result.Error);
 
         using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
@@ -59,7 +60,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
 
         var incrementResult = room.IncrementCountRates();
         if (incrementResult.IsFailure)
-            return Result.Failure<MakeBetResponse>(incrementResult.Error);
+            return new CommonError("increment_count_of_rates_error", incrementResult.Error);
         
         var rate = Rate.Create(CustomId.GenerateId().Id, DateTime.UtcNow, rateToCreate.UserCurrencyExchange,
             rateToCreate.Amount, null, null, false, false, roomIdResult.Value.Id,

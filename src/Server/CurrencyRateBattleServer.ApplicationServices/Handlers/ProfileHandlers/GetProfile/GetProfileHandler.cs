@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
+using CurrencyRateBattleServer.Domain.Entities.Errors;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using CurrencyRateBattleServer.Dto;
 using MediatR;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.ProfileHandlers.GetProfile;
 
-public class GetProfileHandler : IRequestHandler<GetProfileCommand, Result<GetProfileResponse>>
+public class GetProfileHandler : IRequestHandler<GetProfileCommand, Result<GetProfileResponse, Error>>
 {
     private readonly ILogger<GetProfileHandler> _logger;
     private readonly IAccountRepository _accountRepository;
@@ -20,21 +21,21 @@ public class GetProfileHandler : IRequestHandler<GetProfileCommand, Result<GetPr
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<Result<GetProfileResponse>> Handle(GetProfileCommand request, CancellationToken cancellationToken)
+    public async Task<Result<GetProfileResponse, Error>> Handle(GetProfileCommand request, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(GetProfileHandler)} was caused.");
 
         var userEmailResult = Email.TryCreate(request.UserEmail);
         if (userEmailResult.IsFailure)
-            return Result.Failure<GetProfileResponse>(userEmailResult.Error);
+            return new PlayerValidationError("Invalid_email", userEmailResult.Error);
         
         var user = await _userRepository.FindAsync(userEmailResult.Value, cancellationToken);
         if (user is null)
-            return Result.Failure<GetProfileResponse>($"User with suh id: {request.UserEmail} didn't found,");
+            return PlayerValidationError.UserNotFound;
         
         var account = await _accountRepository.GetAccountByUserIdAsync(userEmailResult.Value, cancellationToken);
         if (account is null)
-            return Result.Failure<GetProfileResponse>($"Account with such user id: {request.UserEmail} didn't found,");
+            return PlayerValidationError.AccountNotFound;
 
         return new GetProfileResponse
         {

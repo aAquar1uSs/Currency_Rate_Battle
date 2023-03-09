@@ -5,5 +5,10 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.Get
 
 public class GetRoomCommand : IRequest<Result<GetRoomResponse>>
 {
-    public bool IsClosed { get; set; }
+    public GetRoomCommand(bool isClosed)
+    {
+        IsClosed = isClosed;
+    }
+    
+    public bool IsClosed { get; }
 }

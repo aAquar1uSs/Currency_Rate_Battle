@@ -6,5 +6,10 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.
 
 public class GetAccountHistoryCommand : IRequest<Result<GetAccountHistoryResponse, Error>>
 {
-    public string UserEmail { get; set; }
+    public GetAccountHistoryCommand(string userEmail)
+    {
+        UserEmail = userEmail;
+    }
+    
+    public string UserEmail { get; }
 }

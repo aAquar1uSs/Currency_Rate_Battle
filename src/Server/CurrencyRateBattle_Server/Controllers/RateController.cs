@@ -1,9 +1,10 @@
-﻿using System.Net;
+﻿using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.GetRates;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.GetUserBets;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.MakeBetHandler;
 using CurrencyRateBattleServer.Domain.Entities;
+using CurrencyRateBattleServer.Domain.Entities.Errors;
 using CurrencyRateBattleServer.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -23,55 +24,62 @@ public class RateController : ControllerBase
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
-    [HttpGet] //ToDo add isActive and CurrencyCode in DTO
-    public async Task<ActionResult<List<Room>>> GetRatesAsync(bool? isActive, string? currencyCode, CancellationToken cancellationToken)
+    [HttpGet]
+    [ProducesResponseType(typeof(GetRatesResponse), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<Room>>> GetRatesAsync([FromQuery] bool isActive, [FromQuery] string? currencyCode, CancellationToken cancellationToken)
     {
         var command = new GetRatesCommand {IsActive = isActive, CurrencyName = currencyCode};
 
         var response = await _mediator.Send(command, cancellationToken);
 
-        return Ok(response.Value.Rates);
+        return Ok(response.Value);
     }
 
-    [HttpGet("get-user-bets")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    [HttpGet("user/bets")]
+    [ProducesResponseType(typeof(GetUserBetsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetUserBetsAsync()
     {
-        var userId = GuidHelper.GetGuidFromRequest(HttpContext);
-        if (userId is null)
+        var userEmal = GuidHelper.GetGuidFromRequest(HttpContext);
+        if (userEmal is null)
             return BadRequest();
 
-        var command = new GetUserBetsCommand { UserEmail = userId };
+        var command = new GetUserBetsCommand(userEmal);
 
         var response = await _mediator.Send(command);
 
-        if (response.IsFailure)
-            return BadRequest(response.Error);
-
-        return Ok(response.Value.Bets);
+        return response.IsSuccess
+            ? Ok(response.Value)
+            : ToErrorResponse(response.Error);
     }
 
     [HttpPost("make-bet")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    [ProducesResponseType((int)HttpStatusCode.Conflict)]
-    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(MakeBetResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateRateAsync([FromBody] UserRateDto userRateToCreate)
     {
-        var userId = GuidHelper.GetGuidFromRequest(HttpContext);
+        var userEmal = GuidHelper.GetGuidFromRequest(HttpContext);
+        if (userEmal is null)
+            return Unauthorized();
 
-        if (userId is null)
-            return BadRequest("Incorrect data");
-
-        var command = new MakeBetCommand { UserRateToCreate = userRateToCreate, UserId = userId };
+        var command = new MakeBetCommand(userEmal, userRateToCreate);
 
         var response = await _mediator.Send(command);
 
-        if (response.IsFailure)
-            return BadRequest(response.Error);
-
-        return Ok(response.Value.UserRate);
+        return response.IsSuccess
+            ? Ok(response.Value)
+            : ToErrorResponse(response.Error);
     }
-
+    
+    private IActionResult ToErrorResponse(Error error) => error switch
+    {
+        PlayerValidationError => BadRequest(error.ToDto()),
+        RoomValidationError => BadRequest(error.ToDto()),
+        MoneyValidationError => BadRequest(error.ToDto()),
+        CommonError => BadRequest(error.ToDto()),
+        RateValidationError => BadRequest(error.ToDto()),
+        _ => throw new NotSupportedException($"Unknown type of error {error.GetType()}")
+    };
 }

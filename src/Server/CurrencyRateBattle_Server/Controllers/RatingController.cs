@@ -1,5 +1,4 @@
-﻿using System.Net;
-using CurrencyRateBattleServer.ApplicationServices.Handlers.RatingHandlers.GetUsersRating;
+﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.RatingHandlers.GetUsersRating;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,16 +17,16 @@ public class RatingController : ControllerBase
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
-    [HttpGet("get-users-rating")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    [HttpGet("users")]
+    [ProducesResponseType(typeof(GetUserRatingResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetUsersRatingAsync(CancellationToken cancellationToken)
     {
         var command = new GetUserRatingCommand();
 
         var response = await _mediator.Send(command, cancellationToken);
 
-        return Ok(response.Value.UserRating);
+        return Ok(response.Value);
     }
 
 }

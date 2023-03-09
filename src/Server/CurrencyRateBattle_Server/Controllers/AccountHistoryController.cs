@@ -1,6 +1,4 @@
-﻿using System.Net;
-using CSharpFunctionalExtensions;
-using CurrencyRateBattleServer.ApplicationServices.Converters;
+﻿using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.GetAccountHistory;
 using CurrencyRateBattleServer.Domain.Entities.Errors;
@@ -24,40 +22,47 @@ public class AccountHistoryController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType(typeof(AccountHistoryDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetAccountHistoryAsync(CancellationToken cancellationToken)
     {
         var userEmail = GuidHelper.GetGuidFromRequest(HttpContext);
         if (userEmail is null)
-            return BadRequest();
-        
-        var command = new GetAccountHistoryCommand { UserEmail = userEmail };
+            return Unauthorized();
 
-        var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
+        var command = new GetAccountHistoryCommand(userEmail);
 
-        if (isFailure)
-            return BadRequest(error);
+        var response = await _mediator.Send(command, cancellationToken);
 
-        return Ok(value.AccountHistories);
+        return response.IsSuccess
+            ? Ok(response.Value.AccountHistories)
+            : ToErrorResponse(response.Error);
     }
 
     [HttpPost]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    [ProducesResponseType(typeof(Error),(int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateNewAccountHistory([FromBody] AccountHistoryDto historyDto, CancellationToken cancellationToken)
     {
         var userId = GuidHelper.GetGuidFromRequest(HttpContext);
         if (userId is null)
-            return BadRequest();
+            return Unauthorized();
 
         var command = historyDto.ToCreateCommand(userId);
 
         var response = await _mediator.Send(command, cancellationToken);
 
         return response.HasValue
-            ? BadRequest(response.Value)
+            ? ToErrorResponse(response.Value)
             : Ok();
     }
+    
+    private IActionResult ToErrorResponse(Error error) => error switch
+    {
+        PlayerValidationError => BadRequest(error.ToDto()),
+        RoomValidationError => BadRequest(error.ToDto()),
+        _ => throw new NotSupportedException($"Unknown type of error {error.GetType()}")
+    };
 }

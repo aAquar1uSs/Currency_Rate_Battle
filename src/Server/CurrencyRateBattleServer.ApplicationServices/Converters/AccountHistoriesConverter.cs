@@ -6,12 +6,7 @@ namespace CurrencyRateBattleServer.ApplicationServices.Converters;
 
 public static class AccountHistoriesConverter
 {
-    public static AccountHistoryDto[] ToDto(this AccountHistory[] accountHistories)
-    {
-        return accountHistories.Select(ToDto).ToArray();
-    }
-
-    private static AccountHistoryDto ToDto(this AccountHistory accountHistory)
+    public static AccountHistoryDto ToDto(this AccountHistory accountHistory)
     {
         return new AccountHistoryDto
         {
