@@ -19,9 +19,9 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public Task<UserRating[]> GetUsersRatingAsync()
+    public Task<UserRating[]> GetUsersRating()
     {
-        _logger.LogInformation($"{nameof(GetUsersRatingAsync)} was caused.");
+        _logger.LogInformation($"{nameof(GetUsersRating)} was caused.");
 
         List<UserRating> userRatings = new();
 
@@ -164,9 +164,9 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
         return query.AsNoTracking();
     }
 
-    public Task<Bet[]> FindAsync(AccountId accountId, CancellationToken cancellationToken)
+    public Task<Bet[]> Find(AccountId accountId, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(FindAsync)} was caused.");
+        _logger.LogInformation($"{nameof(Find)} was caused.");
 
         List<Bet> betDtoStorage = new();
 

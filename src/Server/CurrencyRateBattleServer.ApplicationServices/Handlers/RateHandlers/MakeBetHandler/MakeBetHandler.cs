@@ -44,7 +44,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
         if (roomIdResult.IsFailure)
             return new RateValidationError("invalid_rate" ,roomIdResult.Error);
 
-        var room = await _roomRepository.FindAsync(roomIdResult.Value.Id, cancellationToken);
+        var room = await _roomRepository.Find(roomIdResult.Value.Id, cancellationToken);
         if (room is null)
             return RoomValidationError.NotFound;
 
@@ -68,8 +68,8 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
             rateToCreate.Amount, null, null, false, false, roomIdResult.Value.Id,
             room.CurrencyName.Value, account.Id.Id);
 
-        await _rateRepository.CreateAsync(rate, cancellationToken);
-        await _roomRepository.UpdateAsync(room, cancellationToken);
+        await _rateRepository.Create(rate, cancellationToken);
+        await _roomRepository.Update(room, cancellationToken);
 
         transactionScope.Complete();
         

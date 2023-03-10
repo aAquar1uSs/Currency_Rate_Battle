@@ -10,39 +10,39 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.Cal
 public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
 {
     private readonly ILogger<CalculationRateHandler> _logger;
+    private readonly IRateQueryRepository _rateQueryRepository;
     private readonly IRateRepository _rateRepository;
-    private readonly IRoomRepository _roomRepository;
+    private readonly IRoomQueryRepository _roomQueryRepository;
     private readonly ICurrencyQueryRepository _currencyQueryRepository;
     private readonly IAccountRepository _accountRepository;
     private readonly IMediator _mediator;
 
-    public CalculationRateHandler(ILogger<CalculationRateHandler> logger,
-        IRateRepository rateRepository, IRoomRepository roomRepository,
-        ICurrencyQueryRepository currencyQueryRepository,
-        IAccountRepository accountRepository,
-        IMediator mediator)
+    public CalculationRateHandler(ILogger<CalculationRateHandler> logger, IRateQueryRepository rateQueryRepository,
+        IRoomQueryRepository roomQueryRepository, ICurrencyQueryRepository currencyQueryRepository, IAccountRepository accountRepository,
+        IMediator mediator, IRateRepository rateRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _rateRepository = rateRepository ?? throw new ArgumentNullException(nameof(rateRepository));
-        _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
+        _rateQueryRepository = rateQueryRepository ?? throw new ArgumentNullException(nameof(rateQueryRepository));
+        _roomQueryRepository = roomQueryRepository ?? throw new ArgumentNullException(nameof(roomQueryRepository));
         _currencyQueryRepository = currencyQueryRepository ?? throw new ArgumentNullException(nameof(currencyQueryRepository));
         _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+        _rateRepository = rateRepository ?? throw new ArgumentNullException(nameof(rateRepository));
     }
 
     public async Task<Unit> Handle(CalculationRateCommand request, CancellationToken cancellationToken)
     {
-        var closedRooms = await _roomRepository.RoomClosureCheckAsync(cancellationToken);
+        var closedRooms = await _roomQueryRepository.RoomClosureCheckAsync(cancellationToken);
         var roomIds = closedRooms.Select(x => x.Id).ToArray();
 
-        var rates = await _rateRepository.GetActiveRateByRoomIdsAsync(roomIds, cancellationToken);
+        var rates = await _rateQueryRepository.GetActiveRateByRoomIdsAsync(roomIds, cancellationToken);
 
         if (rates.Length == 0)
             return Unit.Value;
 
         var calculateRates = await Calculate(rates, cancellationToken);
 
-        await _rateRepository.UpdateRangeAsync(calculateRates, cancellationToken);
+        await _rateRepository.UpdateRange(calculateRates, cancellationToken);
 
         foreach (var rate in calculateRates)
         {

@@ -17,7 +17,7 @@ public class GetUserRatingHandler : IRequestHandler<GetUserRatingCommand, Result
 
     public async Task<Result<GetUserRatingResponse>> Handle(GetUserRatingCommand request, CancellationToken cancellationToken)
     {
-        var rating = await _userRatingQueryRepository.GetUsersRatingAsync();
+        var rating = await _userRatingQueryRepository.GetUsersRating();
 
         return new GetUserRatingResponse
         {

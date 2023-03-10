@@ -3,9 +3,7 @@ using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 
 namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
-public interface IUserRatingQueryRepository
+public interface IRateQueryRepository
 {
-    Task<UserRating[]> GetUsersRating();
-
-    Task<Bet[]> Find(AccountId accountId, CancellationToken cancellationToken);
+    Task<Rate[]> GetActiveRateByRoomIdsAsync(RoomId[] roomIds, CancellationToken cancellationToken);
 }

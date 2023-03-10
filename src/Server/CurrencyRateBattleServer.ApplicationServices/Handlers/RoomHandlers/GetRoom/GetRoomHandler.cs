@@ -17,7 +17,7 @@ public class GetRoomHandler : IRequestHandler<GetRoomCommand, Result<GetRoomResp
 
     public async Task<Result<GetRoomResponse>> Handle(GetRoomCommand request, CancellationToken cancellationToken)
     {
-        var rooms = await _roomRepository.FindAsync(request.IsClosed, cancellationToken);
+        var rooms = await _roomRepository.Find(request.IsClosed, cancellationToken);
 
         var roomDto = rooms.Select(x => x.ToDto()).ToArray();
 

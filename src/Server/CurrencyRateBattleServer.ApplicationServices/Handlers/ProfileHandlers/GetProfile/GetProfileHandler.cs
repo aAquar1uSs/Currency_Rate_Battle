@@ -29,7 +29,7 @@ public class GetProfileHandler : IRequestHandler<GetProfileCommand, Result<GetPr
         if (userEmailResult.IsFailure)
             return new PlayerValidationError("Invalid_email", userEmailResult.Error);
         
-        var user = await _userRepository.FindAsync(userEmailResult.Value, cancellationToken);
+        var user = await _userRepository.Find(userEmailResult.Value, cancellationToken);
         if (user is null)
             return PlayerValidationError.UserNotFound;
         

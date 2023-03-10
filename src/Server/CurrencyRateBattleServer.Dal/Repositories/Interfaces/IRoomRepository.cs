@@ -4,13 +4,11 @@ namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
 public interface IRoomRepository
 {
-    Task CreateAsync(Room room, CancellationToken cancellationToken);
+    Task Create(Room room, CancellationToken cancellationToken);
 
-    Task UpdateAsync(Room updatedRoom, CancellationToken cancellationToken);
+    Task Update(Room updatedRoom, CancellationToken cancellationToken);
 
-    Task<Room[]> RoomClosureCheckAsync(CancellationToken cancellationToken);
+    Task<Room?> Find(Guid id, CancellationToken cancellationToken);
 
-    Task<Room?> FindAsync(Guid id, CancellationToken cancellationToken);
-
-    Task<Room[]> FindAsync(bool isClosed, CancellationToken cancellationToken);
+    Task<Room[]> Find(bool isClosed, CancellationToken cancellationToken);
 }

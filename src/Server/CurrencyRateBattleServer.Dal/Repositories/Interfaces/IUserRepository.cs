@@ -6,10 +6,10 @@ namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
 public interface IUserRepository
 {
-    public Task<User?> GetAsync(Email email, Password password, CancellationToken cancellationToken);
+    public Task<User?> Get(Email email, Password password, CancellationToken cancellationToken);
 
-    public Task<User?> FindAsync(Email email, CancellationToken cancellationToken);
+    public Task<User?> Find(Email email, CancellationToken cancellationToken);
 
-    public Task CreateAsync(User userData, CancellationToken cancellationToken);
+    public Task Create(User userData, CancellationToken cancellationToken);
 
 }

@@ -59,7 +59,7 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Maybe<
     
     private async Task<Maybe<Error>> CreateWithRoom(Guid historyId, Guid accId, decimal amount, bool isCredit, Guid roomId, CancellationToken cancellationToken)
     {
-        var room = await _roomRepository.FindAsync(roomId, cancellationToken);
+        var room = await _roomRepository.Find(roomId, cancellationToken);
         if (room is null)
             return RoomValidationError.NotFound;
         

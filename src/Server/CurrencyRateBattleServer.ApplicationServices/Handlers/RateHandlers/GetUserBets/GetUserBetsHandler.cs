@@ -35,7 +35,7 @@ public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<Get
             return PlayerValidationError.AccountNotFound;
         }
 
-        var bets = await _userRatingQueryRepository.FindAsync(account.Id, cancellationToken);
+        var bets = await _userRatingQueryRepository.Find(account.Id, cancellationToken);
 
         return new GetUserBetsResponse { Bets = bets.Select(x => x.ToDto()).ToArray() };
     }

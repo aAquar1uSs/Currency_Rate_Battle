@@ -16,7 +16,7 @@ public class UserRepository : IUserRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task<User?> GetAsync(Email email, Password password, CancellationToken cancellationToken)
+    public async Task<User?> Get(Email email, Password password, CancellationToken cancellationToken)
     {
         var userDal = await _dbContext.Users
             .AsNoTracking()
@@ -26,7 +26,7 @@ public class UserRepository : IUserRepository
         return userDal?.ToDomain();
     }
 
-    public async Task<User?> FindAsync(Email email, CancellationToken cancellationToken)
+    public async Task<User?> Find(Email email, CancellationToken cancellationToken)
     {
         var userDal = await _dbContext.Users
             .AsNoTracking()
@@ -34,7 +34,7 @@ public class UserRepository : IUserRepository
         return userDal?.ToDomain();
     }
 
-    public async Task CreateAsync(User userData, CancellationToken cancellationToken)
+    public async Task Create(User userData, CancellationToken cancellationToken)
     {
         var userDal = userData.ToDal();
 

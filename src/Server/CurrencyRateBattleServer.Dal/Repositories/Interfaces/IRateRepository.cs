@@ -5,11 +5,9 @@ namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
 public interface IRateRepository
 {
-    Task CreateAsync(Rate rate, CancellationToken cancellationToken);
+    Task Create(Rate rate, CancellationToken cancellationToken);
 
-    Task<Rate[]> GetActiveRateByRoomIdsAsync(RoomId[] roomIds, CancellationToken cancellationToken);
+    Task UpdateRange(Rate[] updatedRate, CancellationToken cancellationToken);
 
-    Task UpdateRangeAsync(Rate[] updatedRate, CancellationToken cancellationToken);
-
-    Task<Rate[]> FindAsync(bool? isActive, string? currencyName, CancellationToken cancellationToken);
+    Task<Rate[]> Find(bool? isActive, string? currencyName, CancellationToken cancellationToken);
 }

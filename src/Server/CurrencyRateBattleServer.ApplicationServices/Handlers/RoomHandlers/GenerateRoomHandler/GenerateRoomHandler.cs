@@ -29,7 +29,7 @@ public class GenerateRoomHandler : IRequestHandler<GenerateRoomCommand>
             var roomId = RoomId.GenerateId();
             var room = Room.Create(roomId.Id, DateTime.UtcNow.AddDays(1), false, 0, currency);
 
-            await _roomRepository.CreateAsync(room, cancellationToken);
+            await _roomRepository.Create(room, cancellationToken);
         }
         
         return Unit.Value;

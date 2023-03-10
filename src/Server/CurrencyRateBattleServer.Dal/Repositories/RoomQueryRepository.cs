@@ -1,4 +1,5 @@
 ﻿using CurrencyRateBattleServer.Dal.Converters;
+using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Domain.Infrastructure;
@@ -36,5 +37,22 @@ public class RoomQueryRepository : IRoomQueryRepository
 
 
         return rooms.Select(x => x.ToDomain()).ToArray();
+    }
+    
+    public async Task<Room[]> RoomClosureCheckAsync(CancellationToken cancellationToken)
+    {
+        var closedRooms = await _dbContext.Rooms
+            .AsNoTracking()
+            .Where(dal => (dal.EndDate.Date == DateTime.Today
+                           && dal.EndDate.Hour == DateTime.UtcNow.AddHours(1).Hour)
+                          || ((dal.EndDate.Date == DateTime.Today.AddDays(1))
+                              && dal.EndDate.Hour == 0 && DateTime.UtcNow.Hour == 23)
+                          || DateTime.UtcNow > dal.EndDate)
+            .Select(dal => new RoomDal() { EndDate = dal.EndDate, IsClosed = true, Id = dal.Id, CurrencyName = dal.CurrencyName})
+            .ToArrayAsync(cancellationToken);
+        _dbContext.Rooms.UpdateRange(closedRooms);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return closedRooms.ToDomain();
     }
 }

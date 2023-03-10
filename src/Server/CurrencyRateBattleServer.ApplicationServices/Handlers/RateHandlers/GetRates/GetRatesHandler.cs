@@ -18,7 +18,7 @@ public class GetRatesHandler : IRequestHandler<GetRatesCommand, Result<GetRatesR
 
     public async Task<Result<GetRatesResponse>> Handle(GetRatesCommand request, CancellationToken cancellationToken)
     {
-        var rates = await _rateRepository.FindAsync(request.IsActive, request.CurrencyName, cancellationToken);
+        var rates = await _rateRepository.Find(request.IsActive, request.CurrencyName, cancellationToken);
 
         return new GetRatesResponse { Rates = rates.Select(x => x.ToDto()).ToArray() };
     }

@@ -45,7 +45,7 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
         if (passwordResult.IsFailure)
             return new PlayerValidationError("password_not_valid", passwordResult.Error);
         
-        var maybeUser = await _userRepository.GetAsync(emailResult.Value, passwordResult.Value, cancellationToken);
+        var maybeUser = await _userRepository.Get(emailResult.Value, passwordResult.Value, cancellationToken);
 
         if (maybeUser is not null)
             return PlayerValidationError.UserAlreadyExist;
@@ -60,7 +60,7 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
         account.AddStartBalance(amountResult.Value);
         var user = User.Create(request.Email, request.Password);
         
-        await _userRepository.CreateAsync(user, cancellationToken);
+        await _userRepository.Create(user, cancellationToken);
 
         await _accountRepository.Create(account, cancellationToken);
         

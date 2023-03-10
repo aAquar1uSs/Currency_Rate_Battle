@@ -26,6 +26,7 @@ public static class DbConfiguration
             .AddScoped<IRoomQueryRepository, RoomQueryRepository>()
             .AddScoped<ICurrencyRepository, CurrencyRepository>()
             .AddScoped<IAccountQueryRepository, AccountQueryRepository>()
-            .AddScoped<ICurrencyQueryRepository, CurrencyQueryRepository>();
+            .AddScoped<ICurrencyQueryRepository, CurrencyQueryRepository>()
+            .AddScoped<IRateQueryRepository, RateQueryRepository>();
     }
 }
