@@ -8,12 +8,10 @@ namespace CurrencyRateBattleServer.Dal.Repositories;
 
 public class CurrencyRepository : ICurrencyRepository
 {
-    private readonly ILogger<CurrencyRepository> _logger;
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public CurrencyRepository(ILogger<CurrencyRepository> logger, CurrencyRateBattleContext dbContext)
+    public CurrencyRepository(CurrencyRateBattleContext dbContext)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
@@ -26,8 +24,6 @@ public class CurrencyRepository : ICurrencyRepository
 
     public async Task<Currency[]> Get(CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(Get)} was caused");
-
         var currency = await _dbContext.Currencies
             .AsNoTracking()
             .ToArrayAsync(cancellationToken);

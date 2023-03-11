@@ -42,31 +42,36 @@ public class CurrencyRateBattleContext : DbContext
             {
                 CurrencyName = "USD",
                 CurrencyCode = "$",
-                Description = "US Dollar"
+                Description = "US Dollar",
+                UpdateDate = DateTime.UtcNow
             },
             new CurrencyDal
             {
                 CurrencyName = "EUR",
                 CurrencyCode = "$",
-                Description = "Euro"
+                Description = "Euro",
+                UpdateDate = DateTime.UtcNow
             },
             new CurrencyDal
             {
                 CurrencyName = "PLN",
                 CurrencyCode = "zł",
-                Description = "Polish Zlotych"
+                Description = "Polish Zlotych",
+                UpdateDate = DateTime.UtcNow
             },
             new CurrencyDal
             {
                 CurrencyName = "GBP",
                 CurrencyCode = "£",
-                Description = "British Pound"
+                Description = "British Pound",
+                UpdateDate = DateTime.UtcNow
             },
             new CurrencyDal
             {
                 CurrencyName = "CHF",
                 CurrencyCode = "Fr",
-                Description = "Swiss Franc"
+                Description = "Swiss Franc",
+                UpdateDate = DateTime.UtcNow
             });
     }
 }

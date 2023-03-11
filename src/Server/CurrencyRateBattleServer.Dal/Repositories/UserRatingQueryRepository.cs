@@ -10,19 +10,15 @@ namespace CurrencyRateBattleServer.Dal.Repositories;
 
 public class UserRatingQueryRepository : IUserRatingQueryRepository
 {
-    private readonly ILogger<UserRatingQueryRepository> _logger;
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public UserRatingQueryRepository(CurrencyRateBattleContext dbContext, ILogger<UserRatingQueryRepository> logger)
+    public UserRatingQueryRepository(CurrencyRateBattleContext dbContext)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public Task<UserRating[]> GetUsersRating()
     {
-        _logger.LogInformation($"{nameof(GetUsersRating)} was caused.");
-
         List<UserRating> userRatings = new();
 
         var query1 = GetUserRatingDataFirstQuery();
@@ -166,8 +162,6 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
 
     public Task<Bet[]> Find(AccountId accountId, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(Find)} was caused.");
-
         List<Bet> betDtoStorage = new();
 
         var firstQuery = GetBetData(accountId.Id);
