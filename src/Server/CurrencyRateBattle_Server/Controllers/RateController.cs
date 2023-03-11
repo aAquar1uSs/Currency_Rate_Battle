@@ -36,7 +36,7 @@ public class RateController : ControllerBase
     }
 
     [HttpGet("user/bets")]
-    [ProducesResponseType(typeof(GetUserBetsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BetInfoDto[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetUserBetsAsync()
@@ -50,12 +50,12 @@ public class RateController : ControllerBase
         var response = await _mediator.Send(command);
 
         return response.IsSuccess
-            ? Ok(response.Value)
+            ? Ok(response.Value.Bets)
             : ToErrorResponse(response.Error);
     }
 
     [HttpPost("make-bet")]
-    [ProducesResponseType(typeof(MakeBetResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserRateDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateRateAsync([FromBody] UserRateDto userRateToCreate)
@@ -69,7 +69,7 @@ public class RateController : ControllerBase
         var response = await _mediator.Send(command);
 
         return response.IsSuccess
-            ? Ok(response.Value)
+            ? Ok(response.Value.UserRate)
             : ToErrorResponse(response.Error);
     }
     

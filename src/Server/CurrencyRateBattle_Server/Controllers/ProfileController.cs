@@ -3,6 +3,7 @@ using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.ProfileHandlers.GetProfile;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.ProfileHandlers.GetUserBalance;
 using CurrencyRateBattleServer.Domain.Entities.Errors;
+using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -41,7 +42,7 @@ public class ProfileController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(GetProfileResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AccountInfoDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetUserInfoAsync(CancellationToken cancellationToken)
     {
@@ -54,7 +55,7 @@ public class ProfileController : ControllerBase
         var response = await _mediator.Send(command, cancellationToken);
 
         return response.IsSuccess
-            ? Ok(response.Value)
+            ? Ok(response.Value.AccountInfo)
             : ToErrorResponse(response.Error);  
     }
     

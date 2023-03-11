@@ -26,6 +26,7 @@ public static class RoomConverter
     {
         return new()
         {
+            Id = room.Id.Id,
             CountRates = room.CountRates,
             CurrencyExchangeRate = room.CountRates,
             СurrencyName = room.CurrencyName.Value,

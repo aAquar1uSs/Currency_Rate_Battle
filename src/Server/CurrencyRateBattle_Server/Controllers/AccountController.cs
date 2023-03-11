@@ -32,7 +32,7 @@ public class AccountController : ControllerBase
         var response= await _mediator.Send(command, cancellationToken);
 
         return response.IsSuccess
-            ? Ok(response.Value)
+            ? Ok(response.Value.Tokens)
             : ToErrorResponse(response.Error);
     }
 
@@ -47,7 +47,7 @@ public class AccountController : ControllerBase
         var response = await _mediator.Send(command, cancellationToken);
 
         return response.IsSuccess
-            ? Ok(response.Value)
+            ? Ok(response.Value.Tokens)
             : ToErrorResponse(response.Error);
     }
 

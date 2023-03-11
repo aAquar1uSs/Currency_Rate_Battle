@@ -1,4 +1,5 @@
-﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.RatingHandlers.GetUsersRating;
+﻿using CurrencyRateBattleServer.ApplicationServices.Dto;
+using CurrencyRateBattleServer.ApplicationServices.Handlers.RatingHandlers.GetUsersRating;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ public class RatingController : ControllerBase
     }
 
     [HttpGet("users")]
-    [ProducesResponseType(typeof(GetUserRatingResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserRateDto[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetUsersRatingAsync(CancellationToken cancellationToken)
     {
@@ -26,7 +27,7 @@ public class RatingController : ControllerBase
 
         var response = await _mediator.Send(command, cancellationToken);
 
-        return Ok(response.Value);
+        return Ok(response.Value.UserRating);
     }
 
 }

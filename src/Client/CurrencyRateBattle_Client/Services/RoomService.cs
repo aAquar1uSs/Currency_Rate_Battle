@@ -5,26 +5,26 @@ using System.Text.Json;
 using Microsoft.Extensions.Options;
 using CRBClient.Services.Interfaces;
 using CRBClient.Dto;
+using Uri = CRBClient.Helpers.Uri;
 
 namespace CRBClient.Services;
 
 public class RoomService : IRoomService
 {
     private readonly ICRBServerHttpClient _httpClient;
-    private readonly WebServerOptions _options;
     private readonly ILogger<RoomService> _logger;
+    private readonly Uri _uri;
 
-    public RoomService(ICRBServerHttpClient httpClient,
-        IOptions<WebServerOptions> options, ILogger<RoomService> logger)
+    public RoomService(ICRBServerHttpClient httpClient, ILogger<RoomService> logger, IOptions<Uri> uriOptions)
     {
         _httpClient = httpClient;
-        _options = options.Value;
         _logger = logger;
+        _uri = uriOptions.Value;
     }
 
     public async Task<List<RoomViewModel>> GetRoomsAsync(bool isClosed, CancellationToken cancellationToken)
     {
-        var responseTask = await _httpClient.GetAsync(_options.RoomsURL + $"/{isClosed}", cancellationToken);
+        var responseTask = await _httpClient.GetAsync(_uri.RoomsURL + $"?isClosed={isClosed}", cancellationToken);
 
         if (responseTask.StatusCode == HttpStatusCode.OK)
         {
@@ -42,7 +42,7 @@ public class RoomService : IRoomService
 
     public async Task<List<RoomViewModel>> GetFilteredCurrencyAsync(FilterDto filter, CancellationToken cancellationToken)
     {
-        var responseTask = await _httpClient.PostAsync(_options.FilterURL ?? "", filter, cancellationToken);
+        var responseTask = await _httpClient.PostAsync(_uri.RoomsFilterURL, filter, cancellationToken);
 
         if (responseTask.StatusCode == HttpStatusCode.OK)
         {

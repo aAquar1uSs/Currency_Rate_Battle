@@ -1,11 +1,7 @@
-﻿using System.Net;
-using CSharpFunctionalExtensions;
-using CurrencyRateBattleServer.ApplicationServices.Converters;
-using CurrencyRateBattleServer.ApplicationServices.Dto;
+﻿using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.GetFilteredRoom;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.GetRoom;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Domain.Entities.Errors;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +21,7 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(GetRoomResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RoomDto[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<IEnumerable<Room>>> GetRoomsAsync([FromQuery] bool isClosed, CancellationToken cancellationToken)
     {
@@ -33,11 +29,11 @@ public class RoomController : ControllerBase
 
         var response = await _mediator.Send(command, cancellationToken);
 
-        return Ok(response.Value);
+        return Ok(response.Value.Rooms);
     }
 
     [HttpPost("filter")]
-    [ProducesResponseType(typeof(GetFilteredRoomResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RoomDto[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromBody] FilterDto filter, CancellationToken cancellationToken)
     {
@@ -45,6 +41,6 @@ public class RoomController : ControllerBase
 
         var response = await _mediator.Send(command, cancellationToken);
         
-        return Ok(response.Value);
+        return Ok(response.Value.Rooms);
     }
 }

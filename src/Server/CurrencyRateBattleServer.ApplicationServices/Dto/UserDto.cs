@@ -1,4 +1,6 @@
 ﻿
+using System.Text.Json.Serialization;
+
 namespace CurrencyRateBattleServer.ApplicationServices.Dto;
 
 public class UserDto

@@ -64,7 +64,7 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
 
             await _accountRepository.Update(account, cancellationToken);
             
-            var command = new CreateHistoryCommand(account.UserEmail.Value, rate.RoomId.Id, DateTime.UtcNow, account.Amount.Value, true);
+            var command = new CreateHistoryCommand(account.UserEmail.Value, rate.RoomId.Id, DateTime.UtcNow, moneyCreatedResult.Value.Value, true);
             _ = await _mediator.Send(command, cancellationToken);
         }
 

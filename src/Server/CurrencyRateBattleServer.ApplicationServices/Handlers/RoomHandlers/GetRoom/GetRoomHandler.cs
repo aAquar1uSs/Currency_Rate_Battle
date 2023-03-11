@@ -10,7 +10,7 @@ public class GetRoomHandler : IRequestHandler<GetRoomCommand, Result<GetRoomResp
 {
     private readonly IRoomRepository _roomRepository;
 
-    public GetRoomHandler(ILogger<GetRoomHandler> logger, IRoomRepository roomRepository)
+    public GetRoomHandler(IRoomRepository roomRepository)
     {
         _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
     }

@@ -2,6 +2,7 @@
 using CRBClient.Services;
 using CRBClient.Services.Interfaces;
 using Serilog;
+using Uri = CRBClient.Helpers.Uri;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,14 +17,14 @@ builder.Logging.AddSerilog(logger)
     .AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
 
 builder.Services.AddControllersWithViews();
-builder.Services.Configure<WebServerOptions>(
-    builder.Configuration.GetSection(WebServerOptions.SectionName));
+builder.Services.Configure<WebServerOptions>(builder.Configuration.GetSection(WebServerOptions.SectionName));
+builder.Services.Configure<Uri>(builder.Configuration.GetSection(Uri.SectionName));
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddScoped<ICRBServerHttpClient, CRBServerHttpClient>();
+builder.Services.AddScoped<ICRBServerHttpClient, CRBServerClient>();
 
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
