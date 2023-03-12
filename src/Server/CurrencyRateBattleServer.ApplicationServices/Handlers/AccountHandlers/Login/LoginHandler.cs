@@ -31,7 +31,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, Result<LoginResponse, 
         var passwordResult = Password.TryCreate(request.Password);
         if (passwordResult.IsFailure)
             return new PlayerValidationError("password_not_valid", passwordResult.Error);
-                
+
         var maybeUser = await _userRepository.Get(emailResult.Value, passwordResult.Value, cancellationToken);
 
         if (maybeUser is null)

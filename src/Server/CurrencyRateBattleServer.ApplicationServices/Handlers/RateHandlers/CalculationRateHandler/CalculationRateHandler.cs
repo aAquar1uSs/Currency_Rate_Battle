@@ -63,7 +63,7 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
             account.ApportionCash(moneyCreatedResult.Value);
 
             await _accountRepository.Update(account, cancellationToken);
-            
+
             var command = new CreateHistoryCommand(account.UserEmail.Value, rate.RoomId.Id, DateTime.UtcNow, moneyCreatedResult.Value.Value, true);
             _ = await _mediator.Send(command, cancellationToken);
         }
@@ -83,7 +83,7 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
         foreach (var rate in rates)
         {
             var currencyRate = await _currencyQueryRepository.GetRateByCurrencyName(rate.CurrencyName.Value, cancellationToken);
-            if (currencyRate != null && rate.RateCurrencyExchange.Value == Math.Round(currencyRate, 2))
+            if (rate.RateCurrencyExchange.Value == Math.Round(currencyRate, 2))
                 rate.IsWonBet();
             else
             {

@@ -1,12 +1,11 @@
 ﻿using System.Text.Json;
-using CurrencyRateBattleServer.Domain.Entities;
 using NbuClient.Dto;
 
 namespace NbuClient;
 
 public class NbuApiApiClient : INbuApiClient
 {
-    private const string Path = "NBUStatService/v1/statdirectory/exchange?json";
+    private const string Uri = "NBUStatService/v1/statdirectory/exchange?json";
     private readonly HttpClient _client;
 
     public NbuApiApiClient(HttpClient client)
@@ -16,7 +15,7 @@ public class NbuApiApiClient : INbuApiClient
 
     public async Task<CurrencyDto[]?> GetCurrencyRatesAsync(CancellationToken cancellationToken)
     {
-        var response = await _client.GetAsync(Path, cancellationToken);
+        var response = await _client.GetAsync(Uri, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
             return Array.Empty<CurrencyDto>();

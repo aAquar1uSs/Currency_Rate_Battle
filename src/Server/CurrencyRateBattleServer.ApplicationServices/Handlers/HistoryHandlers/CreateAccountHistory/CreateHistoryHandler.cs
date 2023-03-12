@@ -31,19 +31,19 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Maybe<
         var emailResult = Email.TryCreate(request.UserEmail);
         if (emailResult.IsFailure)
             return new PlayerValidationError("email_not_valid", emailResult.Error);
-        
+
         var account = await _accountQueryRepository.GetAccountByUserId(emailResult.Value, cancellationToken);
 
         if (account is null)
             return PlayerValidationError.AccountNotFound;
-        
+
         var customAccountHistoryId = AccountHistoryId.GenerateId();
 
         var result = request.RoomId is null
             ? await CreateWithoutRoom(customAccountHistoryId.Id, account.Id.Id, request.Amount, request.IsCredit, cancellationToken)
             : await CreateWithRoom(customAccountHistoryId.Id, account.Id.Id, request.Amount, request.IsCredit, request.RoomId.Value,
                 cancellationToken);
-        
+
         return result.HasValue 
             ? result.Value
             : Maybe<Error>.None;
@@ -53,16 +53,16 @@ public class CreateHistoryHandler : IRequestHandler<CreateHistoryCommand, Maybe<
     {
        var accountHistory = AccountHistory.Create(historyId, accId, DateTime.UtcNow, amount, isCredit);
        await _accountHistoryRepository.Create(accountHistory, cancellationToken);
-       
+
        return Maybe<Error>.None;
     }
-    
+
     private async Task<Maybe<Error>> CreateWithRoom(Guid historyId, Guid accId, decimal amount, bool isCredit, Guid roomId, CancellationToken cancellationToken)
     {
         var room = await _roomRepository.Find(roomId, cancellationToken);
         if (room is null)
             return RoomValidationError.NotFound;
-        
+
         var accountHistory = AccountHistory.Create(historyId, accId, DateTime.Now, amount, isCredit, room.Id.Id);
         await _accountHistoryRepository.Create(accountHistory, cancellationToken);
 

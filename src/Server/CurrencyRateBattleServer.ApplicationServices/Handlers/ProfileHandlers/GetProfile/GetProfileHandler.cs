@@ -28,11 +28,11 @@ public class GetProfileHandler : IRequestHandler<GetProfileCommand, Result<GetPr
         var userEmailResult = Email.TryCreate(request.UserEmail);
         if (userEmailResult.IsFailure)
             return new PlayerValidationError("Invalid_email", userEmailResult.Error);
-        
+
         var user = await _userRepository.Find(userEmailResult.Value, cancellationToken);
         if (user is null)
             return PlayerValidationError.UserNotFound;
-        
+
         var account = await _accountQueryRepository.GetAccountByUserId(userEmailResult.Value, cancellationToken);
         if (account is null)
             return PlayerValidationError.AccountNotFound;

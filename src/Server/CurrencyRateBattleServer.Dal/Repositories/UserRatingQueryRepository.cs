@@ -4,7 +4,6 @@ using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Dal.Repositories;
 
@@ -40,6 +39,34 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
         }
 
         return Task.FromResult(userRatings.ToArray());
+    }
+    
+    public Task<Bet[]> Find(AccountId accountId, CancellationToken cancellationToken)
+    {
+        List<Bet> betDtoStorage = new();
+
+        var firstQuery = GetBetData(accountId.Id);
+        var secondQuery = GetBetSubQuery(firstQuery);
+
+        foreach (var data in secondQuery)
+        {
+            betDtoStorage.Add(new Bet
+            {
+                Id = data.RateId,
+                SetDate = data.RateSetDate,
+                BetAmount = (decimal)data.Amount,
+                SettleDate = data.RateSettleDate,
+                WonCurrencyExchange = data.RealCurrencyExchangeRate is null ? null : Math.Round((decimal)data.RealCurrencyExchangeRate, 2),
+                UserCurrencyExchange = Math.Round(data.UserRateCurrencyExchange, 2),
+                PayoutAmount = data.Payout,
+                CurrencyName = data.CurrencyName,
+                IsClosed = data.IsClosed,
+                RoomDate = data.RoomDate
+            });
+        }
+
+        betDtoStorage.Sort((bet1, bet2) => bet1.RoomDate.CompareTo(bet2.RoomDate));
+        return Task.FromResult(betDtoStorage.ToArray());
     }
 
     private IQueryable<BetDal> GetBetData(Guid accountId)
@@ -86,7 +113,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                         RoomDate = res.RoomDate,
                         RoomId = res.RoomId,
                         CurrencyName = res.CurrencyName,
-                        RealCurrencyExchangeRate = subCurr.RateCurrencyExchange
+                        RealCurrencyExchangeRate = res.RealCurrencyExchangeRate
                     };
         return query;
     }
@@ -158,33 +185,5 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                     };
 
         return query.AsNoTracking();
-    }
-
-    public Task<Bet[]> Find(AccountId accountId, CancellationToken cancellationToken)
-    {
-        List<Bet> betDtoStorage = new();
-
-        var firstQuery = GetBetData(accountId.Id);
-        var secondQuery = GetBetSubQuery(firstQuery);
-
-        foreach (var data in secondQuery)
-        {
-            betDtoStorage.Add(new Bet
-            {
-                Id = data.RateId,
-                SetDate = data.RateSetDate,
-                BetAmount = (decimal)data.Amount,
-                SettleDate = data.RateSettleDate,
-                WonCurrencyExchange = Math.Round((decimal)data.RealCurrencyExchangeRate, 2),
-                UserCurrencyExchange = Math.Round(data.UserRateCurrencyExchange, 2),
-                PayoutAmount = data.Payout,
-                CurrencyName = data.CurrencyName,
-                IsClosed = data.IsClosed,
-                RoomDate = data.RoomDate
-            });
-        }
-
-        betDtoStorage.Sort((bet1, bet2) => bet1.RoomDate.CompareTo(bet2.RoomDate));
-        return Task.FromResult(betDtoStorage.ToArray());
     }
 }
