@@ -85,6 +85,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                          IsClosed = rate.IsClosed,
                          AccountId = rate.AccountId,
                          UserRateCurrencyExchange = rate.RateCurrencyExchange,
+                         RealCurrencyExchangeRate = curr.Rate,
                          Payout = rate.Payout,
                          RoomDate = room.EndDate,
                          RoomId = rate.RoomId,
@@ -96,8 +97,8 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
     private IQueryable<BetDal> GetBetSubQuery(IQueryable<BetDal> data)
     {
         var query = from res in data
-                    join rates in _dbContext.Rates
-                on new { res.RoomId, res.CurrencyName, res.AccountId } equals new { rates.RoomId, rates.CurrencyName, rates.AccountId }
+            join rates in _dbContext.Rates
+                        on new { res.RoomId, res.CurrencyName, res.AccountId } equals new { rates.RoomId, rates.CurrencyName, rates.AccountId }
                 into gj from subCurr in gj.DefaultIfEmpty()
                     select new BetDal
                     {
