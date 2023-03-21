@@ -15,14 +15,14 @@ public class RateQueryRepository : IRateQueryRepository
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
     
-    public async Task<Rate[]> GetActiveRateByRoomIdsAsync(RoomId[] roomIds, CancellationToken cancellationToken)
+    public async Task<Rate[]> GetActiveRateByRoomIdsAsync(IEnumerable<RoomId> roomIds, CancellationToken cancellationToken)
     {
         var roomGuidIds = roomIds.Select(x => x.Id); 
-
+        
         var rates = await _dbContext.Rates
+            .AsNoTracking()
             .Where(dal => roomGuidIds.Contains(dal.RoomId))
             .Where(dal => !dal.IsClosed)
-            .AsNoTracking()
             .ToArrayAsync(cancellationToken);
 
         return rates.ToDomain();

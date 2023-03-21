@@ -15,7 +15,7 @@ public static class RateConverter
             rate.SettleDate, rate.Payout,
             rate.IsClosed, rate.IsWon,
             rate.RoomId, rate.CurrencyName,
-            rate.AccountId);
+            rate.AccountId, rate.RealCurrencyExchange);
     }
 
     public static RateDal[] ToDal(this Rate[] domain)
@@ -37,6 +37,7 @@ public static class RateConverter
             SetDate = rate.SetDate,
             SettleDate = rate.SettleDate,
             RateCurrencyExchange = rate.RateCurrencyExchange.Value,
+            RealCurrencyExchange = rate.RealCurrencyExchange?.Value,
             RoomId = rate.RoomId.Id
         };
     }

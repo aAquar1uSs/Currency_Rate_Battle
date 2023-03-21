@@ -44,7 +44,7 @@ public class RoomQueryRepository : IRoomQueryRepository
                           || ((dal.EndDate.Date == DateTime.Today.AddDays(1))
                               && dal.EndDate.Hour == 0 && DateTime.UtcNow.Hour == 23)
                           || DateTime.UtcNow > dal.EndDate)
-            .Select(dal => new RoomDal() { EndDate = dal.EndDate, IsClosed = true, Id = dal.Id, CurrencyName = dal.CurrencyName})
+            .Select(dal => new RoomDal { EndDate = dal.EndDate, IsClosed = true, Id = dal.Id, CurrencyName = dal.CurrencyName,CountRates = dal.CountRates})
             .ToArrayAsync(cancellationToken);
         _dbContext.Rooms.UpdateRange(closedRooms);
         await _dbContext.SaveChangesAsync(cancellationToken);

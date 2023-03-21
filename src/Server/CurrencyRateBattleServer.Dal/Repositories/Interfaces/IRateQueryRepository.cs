@@ -5,5 +5,5 @@ namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
 public interface IRateQueryRepository
 {
-    Task<Rate[]> GetActiveRateByRoomIdsAsync(RoomId[] roomIds, CancellationToken cancellationToken);
+    Task<Rate[]> GetActiveRateByRoomIdsAsync(IEnumerable<RoomId> roomIds, CancellationToken cancellationToken);
 }

@@ -63,7 +63,7 @@ public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResp
         var incrementResult = room.IncrementCountRates();
         if (incrementResult.IsFailure)
             return new CommonError("increment_count_of_rates_error", incrementResult.Error);
-        
+
         var rate = Rate.Create(CustomId.GenerateId().Id, DateTime.UtcNow, rateToCreate.UserCurrencyExchange,
             rateToCreate.Amount, null, null, false, false, roomIdResult.Value.Id,
             room.CurrencyName.Value, account.Id.Id);

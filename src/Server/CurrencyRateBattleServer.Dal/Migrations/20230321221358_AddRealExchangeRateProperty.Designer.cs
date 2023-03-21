@@ -3,6 +3,7 @@ using System;
 using CurrencyRateBattleServer.Dal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CurrencyRateBattleServer.Dal.Migrations
 {
     [DbContext(typeof(CurrencyRateBattleContext))]
-    partial class CurrencyRateBattleContextModelSnapshot : ModelSnapshot
+    [Migration("20230321221358_AddRealExchangeRateProperty")]
+    partial class AddRealExchangeRateProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

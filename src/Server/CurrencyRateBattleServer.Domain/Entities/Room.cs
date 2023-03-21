@@ -58,7 +58,7 @@ public class Room
         if (EndDate <= DateTime.UtcNow)
             return Result.Failure("Room is closed.");
         
-        CountRates++;
+        CountRates += 1;
         
         return Result.Success();
     }

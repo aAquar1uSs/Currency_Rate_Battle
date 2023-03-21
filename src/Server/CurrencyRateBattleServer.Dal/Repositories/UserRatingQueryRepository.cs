@@ -85,7 +85,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                          IsClosed = rate.IsClosed,
                          AccountId = rate.AccountId,
                          UserRateCurrencyExchange = rate.RateCurrencyExchange,
-                         RealCurrencyExchangeRate = curr.Rate,
+                         RealCurrencyExchangeRate = rate.RealCurrencyExchange,
                          Payout = rate.Payout,
                          RoomDate = room.EndDate,
                          RoomId = rate.RoomId,

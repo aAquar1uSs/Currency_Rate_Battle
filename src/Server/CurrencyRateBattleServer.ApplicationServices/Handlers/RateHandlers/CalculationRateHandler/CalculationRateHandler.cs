@@ -76,7 +76,8 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
         if (rates.Length == 1)
         {
             var rate = rates.First();
-            rate.Change(true, rate.Amount.Value, DateTime.UtcNow);
+            var currencyRate = await _currencyQueryRepository.GetRateByCurrencyName(rate.CurrencyName.Value, cancellationToken);
+            rate.Change(true, rate.Amount.Value, DateTime.UtcNow, currencyRate);
             return rates;
         }
 
@@ -84,10 +85,10 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
         {
             var currencyRate = await _currencyQueryRepository.GetRateByCurrencyName(rate.CurrencyName.Value, cancellationToken);
             if (rate.RateCurrencyExchange.Value == Math.Round(currencyRate, 2))
-                rate.IsWonBet();
+                rate.IsWonBet(currencyRate);
             else
             {
-                rate.IsLoseBet();
+                rate.IsLoseBet(currencyRate);
             }
         }
 

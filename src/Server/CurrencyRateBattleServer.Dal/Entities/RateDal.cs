@@ -30,6 +30,8 @@ public sealed class RateDal
     /// </summary>
     public bool IsWon { get; set; }
     
+    public decimal? RealCurrencyExchange { get; set; }
+    
     public Guid RoomId { get; set; }
 
     [ForeignKey("RoomId")]
