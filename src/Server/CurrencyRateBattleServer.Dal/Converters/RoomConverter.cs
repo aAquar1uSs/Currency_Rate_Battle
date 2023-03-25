@@ -33,6 +33,7 @@ public static class RoomConverter
     {
         return new RoomDal
         {
+            Id = room.Id.Id,
             CountRates = room.CountRates,
             CurrencyName = room.CurrencyName.Value,
             EndDate = room.EndDate,

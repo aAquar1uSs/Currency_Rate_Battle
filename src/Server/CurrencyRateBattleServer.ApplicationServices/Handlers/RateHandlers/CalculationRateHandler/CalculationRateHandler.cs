@@ -1,33 +1,26 @@
-﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.HistoryHandlers.CreateAccountHistory;
+﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.PayoutHandler;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.CalculationRateHandler;
 
 public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
 {
-    private readonly ILogger<CalculationRateHandler> _logger;
     private readonly IRateQueryRepository _rateQueryRepository;
     private readonly IRateRepository _rateRepository;
     private readonly IRoomQueryRepository _roomQueryRepository;
     private readonly ICurrencyQueryRepository _currencyQueryRepository;
-    private readonly IAccountRepository _accountRepository;
     private readonly IMediator _mediator;
 
-    public CalculationRateHandler(ILogger<CalculationRateHandler> logger, IRateQueryRepository rateQueryRepository,
-        IRoomQueryRepository roomQueryRepository, ICurrencyQueryRepository currencyQueryRepository, IAccountRepository accountRepository,
-        IMediator mediator, IRateRepository rateRepository)
+    public CalculationRateHandler(IRateQueryRepository rateQueryRepository, IRoomQueryRepository roomQueryRepository, 
+        ICurrencyQueryRepository currencyQueryRepository, IRateRepository rateRepository, IMediator mediator)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _rateQueryRepository = rateQueryRepository ?? throw new ArgumentNullException(nameof(rateQueryRepository));
         _roomQueryRepository = roomQueryRepository ?? throw new ArgumentNullException(nameof(roomQueryRepository));
         _currencyQueryRepository = currencyQueryRepository ?? throw new ArgumentNullException(nameof(currencyQueryRepository));
-        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
-        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         _rateRepository = rateRepository ?? throw new ArgumentNullException(nameof(rateRepository));
+        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
     public async Task<Unit> Handle(CalculationRateCommand request, CancellationToken cancellationToken)
@@ -40,47 +33,16 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
         if (rates.Length == 0)
             return Unit.Value;
 
-        var calculateRates = await Calculate(rates, cancellationToken);
-
-        await _rateRepository.UpdateRange(calculateRates, cancellationToken);
-
-        foreach (var rate in calculateRates)
-        {
-            var account = await _accountRepository.Get(rate.AccountId, cancellationToken);
-            if (account is null)
-            {
-                _logger.LogWarning("Account not found when rate was processed. Skip processing for account id {Id}", rate.AccountId.Value);
-                continue;
-            }
-
-            var moneyCreatedResult = Amount.TryCreate(rate.Payout?.Value);
-            if (moneyCreatedResult.IsFailure)
-            {
-                _logger.LogWarning("Failed to payment process. For account id {id}. Skip processing. {Reason}", account.Id.Value, moneyCreatedResult.Error);
-                continue;
-            }
-
-            account.ApportionCash(moneyCreatedResult.Value);
-
-            await _accountRepository.Update(account, cancellationToken);
-
-            var command = new CreateHistoryCommand(account.UserEmail.Value, rate.RoomId.Id, DateTime.UtcNow, moneyCreatedResult.Value.Value, true);
-            _ = await _mediator.Send(command, cancellationToken);
-        }
+        await Process(rates, cancellationToken);
 
         return Unit.Value;
     }
 
-    private async Task<Rate[]> Calculate(Rate[] rates, CancellationToken cancellationToken)
+    private async Task Process(Rate[] rates, CancellationToken cancellationToken)
     {
         if (rates.Length == 1)
-        {
-            var rate = rates.First();
-            var currencyRate = await _currencyQueryRepository.GetRateByCurrencyName(rate.CurrencyName.Value, cancellationToken);
-            rate.Change(true, rate.Amount.Value, DateTime.UtcNow, currencyRate);
-            return rates;
-        }
-
+            await TechnicalReturn(rates.First(), cancellationToken);
+        
         foreach (var rate in rates)
         {
             var currencyRate = await _currencyQueryRepository.GetRateByCurrencyName(rate.CurrencyName.Value, cancellationToken);
@@ -92,58 +54,70 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
             }
         }
 
-        return CalculateWinningRates(rates.ToArray());
+        await CalculateWinningRates(rates, cancellationToken);
     }
 
-    private Rate[] CalculateWinningRates(Rate[] rates)
+    private async Task TechnicalReturn(Rate rate, CancellationToken cancellationToken)
+    {
+        var currencyRate = await _currencyQueryRepository.GetRateByCurrencyName(rate.CurrencyName.Value, cancellationToken);
+        rate.Change(true, rate.Amount.Value, DateTime.UtcNow, currencyRate);
+        
+        await _rateRepository.Update(rate, cancellationToken);
+    }
+
+    private async Task CalculateWinningRates(Rate[] rates, CancellationToken cancellationToken)
     {
         var commonBank = rates.Sum(rate => rate.Amount.Value);
-
         var winnerCount = rates.Count(rate => rate.IsWon);
 
-        if (winnerCount == 0)
+        switch (winnerCount)
         {
-            foreach (var rate in rates)
+            case 0:
             {
-                rate.CreatePayout(0m, DateTime.UtcNow);
+                await CreateEmptyPayout(rates, cancellationToken);
+                return;
+            }
+            case 1:
+            {
+                await CreatePayoutForOneWinner(rates.First(x => x.IsWon), commonBank, cancellationToken);
+                return;
+            }
+            default:
+            {
+                if (CheckSameRates(rates))
+                    await UnusualCalculation(rates, commonBank, cancellationToken);
+                else
+                    await StandartCalculation(rates, commonBank, cancellationToken);
+                return;
             }
         }
-        else if (winnerCount == 1)
-        {
-            var rate = rates.FirstOrDefault(rate => rate.IsWon);
-            if (rate != null)
-            {
-                var payout = rate.Amount.Value + (0.5m * (commonBank - rate.Amount.Value));
-                rate.CreatePayout(payout, DateTime.UtcNow);
-            }
-        }
-        else
-        {
-            if (CheckSameRates(rates))
-                UnusualCalculation(ref rates, commonBank);
-            else
-                StandartCalculation(ref rates, commonBank);
-        }
-
-        return rates;
     }
 
-    private static void StandartCalculation(ref Rate[] rates, decimal commonBank)
+    private async Task CreateEmptyPayout(Rate[] rates, CancellationToken cancellationToken)
     {
-        var winnerBank = rates
-            .Where(rate => rate.IsWon)
-            .Sum(rate => rate.Amount.Value);
-
-        var kef = commonBank / winnerBank;
-
         foreach (var rate in rates)
         {
-            var payout = rate.IsWon ? Math.Round(rate.Amount.Value * kef, 2) : 0;
-            rate.CreatePayout(payout, DateTime.UtcNow);
+            rate.CreatePayout(0m, DateTime.UtcNow);
         }
+        
+        await _rateRepository.UpdateRange(rates, cancellationToken);
+        _ = rates.Select(async x =>
+        {
+            await MakePayout(x.AccountId.Id, 0m, x.RoomId.Id, cancellationToken);
+        });
     }
 
-    private static void UnusualCalculation(ref Rate[] rates, decimal commonBank)
+    private async Task CreatePayoutForOneWinner(Rate rate, decimal commonBank, CancellationToken cancellationToken)
+    {
+        var payout = rate.Amount.Value + (0.5m * (commonBank - rate.Amount.Value));
+        rate.CreatePayout(payout, DateTime.UtcNow);
+
+        await _rateRepository.Update(rate, cancellationToken);
+
+        await MakePayout(rate.AccountId.Id, payout, rate.RoomId.Id, cancellationToken);
+    }
+
+    private async Task UnusualCalculation(Rate[] rates, decimal commonBank, CancellationToken cancellationToken)
     {
         rates.ToList().Sort((x, y) => x.SetDate.CompareTo(y.SetDate));
 
@@ -164,6 +138,35 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
             var payout = rate.IsWon ? Math.Round(winningMoney[index--], 2) : 0m;
             rate.CreatePayout(payout, DateTime.UtcNow);
         });
+        
+        await _rateRepository.UpdateRange(rates, cancellationToken);
+
+        _ = rates.Select(async x =>
+        {
+            await MakePayout(x.AccountId.Id, x.Payout.Value, x.RoomId.Id, cancellationToken);
+        });
+    }
+    
+    private async Task StandartCalculation(Rate[] rates, decimal commonBank, CancellationToken cancellationToken)
+    {
+        var winnerBank = rates
+            .Where(rate => rate.IsWon)
+            .Sum(rate => rate.Amount.Value);
+
+        var kef = commonBank / winnerBank;
+
+        foreach (var rate in rates)
+        {
+            var payout = rate.IsWon ? Math.Round(rate.Amount.Value * kef, 2) : 0;
+            rate.CreatePayout(payout, DateTime.UtcNow);
+        }
+
+        await _rateRepository.UpdateRange(rates, cancellationToken);
+        
+        _ = rates.Select(async x =>
+        {
+            await MakePayout(x.AccountId.Id, x.Payout.Value, x.RoomId.Id, cancellationToken);
+        });
     }
 
     private static bool CheckSameRates(Rate[] rates)
@@ -172,5 +175,11 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
         var amount = winnings.First().Amount;
 
         return winnings.All(rate => rate.Amount == amount);
+    }
+
+    private async Task MakePayout(Guid accountId, decimal payout, Guid roomId, CancellationToken cancellationToken)
+    {
+        var command = new PayoutCommand(accountId, payout, roomId);
+        _ = await _mediator.Send(command, cancellationToken);
     }
 }

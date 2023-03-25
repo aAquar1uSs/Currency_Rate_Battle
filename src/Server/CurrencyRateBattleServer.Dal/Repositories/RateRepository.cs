@@ -60,4 +60,11 @@ public class RateRepository : IRateRepository
 
         return result.ToDomain();
     }
+
+    public async Task Update(Rate rate, CancellationToken cancellationToken)
+    {
+        var rateDal = rate.ToDal();
+        _ = _dbContext.Rates.Update(rateDal);
+        _ = await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

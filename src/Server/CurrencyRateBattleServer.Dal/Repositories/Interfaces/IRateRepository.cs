@@ -10,4 +10,6 @@ public interface IRateRepository
     Task UpdateRange(Rate[] updatedRate, CancellationToken cancellationToken);
 
     Task<Rate[]> Find(bool? isActive, string? currencyName, CancellationToken cancellationToken);
+
+    Task Update(Rate rate, CancellationToken cancellationToken);
 }
