@@ -56,7 +56,7 @@ public class Currency
     }
 
     public static Currency Create(string currencyName, string currencySymbol,
-        decimal amount, string? description, DateTime updateDate)
+        decimal amount, DateTime updateDate, string? description = null)
     {
         var currencyNameDomain = CurrencyName.Create(currencyName);
 
@@ -68,16 +68,6 @@ public class Currency
             currencyCodeDomain, amountDomain, description, updateDate);
     }
 
-    public static Currency Create(string currencyName,
-        decimal amount, DateTime updateDate)
-    {
-        var currencyNameDomain = CurrencyName.Create(currencyName);
-
-        var amountDomain = Amount.Create(amount);
-
-        return new Currency(currencyNameDomain, amountDomain, updateDate);
-    }
-
     public Result TryUpdateCurrency(decimal rate, string? date)
     {
         var rateResult = Amount.TryCreate(rate);
@@ -85,7 +75,7 @@ public class Currency
             return Result.Failure(rateResult.Error);
         
         if (date is null || !DateTime.TryParse(date, out var dateTime))
-            return Result.Failure("Can not parse the curreny updated date");
+            return Result.Failure("Can not parse the currency updated date");
 
         Rate = rateResult.Value;
         UpdateDate = dateTime;

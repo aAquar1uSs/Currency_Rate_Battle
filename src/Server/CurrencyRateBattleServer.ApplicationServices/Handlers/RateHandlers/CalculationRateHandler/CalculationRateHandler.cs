@@ -60,7 +60,7 @@ public class CalculationRateHandler : IRequestHandler<CalculationRateCommand>
     private async Task TechnicalReturn(Rate rate, CancellationToken cancellationToken)
     {
         var currencyRate = await _currencyQueryRepository.GetRateByCurrencyName(rate.CurrencyName.Value, cancellationToken);
-        rate.Change(true, rate.Amount.Value, DateTime.UtcNow, currencyRate);
+        rate.Update(true, rate.Amount.Value, DateTime.UtcNow, currencyRate);
         
         await _rateRepository.Update(rate, cancellationToken);
     }

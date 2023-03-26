@@ -147,7 +147,7 @@ public class Rate
             accountOneId, realExchangeRate);
     }
 
-    public void Change(bool isClosed,
+    public void Update(bool isClosed,
         decimal payout,
         DateTime settledDate,
         decimal realCurrencyRate)

@@ -15,15 +15,4 @@ public static class CurrencyConverter
         };
 
     }
-
-    public static Currency? ToDomain(this NbuClient.Dto.CurrencyDto currencyDto)
-    {
-        if (currencyDto.Currency is null || currencyDto.Date is null)
-            return null;
-
-        if (!DateTime.TryParse(currencyDto.Date, out var updateDate))
-            return null;
-
-        return Currency.Create(currencyDto.Currency, currencyDto.Rate, updateDate);
-    }
 }
