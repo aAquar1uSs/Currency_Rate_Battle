@@ -17,9 +17,4 @@ public static class UserRatingConverter
             WonBetsPercentage = rating.WonBetsPercentage
         };
     }
-
-    public static UserRatingDto[] ToDto(this UserRating[] ratings)
-    {
-        return ratings.Select(x => x.ToDto()).ToArray();
-    }
 }

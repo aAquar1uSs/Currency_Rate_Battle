@@ -1,40 +1,42 @@
 ﻿using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
+using CurrencyRateBattleServer.Domain.Entities.Errors;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.GetUserBets;
 
-public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<GetUserBetsResponse>>
+public class GetUserBetsHandler : IRequestHandler<GetUserBetsCommand, Result<GetUserBetsResponse, Error>>
 {
     private readonly ILogger<GetUserBetsHandler> _logger;
-    private readonly IAccountRepository _accountRepository;
+    private readonly IAccountQueryRepository _accountQueryRepository;
     private readonly IUserRatingQueryRepository _userRatingQueryRepository;
 
-    public GetUserBetsHandler(ILogger<GetUserBetsHandler> logger, IAccountRepository accountRepository,
+    public GetUserBetsHandler(ILogger<GetUserBetsHandler> logger, IAccountQueryRepository accountQueryRepository,
         IUserRatingQueryRepository userRatingQueryRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+        _accountQueryRepository = accountQueryRepository ?? throw new ArgumentNullException(nameof(accountQueryRepository));
         _userRatingQueryRepository = userRatingQueryRepository ?? throw new ArgumentNullException(nameof(userRatingQueryRepository));
     }
 
-    public async Task<Result<GetUserBetsResponse>> Handle(GetUserBetsCommand request, CancellationToken cancellationToken)
+    public async Task<Result<GetUserBetsResponse, Error>> Handle(GetUserBetsCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(GetUserBetsHandler)},  was caused. Start processing.");
-
-        var userIdResult = UserId.TryCreate(request.UserId);
-        if (userIdResult.IsFailure)
-            return Result.Failure<GetUserBetsResponse>(userIdResult.Error);
+        var userEmailResult = Email.TryCreate(request.UserEmail);
+        if (userEmailResult.IsFailure)
+            return new PlayerValidationError("email_not_valid", userEmailResult.Error); 
         
-        var account = await _accountRepository.GetAccountByUserIdAsync(userIdResult.Value, cancellationToken);
+        var account = await _accountQueryRepository.GetAccountByUserId(userEmailResult.Value, cancellationToken);
         if (account is null)
-            return Result.Failure<GetUserBetsResponse>($"Account with such user id {request.UserId} does not exist");
+        {
+            _logger.LogWarning("Account with such user email: {Email} not found.", userEmailResult.Value);
+            return PlayerValidationError.AccountNotFound;
+        }
 
-        var bets = await _userRatingQueryRepository.FindAsync(account.Id, cancellationToken);
+        var bets = await _userRatingQueryRepository.Find(account.Id, cancellationToken);
 
-        return new GetUserBetsResponse { Bets = bets.ToDto() };
+        return new GetUserBetsResponse { Bets = bets.Select(x => x.ToDto()).ToArray() };
     }
 }

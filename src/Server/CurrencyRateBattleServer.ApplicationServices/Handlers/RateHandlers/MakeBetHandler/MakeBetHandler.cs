@@ -1,66 +1,78 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Transactions;
+using CSharpFunctionalExtensions;
 using CurrencyRateBattleServer.ApplicationServices.Converters;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
+using CurrencyRateBattleServer.Domain.Entities.Errors;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.MakeBetHandler;
 
-public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResponse>>
+public class MakeBetHandler : IRequestHandler<MakeBetCommand, Result<MakeBetResponse, Error>>
 {
     private readonly ILogger<MakeBetHandler> _logger;
+    private readonly IAccountQueryRepository _accountQueryRepository;
     private readonly IAccountRepository _accountRepository;
-    private readonly ICurrencyStateRepository _currencyStateRepository;
     private readonly IRateRepository _rateRepository;
+    private readonly IRoomRepository _roomRepository;
 
-    public MakeBetHandler(ILogger<MakeBetHandler> logger, IAccountRepository accountRepository,
-        ICurrencyStateRepository currencyStateRepository, IRateRepository rateRepository)
+    public MakeBetHandler(ILogger<MakeBetHandler> logger, IAccountQueryRepository accountQueryRepository,
+        IRoomRepository roomRepository, IRateRepository rateRepository, IAccountRepository accountRepository)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
-        _currencyStateRepository = currencyStateRepository ?? throw new ArgumentNullException(nameof(currencyStateRepository));
+        _accountQueryRepository = accountQueryRepository ?? throw new ArgumentNullException(nameof(accountQueryRepository));
         _rateRepository = rateRepository ?? throw new ArgumentNullException(nameof(rateRepository));
+        _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
     }
 
-    public async Task<Result<MakeBetResponse>> Handle(MakeBetCommand request, CancellationToken cancellationToken)
+    public async Task<Result<MakeBetResponse, Error>> Handle(MakeBetCommand request, CancellationToken cancellationToken)
     {
         _logger.LogDebug($"{nameof(MakeBetHandler)} was caused.");
-        var userIdResult = UserId.TryCreate(request.UserId);
-        if (userIdResult.IsFailure)
-            return Result.Failure<MakeBetResponse>(userIdResult.Error);
+        var userEmailResult = Email.TryCreate(request.UserEmail);
+        if (userEmailResult.IsFailure)
+            return new PlayerValidationError("email_not_valid", userEmailResult.Error); 
         
-        var account = await _accountRepository.GetAccountByUserIdAsync(userIdResult.Value, cancellationToken);
+        var account = await _accountQueryRepository.GetAccountByUserId(userEmailResult.Value, cancellationToken);
         if (account is null)
-            return Result.Failure<MakeBetResponse>($"Account with such user id: {request.UserId} does not exist.");
+            return PlayerValidationError.AccountNotFound;
         
         var rateToCreate = request.UserRateToCreate;
         var roomIdResult = RoomId.TryCreate(rateToCreate.RoomId);
         if (roomIdResult.IsFailure)
-            return Result.Failure<MakeBetResponse>(roomIdResult.Error);
-        
-        var currencyId = await _currencyStateRepository.GetCurrencyStateIdByRoomIdAsync(roomIdResult.Value, cancellationToken);
-        var currencyIdResult = CurrencyCode.TryCreate(currencyId);
-        if (currencyIdResult.IsFailure)
-            return Result.Failure<MakeBetResponse>(currencyIdResult.Error);
-        
+            return new RateValidationError("invalid_rate" ,roomIdResult.Error);
+
+        var room = await _roomRepository.Find(roomIdResult.Value.Id, cancellationToken);
+        if (room is null)
+            return RoomValidationError.NotFound;
+
         var amountResult = Amount.TryCreate(rateToCreate.Amount);
         if (amountResult.IsFailure)
-            return Result.Failure<MakeBetResponse>(amountResult.Error);
+            return new MoneyValidationError("invalid_amount" ,amountResult.Error);
 
         var result = account.WritingOffMoney(amountResult.Value);
         if (result.IsFailure)
-            return Result.Failure<MakeBetResponse>(result.Error);
+            return new MoneyValidationError("writing_off_error" ,result.Error);
 
-        await _accountRepository.UpdateAsync(account, cancellationToken);
+        using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        var rate = Rate.Create(OneId.GenerateId().Id, DateTime.UtcNow, rateToCreate.UserCurrencyExchange,
+        await _accountRepository.Update(account, cancellationToken);
+
+        var incrementResult = room.IncrementCountRates();
+        if (incrementResult.IsFailure)
+            return new CommonError("increment_count_of_rates_error", incrementResult.Error);
+
+        var rate = Rate.Create(CustomId.GenerateId().Id, DateTime.UtcNow, rateToCreate.UserCurrencyExchange,
             rateToCreate.Amount, null, null, false, false, roomIdResult.Value.Id,
-            currencyIdResult.Value.Value, account.Id.Id);
+            room.CurrencyName.Value, account.Id.Id);
 
-        await _rateRepository.CreateAsync(rate, cancellationToken);
+        await _rateRepository.Create(rate, cancellationToken);
+        await _roomRepository.Update(room, cancellationToken);
 
+        transactionScope.Complete();
+        
         return new MakeBetResponse { UserRate = rate.ToDto() };
     }
 }

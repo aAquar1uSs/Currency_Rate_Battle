@@ -6,14 +6,20 @@ namespace CurrencyRateBattleServer.Dal.Converters;
 
 public static class CurrencyConverter
 {
-    public static CurrencyState ToDomain(this CurrencyStateDal dal)
-    {
-        return CurrencyState.Create(dal.Id, dal.UpdateDate, dal.CurrencyExchangeRate, dal.RoomId, dal.CurrencyCode,
-            dal.CurrencyName);
-    }
-
     public static Currency ToDomain(this CurrencyDal dal)
     {
-        return Currency.Create(dal.CurrencyName, dal.CurrencyCode, dal.Rate, dal.Description, dal.UpdateDate);
+        return Currency.Create(dal.CurrencyName, dal.CurrencyCode, dal.Rate, dal.UpdateDate, dal.Description);
+    }
+
+    public static CurrencyDal ToDal(this Currency currency)
+    {
+        return new CurrencyDal
+        {
+            CurrencyCode = currency.CurrencySymbol.Value,
+            CurrencyName = currency.CurrencyName.Value,
+            Description = currency.Description,
+            Rate = currency.Rate.Value,
+            UpdateDate = currency.UpdateDate
+        };
     }
 }

@@ -7,13 +7,13 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["src/CurrencyRateBattle_Server/CurrencyRateBattleServer.csproj", "src/CurrencyRateBattle_Server/"]
+COPY ["src/Server/CurrencyRateBattle_Server/CurrencyRateBattleServer.csproj", "src/Server/CurrencyRateBattle_Server/"]
 
 RUN apt-get update
 
-RUN dotnet restore "src/CurrencyRateBattle_Server/CurrencyRateBattleServer.csproj"
+RUN dotnet restore "src/Server/CurrencyRateBattle_Server/CurrencyRateBattleServer.csproj"
 COPY . .
-WORKDIR "/src/src/CurrencyRateBattle_Server"
+WORKDIR "/src/src/Server/CurrencyRateBattle_Server"
 RUN dotnet build "CurrencyRateBattleServer.csproj" -c Release -o /app/build
 
 FROM build AS publish

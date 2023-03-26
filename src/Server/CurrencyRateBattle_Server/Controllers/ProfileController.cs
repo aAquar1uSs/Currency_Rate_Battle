@@ -1,7 +1,9 @@
-﻿using System.Net;
-using CSharpFunctionalExtensions;
+﻿using CurrencyRateBattleServer.ApplicationServices.Converters;
+using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.ProfileHandlers.GetProfile;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.ProfileHandlers.GetUserBalance;
+using CurrencyRateBattleServer.Domain.Entities.Errors;
+using CurrencyRateBattleServer.Dto;
 using CurrencyRateBattleServer.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -14,54 +16,52 @@ namespace CurrencyRateBattleServer.Controllers;
 [Authorize]
 public class ProfileController : ControllerBase
 {
-    private readonly ILogger<ProfileController> _logger;
     private readonly IMediator _mediator;
 
-    public ProfileController(IMediator mediator, ILogger<ProfileController> logger)
+    public ProfileController(IMediator mediator)
     {
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    [HttpGet("get-balance")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [HttpGet("balance")]
+    [ProducesResponseType(typeof(GetUserBalanceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetUserBalanceAsync(CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(GetUserBalanceAsync)} was triggered.");
+        var userEmal = GuidHelper.GetGuidFromRequest(HttpContext);
+        if (userEmal is null)
+            return Unauthorized();
 
-        var userId = GuidHelper.GetGuidFromRequest(HttpContext);
-        if (userId is null)
-            return BadRequest();
+        var command = new GetUserBalanceCommand { UserId = userEmal };
 
-        var command = new GetUserBalanceCommand { UserId = userId.Value };
+        var response = await _mediator.Send(command, cancellationToken);
 
-        var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
-
-        if (isFailure)
-            return BadRequest(error);
-
-        return Ok(value.Amount);
+        return response.IsSuccess
+            ? Ok(response.Value)
+            : ToErrorResponse(response.Error);
     }
 
     [HttpGet]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(AccountInfoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetUserInfoAsync(CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(GetUserInfoAsync)} was triggered.");
+        var userEmail = GuidHelper.GetGuidFromRequest(HttpContext);
+        if (userEmail is null)
+            return Unauthorized();
 
-        var userId = GuidHelper.GetGuidFromRequest(HttpContext);
-        if (userId is null)
-            return BadRequest();
+        var command = new GetProfileCommand { UserEmail = userEmail };
 
-        var command = new GetProfileCommand { UserId = userId.Value };
+        var response = await _mediator.Send(command, cancellationToken);
 
-        var (_, isFailure, value, error) = await _mediator.Send(command, cancellationToken);
-
-        if (isFailure)
-            return BadRequest(error);
-
-        return Ok(value.AccountInfo);
+        return response.IsSuccess
+            ? Ok(response.Value.AccountInfo)
+            : ToErrorResponse(response.Error);  
     }
+    
+    private IActionResult ToErrorResponse(Error error) => error switch
+    {
+        PlayerValidationError => BadRequest(error.ToDto()),
+        _ => throw new NotSupportedException($"Unknown type of error {error.GetType()}")
+    };
 }

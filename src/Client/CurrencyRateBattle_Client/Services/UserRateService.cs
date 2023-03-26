@@ -1,28 +1,28 @@
 ﻿using CRBClient.Helpers;
 using CRBClient.Models;
-using Microsoft.Extensions.Options;
 using CRBClient.Services.Interfaces;
 using System.Net;
+using Microsoft.Extensions.Options;
+using Uri = CRBClient.Helpers.Uri;
 
 namespace CRBClient.Services;
 
 public class UserRateService : IUserRateService
 {
     private readonly ICRBServerHttpClient _httpClient;
-    private readonly WebServerOptions _options;
     private readonly ILogger<UserRateService> _logger;
+    private readonly Uri _uri;
 
-    public UserRateService(ICRBServerHttpClient httpClient,
-        IOptions<WebServerOptions> options, ILogger<UserRateService> logger)
+    public UserRateService(ICRBServerHttpClient httpClient, ILogger<UserRateService> logger, IOptions<Uri> uriOptions)
     {
         _httpClient = httpClient;
-        _options = options.Value;
         _logger = logger;
+        _uri = uriOptions.Value;
     }
 
     public async Task<List<BetViewModel>> GetUserRates(CancellationToken cancellationToken)
     {
-        var response = await _httpClient.GetAsync(_options.GetUserBetsURL ?? "", cancellationToken);
+        var response = await _httpClient.GetAsync(_uri.GetUserBetsURL, cancellationToken);
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("User rates are loaded successfully");
@@ -30,7 +30,7 @@ public class UserRateService : IUserRateService
         }
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            _logger.LogInformation("User rates not loaded, user is unauthorized");
+            _logger.LogWarning("User rates not loaded, user is unauthorized");
             throw new GeneralException();
         }
         return new List<BetViewModel>();
@@ -39,7 +39,7 @@ public class UserRateService : IUserRateService
 
     public async Task InsertUserRateAsync(RateViewModel rateViewModel,CancellationToken cancellationToken)
     {
-        var response = await _httpClient.PostAsync(_options.MakeBetURL ?? "", rateViewModel, cancellationToken);
+        var response = await _httpClient.PostAsync(_uri.MakeBetURL, rateViewModel, cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.OK)
         {

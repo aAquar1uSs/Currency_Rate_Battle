@@ -13,14 +13,14 @@ public class AccountHistoryDal
     public decimal Amount { get; set; }
 
     public bool IsCredit { get; set; }
-    
+
     public Guid? RoomId { get; set; }
-    
+
     [ForeignKey("RoomId")]
     public RoomDal? Room { get; set; }
 
     public Guid AccountId { get; set; }
-    
+
     [ForeignKey("AccountId")]
     public AccountDal Account { get; set; }
 }

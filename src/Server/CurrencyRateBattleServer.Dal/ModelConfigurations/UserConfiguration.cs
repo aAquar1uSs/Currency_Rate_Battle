@@ -9,7 +9,6 @@ public class UserConfiguration : IEntityTypeConfiguration<UserDal>
 {
     public void Configure(EntityTypeBuilder<UserDal> builder)
     {
-        _ = builder.ToTable("User").HasKey(user => user.Id);
-        _ = builder.Property(user => user.Email).IsRequired();
+        _ = builder.ToTable("User").HasKey(user => user.Email);
     }
 }

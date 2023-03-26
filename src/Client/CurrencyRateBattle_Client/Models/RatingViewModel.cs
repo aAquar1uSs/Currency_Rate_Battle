@@ -10,24 +10,24 @@ public class RatingViewModel
     // 4 - Percentage of won bets
 
     // Basic rating by number of bets
-    [JsonProperty("BetsNo")]
+    [JsonProperty("betsNo")]
     public long BetsNo { get; set; }
 
     // Number of won bets
-    [JsonProperty("WonBetsNo")]
+    [JsonProperty("wonBetsNo")]
     public long WonBetsNo { get; set; }
 
     //Percentage of payout/bets amount
-    [JsonProperty("ProfitPercentage")]
+    [JsonProperty("profitPercentage")]
     public decimal ProfitPercentage { get; set; }
 
     //Percentage of won bets
-    [JsonProperty("WonBetsPercentage")]
+    [JsonProperty("wonBetsPercentage")]
     public decimal WonBetsPercentage { get; set; }
 
-    [JsonProperty("Email")]
+    [JsonProperty("email")]
     public string Email { get; set; } = default!;
 
-    [JsonProperty("LastBetDate")]
+    [JsonProperty("lastBetDate")]
     public DateTime LastBetDate { get; set; }
 }

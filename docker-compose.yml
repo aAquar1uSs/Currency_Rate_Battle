@@ -1,7 +1,6 @@
 version: '3.4'
 
 services:
-
   db:
     image: postgres:14.1-alpine
     restart: always
@@ -18,7 +17,7 @@ services:
     image: ${DOCKER_REGISTRY-}currencyratebattleserver
     build:
       context: .
-      dockerfile: src/CurrencyRateBattle_Server/Dockerfile
+      dockerfile: src/Server/CurrencyRateBattle_Server/Dockerfile
     
     environment:
       - ConnectionStrings__ConnectionDb=Host=db;Port=5432;Database=CRBdb;Username=postgres;Password=111111
@@ -33,7 +32,7 @@ services:
     image: ${DOCKER_REGISTRY-}currencyratebattleclient
     build:
       context: .
-      dockerfile: src/CurrencyRateBattle_Client/Dockerfile
+      dockerfile: src/Client/CurrencyRateBattle_Client/Dockerfile
     environment:
       - WebServer__BaseURL=http://currencyratebattleserver:80
     

@@ -12,14 +12,10 @@ namespace CurrencyRateBattleServer.ApplicationServices.Infrastructure.JwtManager
 
 public class JwtManager : IJwtManager
 {
-    private readonly ILogger<IJwtManager> _logger;
-
     private readonly IConfiguration _configuration;
 
-    public JwtManager(ILogger<JwtManager> logger,
-        IConfiguration configuration)
+    public JwtManager(IConfiguration configuration)
     {
-        _logger = logger;
         _configuration = configuration;
     }
 
@@ -31,7 +27,7 @@ public class JwtManager : IJwtManager
         {
             Subject = new ClaimsIdentity(new Claim[]
             {
-                new("UserId", user.Id.Value)
+                new("UserId", user.Email.Value)
             }),
             Expires = DateTime.UtcNow.AddMinutes(10),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey),

@@ -5,7 +5,7 @@ namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
 public interface IUserRatingQueryRepository
 {
-    Task<UserRating[]> GetUsersRatingAsync();
+    Task<UserRating[]> GetUsersRating();
 
-    Task<Bet[]> FindAsync(AccountId accountId, CancellationToken cancellationToken);
+    Task<Bet[]> Find(AccountId accountId, CancellationToken cancellationToken);
 }

@@ -5,7 +5,7 @@ namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
 public interface IRoomQueryRepository
 {
-    Task<RoomInfo[]> FindAsync(bool isClosed, CancellationToken cancellationToken);
-
-    Task<RoomInfo[]> GetActiveRoomsWithFilterAsync(Filter filter, CancellationToken cancellationToken);
+    Task<Room[]> GetActiveRoomsWithFilterAsync(Filter filter, CancellationToken cancellationToken);
+    
+    Task<Room[]> RoomClosureCheckAsync(CancellationToken cancellationToken);
 }

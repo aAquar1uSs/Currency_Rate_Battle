@@ -10,6 +10,14 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<CurrencyDal>
     {
         _ = builder.ToTable("Currency")
             .HasKey(cur => cur.CurrencyName);
+
+        _ = builder.ToTable("Currency")
+            .Property(currency => currency.UpdateDate)
+            .HasDefaultValue(DateTime.UtcNow);
+        
+        _ = builder.ToTable("Currency")
+            .Property(currency => currency.Rate)
+            .HasDefaultValue(0);
     }
 }
 

@@ -13,18 +13,18 @@ public class HomeController : Controller
     private readonly ILogger<HomeController> _logger;
     private readonly IRoomService _roomService;
     private readonly IUserService _userService;
-    private readonly ICurrencyStateService _currencyStateService;
+    private readonly ICurrencyService _currencyService;
     private List<RoomViewModel> _roomStorage = new();
 
     public HomeController(ILogger<HomeController> logger,
         IRoomService roomService,
         IUserService userService,
-        ICurrencyStateService currencyStateService)
+        ICurrencyService currencyService)
     {
         _logger = logger;
         _roomService = roomService;
         _userService = userService;
-        _currencyStateService = currencyStateService;
+        _currencyService = currencyService;
     }
 
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
@@ -44,7 +44,7 @@ public class HomeController : Controller
         try
         {
             ViewBag.Balance = await _userService.GetUserBalanceAsync(cancellationToken);
-            var currState = await _currencyStateService.GetCurrencyRatesAsync(cancellationToken);
+            var currState = await _currencyService.GetCurrencyRatesAsync(cancellationToken);
             ViewBag.CurrencyRates = currState;
             ViewBag.Title = "Main Page";
 

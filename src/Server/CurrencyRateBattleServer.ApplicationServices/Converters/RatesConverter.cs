@@ -14,10 +14,4 @@ public static class RatesConverter
             Amount = rate.Amount.Value, RoomId = rate.RoomId.Id, UserCurrencyExchange = rate.RateCurrencyExchange.Value
         };
     }
-
-    public static UserRateDto[] ToDto(this Rate[] rates)
-    {
-        return rates.Select(x => x.ToDto()).ToArray();
-    }
-    
 }

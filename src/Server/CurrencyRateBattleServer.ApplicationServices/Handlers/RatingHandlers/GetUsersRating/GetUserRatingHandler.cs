@@ -8,22 +8,20 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RatingHandlers.G
 
 public class GetUserRatingHandler : IRequestHandler<GetUserRatingCommand, Result<GetUserRatingResponse>>
 {
-    private readonly ILogger<GetUserRatingHandler> _logger;
     private readonly IUserRatingQueryRepository _userRatingQueryRepository;
 
-    public GetUserRatingHandler(ILogger<GetUserRatingHandler> logger, IUserRatingQueryRepository userRatingQueryRepository)
+    public GetUserRatingHandler(IUserRatingQueryRepository userRatingQueryRepository)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _userRatingQueryRepository = userRatingQueryRepository ?? throw new ArgumentNullException(nameof(userRatingQueryRepository));
     }
 
     public async Task<Result<GetUserRatingResponse>> Handle(GetUserRatingCommand request, CancellationToken cancellationToken)
     {
-        var rating = await _userRatingQueryRepository.GetUsersRatingAsync();
+        var rating = await _userRatingQueryRepository.GetUsersRating();
 
         return new GetUserRatingResponse
         {
-            UserRating = rating.ToDto()
+            UserRating = rating.Select(x => x.ToDto()).ToArray()
         };
     }
 }

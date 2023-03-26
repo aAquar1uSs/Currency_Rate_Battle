@@ -1,6 +1,4 @@
-﻿using System.Net;
-using CSharpFunctionalExtensions;
-using CurrencyRateBattleServer.ApplicationServices.Dto;
+﻿using CurrencyRateBattleServer.ApplicationServices.Dto;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.GetFilteredRoom;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.GetRoom;
 using CurrencyRateBattleServer.Domain.Entities;
@@ -15,22 +13,19 @@ namespace CurrencyRateBattleServer.Controllers;
 [Authorize]
 public class RoomController : ControllerBase
 {
-    private readonly ILogger<RoomController> _logger;
     private readonly IMediator _mediator;
 
-    public RoomController(ILogger<RoomController> logger, IMediator mediator)
+    public RoomController(IMediator mediator)
     {
-        _logger = logger;
         _mediator = mediator;
     }
 
-    [HttpGet("get-rooms/{isClosed}")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-    public async Task<ActionResult<IEnumerable<Room>>> GetRoomsAsync([FromRoute] bool isClosed, CancellationToken cancellationToken)
+    [HttpGet]
+    [ProducesResponseType(typeof(RoomDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<IEnumerable<Room>>> GetRoomsAsync([FromQuery] bool isClosed, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("List of rooms are retrieving.");
-        var command = new GetRoomCommand {IsClosed = isClosed};
+        var command = new GetRoomCommand(isClosed);
 
         var response = await _mediator.Send(command, cancellationToken);
 
@@ -38,20 +33,14 @@ public class RoomController : ControllerBase
     }
 
     [HttpPost("filter")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType(typeof(RoomDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromBody] FilterDto filter, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Filtered room list.");
-
         var command = new GetFilteredRoomCommand { Filter = filter };
 
-        var (_, isFailure, value) = await _mediator.Send(command, cancellationToken);
-
-        if (isFailure)
-            return BadRequest();
-
-        return Ok(value.Rooms);
+        var response = await _mediator.Send(command, cancellationToken);
+        
+        return Ok(response.Value.Rooms);
     }
 }

@@ -31,12 +31,13 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("Email");
 
                     b.ToTable("Account", (string)null);
                 });
@@ -84,10 +85,14 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                         .HasColumnType("varchar(128)");
 
                     b.Property<decimal>("Rate")
-                        .HasColumnType("decimal");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal")
+                        .HasDefaultValue(0m);
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("timestamp without time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValue(new DateTime(2023, 3, 21, 22, 13, 58, 85, DateTimeKind.Utc).AddTicks(5308));
 
                     b.HasKey("CurrencyName");
 
@@ -100,7 +105,7 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                             CurrencyCode = "$",
                             Description = "US Dollar",
                             Rate = 0m,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            UpdateDate = new DateTime(2023, 3, 21, 22, 13, 58, 85, DateTimeKind.Utc).AddTicks(5671)
                         },
                         new
                         {
@@ -108,7 +113,7 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                             CurrencyCode = "$",
                             Description = "Euro",
                             Rate = 0m,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            UpdateDate = new DateTime(2023, 3, 21, 22, 13, 58, 85, DateTimeKind.Utc).AddTicks(5672)
                         },
                         new
                         {
@@ -116,7 +121,7 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                             CurrencyCode = "zł",
                             Description = "Polish Zlotych",
                             Rate = 0m,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            UpdateDate = new DateTime(2023, 3, 21, 22, 13, 58, 85, DateTimeKind.Utc).AddTicks(5673)
                         },
                         new
                         {
@@ -124,7 +129,7 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                             CurrencyCode = "£",
                             Description = "British Pound",
                             Rate = 0m,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            UpdateDate = new DateTime(2023, 3, 21, 22, 13, 58, 85, DateTimeKind.Utc).AddTicks(5674)
                         },
                         new
                         {
@@ -132,39 +137,8 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                             CurrencyCode = "Fr",
                             Description = "Swiss Franc",
                             Rate = 0m,
-                            UpdateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            UpdateDate = new DateTime(2023, 3, 21, 22, 13, 58, 85, DateTimeKind.Utc).AddTicks(5678)
                         });
-                });
-
-            modelBuilder.Entity("CurrencyRateBattleServer.Dal.Entities.CurrencyStateDal", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("CurrencyCode")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("CurrencyExchangeRate")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("CurrencyName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("RoomId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoomId", "CurrencyCode")
-                        .IsUnique();
-
-                    b.ToTable("CurrencyState", (string)null);
                 });
 
             modelBuilder.Entity("CurrencyRateBattleServer.Dal.Entities.RateDal", b =>
@@ -197,6 +171,9 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                     b.Property<decimal>("RateCurrencyExchange")
                         .HasColumnType("numeric");
 
+                    b.Property<decimal?>("RealCurrencyExchange")
+                        .HasColumnType("numeric");
+
                     b.Property<Guid>("RoomId")
                         .HasColumnType("uuid");
 
@@ -223,6 +200,13 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("CountRates")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CurrencyName")
+                        .IsRequired()
+                        .HasColumnType("varchar(3)");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -233,27 +217,21 @@ namespace CurrencyRateBattleServer.Dal.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CurrencyName");
+
                     b.ToTable("Room", (string)null);
                 });
 
             modelBuilder.Entity("CurrencyRateBattleServer.Dal.Entities.UserDal", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
+                    b.HasKey("Email");
 
                     b.ToTable("User", (string)null);
                 });
@@ -262,7 +240,7 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                 {
                     b.HasOne("CurrencyRateBattleServer.Dal.Entities.UserDal", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("Email")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -282,17 +260,6 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                         .HasForeignKey("RoomId");
 
                     b.Navigation("Account");
-
-                    b.Navigation("Room");
-                });
-
-            modelBuilder.Entity("CurrencyRateBattleServer.Dal.Entities.CurrencyStateDal", b =>
-                {
-                    b.HasOne("CurrencyRateBattleServer.Dal.Entities.RoomDal", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Room");
                 });
@@ -322,6 +289,17 @@ namespace CurrencyRateBattleServer.Dal.Migrations
                     b.Navigation("Currency");
 
                     b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("CurrencyRateBattleServer.Dal.Entities.RoomDal", b =>
+                {
+                    b.HasOne("CurrencyRateBattleServer.Dal.Entities.CurrencyDal", "Currency")
+                        .WithMany()
+                        .HasForeignKey("CurrencyName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Currency");
                 });
 #pragma warning restore 612, 618
         }

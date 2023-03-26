@@ -4,25 +4,20 @@ using CurrencyRateBattleServer.Data;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Dal.Repositories;
 
 public class UserRatingQueryRepository : IUserRatingQueryRepository
 {
-    private readonly ILogger<UserRatingQueryRepository> _logger;
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public UserRatingQueryRepository(CurrencyRateBattleContext dbContext, ILogger<UserRatingQueryRepository> logger)
+    public UserRatingQueryRepository(CurrencyRateBattleContext dbContext)
     {
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public Task<UserRating[]> GetUsersRatingAsync()
+    public Task<UserRating[]> GetUsersRating()
     {
-        _logger.LogInformation($"{nameof(GetUsersRatingAsync)} was caused.");
-
         List<UserRating> userRatings = new();
 
         var query1 = GetUserRatingDataFirstQuery();
@@ -45,6 +40,34 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
 
         return Task.FromResult(userRatings.ToArray());
     }
+    
+    public Task<Bet[]> Find(AccountId accountId, CancellationToken cancellationToken)
+    {
+        List<Bet> betDtoStorage = new();
+
+        var firstQuery = GetBetData(accountId.Id);
+        var secondQuery = GetBetSubQuery(firstQuery);
+
+        foreach (var data in secondQuery)
+        {
+            betDtoStorage.Add(new Bet
+            {
+                Id = data.RateId,
+                SetDate = data.RateSetDate,
+                BetAmount = (decimal)data.Amount,
+                SettleDate = data.RateSettleDate,
+                WonCurrencyExchange = data.RealCurrencyExchangeRate is null ? null : Math.Round((decimal)data.RealCurrencyExchangeRate, 2),
+                UserCurrencyExchange = Math.Round(data.UserRateCurrencyExchange, 2),
+                PayoutAmount = data.Payout,
+                CurrencyName = data.CurrencyName,
+                IsClosed = data.IsClosed,
+                RoomDate = data.RoomDate
+            });
+        }
+
+        betDtoStorage.Sort((bet1, bet2) => bet1.RoomDate.CompareTo(bet2.RoomDate));
+        return Task.FromResult(betDtoStorage.ToArray());
+    }
 
     private IQueryable<BetDal> GetBetData(Guid accountId)
     {
@@ -62,6 +85,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                          IsClosed = rate.IsClosed,
                          AccountId = rate.AccountId,
                          UserRateCurrencyExchange = rate.RateCurrencyExchange,
+                         RealCurrencyExchangeRate = rate.RealCurrencyExchange,
                          Payout = rate.Payout,
                          RoomDate = room.EndDate,
                          RoomId = rate.RoomId,
@@ -73,8 +97,8 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
     private IQueryable<BetDal> GetBetSubQuery(IQueryable<BetDal> data)
     {
         var query = from res in data
-                    join rates in _dbContext.Rates
-                on new { res.RoomId, res.CurrencyName, res.AccountId } equals new { rates.RoomId, rates.CurrencyName, rates.AccountId }
+            join rates in _dbContext.Rates
+                        on new { res.RoomId, res.CurrencyName, res.AccountId } equals new { rates.RoomId, rates.CurrencyName, rates.AccountId }
                 into gj from subCurr in gj.DefaultIfEmpty()
                     select new BetDal
                     {
@@ -90,7 +114,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                         RoomDate = res.RoomDate,
                         RoomId = res.RoomId,
                         CurrencyName = res.CurrencyName,
-                        RealCurrencyExchangeRate = subCurr.RateCurrencyExchange
+                        RealCurrencyExchangeRate = res.RealCurrencyExchangeRate
                     };
         return query;
     }
@@ -99,7 +123,7 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
     {
         var query1 = from rate in _dbContext.Rates
                      join acc in _dbContext.Accounts on rate.AccountId equals acc.Id
-                     join user in _dbContext.Users on acc.UserId equals user.Id
+                     join user in _dbContext.Users on acc.Email equals user.Email
                      where rate.IsClosed == true
                      select new UserRatingDal
                      {
@@ -162,35 +186,5 @@ public class UserRatingQueryRepository : IUserRatingQueryRepository
                     };
 
         return query.AsNoTracking();
-    }
-
-    public Task<Bet[]> FindAsync(AccountId accountId, CancellationToken cancellationToken)
-    {
-        _logger.LogInformation($"{nameof(FindAsync)} was caused.");
-
-        List<Bet> betDtoStorage = new();
-
-        var firstQuery = GetBetData(accountId.Id);
-        var secondQuery = GetBetSubQuery(firstQuery);
-
-        foreach (var data in secondQuery)
-        {
-            betDtoStorage.Add(new Bet
-            {
-                Id = data.RateId,
-                SetDate = data.RateSetDate,
-                BetAmount = (decimal)data.Amount,
-                SettleDate = data.RateSettleDate,
-                WonCurrencyExchange = Math.Round((decimal)data.RealCurrencyExchangeRate, 2),
-                UserCurrencyExchange = Math.Round(data.UserRateCurrencyExchange, 2),
-                PayoutAmount = data.Payout,
-                CurrencyName = data.CurrencyName,
-                IsClosed = data.IsClosed,
-                RoomDate = data.RoomDate
-            });
-        }
-
-        betDtoStorage.Sort((bet1, bet2) => bet1.RoomDate.CompareTo(bet2.RoomDate));
-        return Task.FromResult(betDtoStorage.ToArray());
     }
 }

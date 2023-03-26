@@ -2,27 +2,22 @@
 using CurrencyRateBattleServer.Dal.Entities;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Dal.Repositories;
 
 public class RateRepository : IRateRepository
 {
-    private readonly ILogger<RateRepository> _logger;
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public RateRepository(ILogger<RateRepository> logger, CurrencyRateBattleContext dbContext)
+    public RateRepository(CurrencyRateBattleContext dbContext)
     {
-        ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(dbContext);
-
-        _logger = logger;
+        
         _dbContext = dbContext;
     }
 
-    public async Task CreateAsync(Rate rate, CancellationToken cancellationToken)
+    public async Task Create(Rate rate, CancellationToken cancellationToken)
     {
         var rateDal = rate.ToDal();
 
@@ -30,35 +25,16 @@ public class RateRepository : IRateRepository
         _ = await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Rate[]> GetActiveRateByRoomIdsAsync(RoomId[] roomIds, CancellationToken cancellationToken)
+    public async Task UpdateRange(Rate[] updatedRate, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(GetActiveRateByRoomIdsAsync)} was caused.");
-
-        var roomGuidIds = roomIds.Select(x => x.Id); 
-
-        var rates = await _dbContext.Rates
-            .Where(dal => roomGuidIds.Contains(dal.RoomId))
-            .Where(dal => !dal.IsClosed)
-            .AsNoTracking()
-            .ToArrayAsync(cancellationToken);
-
-        return rates.ToDomain();
-    }
-
-    public async Task UpdateRangeAsync(Rate[] updatedRate, CancellationToken cancellationToken)
-    {
-        _logger.LogInformation($"{nameof(UpdateRangeAsync)} was caused.");
-
         var updatedRateDal = updatedRate.ToDal();
 
         _dbContext.Rates.UpdateRange(updatedRateDal);
         _ = await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Rate[]> FindAsync(bool? isActive, string? currencyName, CancellationToken cancellationToken)
+    public async Task<Rate[]> Find(bool? isActive, string? currencyName, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(FindAsync)} was caused.");
-
         var currencyId = string.Empty;
         if (currencyName is not null)
         {
@@ -85,11 +61,10 @@ public class RateRepository : IRateRepository
         return result.ToDomain();
     }
 
-    public async Task DeleteRateAsync(Rate rateToDelete)
+    public async Task Update(Rate rate, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(DeleteRateAsync)} was caused.");
-
-        _ = _dbContext.Rates.Remove(rateToDelete.ToDal());
-        _ = await _dbContext.SaveChangesAsync();
+        var rateDal = rate.ToDal();
+        _ = _dbContext.Rates.Update(rateDal);
+        _ = await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

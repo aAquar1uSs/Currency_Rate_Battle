@@ -1,18 +1,14 @@
-﻿using CurrencyRateBattleServer.Dal.Entities;
-using CurrencyRateBattleServer.Domain.Entities;
-using CurrencyRateBattleServer.Domain.Entities.ValueObjects;
+﻿using CurrencyRateBattleServer.Domain.Entities;
 
 namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
 public interface IRoomRepository
 {
-    Task CreateAsync(CancellationToken cancellationToken);
+    Task Create(Room room, CancellationToken cancellationToken);
 
-    Task UpdateAsync(RoomDal updatedRoomDal, CancellationToken cancellationToken);
+    Task Update(Room updatedRoom, CancellationToken cancellationToken);
 
-    Task<Room[]> RoomClosureCheckAsync(CancellationToken cancellationToken);
+    Task<Room?> Find(Guid id, CancellationToken cancellationToken);
 
-    Task<RoomDal?> FindAsync(Guid id, CancellationToken cancellationToken);
-
-    Task DeleteAsync(RoomId roomId, CancellationToken cancellationToken);
+    Task<Room[]> Find(bool isClosed, CancellationToken cancellationToken);
 }

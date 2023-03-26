@@ -1,34 +1,37 @@
 ﻿using System.Globalization;
 using System.Net;
+using System.Text.Json;
+using CRBClient.Dto;
 using CRBClient.Helpers;
 using CRBClient.Models;
 using Microsoft.Extensions.Options;
 using CRBClient.Services.Interfaces;
+using Uri = CRBClient.Helpers.Uri;
 
 namespace CRBClient.Services;
 
 public class UserService : IUserService
 {
     private readonly ICRBServerHttpClient _httpClient;
-    private readonly WebServerOptions _options;
+    private readonly Uri _uri;
     private readonly ILogger<UserService> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private ISession? Session => _httpContextAccessor.HttpContext?.Session;
 
     public UserService(ICRBServerHttpClient httpClient,
         IHttpContextAccessor httpContextAccessor,
-        IOptions<WebServerOptions> options,
+        IOptions<Uri> options,
         ILogger<UserService> logger)
     {
         _httpClient = httpClient;
-        _options = options.Value;
+        _uri = options.Value;
         _logger = logger;
         _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task RegisterUserAsync(UserViewModel user, CancellationToken cancellationToken)
     {
-        var response = await _httpClient.PostAsync(_options.RegistrationAccURL ?? "", user, cancellationToken);
+        var response = await _httpClient.PostAsync(_uri.RegistrationAccURL ?? "", user, cancellationToken);
 
         if (user.Password != user.ConfirmPassword)
         {
@@ -39,9 +42,10 @@ public class UserService : IUserService
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("User was successfully registered");
-            var token = await response.Content.ReadAsStringAsync(cancellationToken);
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            var token = JsonSerializer.Deserialize<TokenDto>(content);
             if (Session is not null)
-                Session.SetString("token", token);
+                Session.SetString("token", token?.Token);
         }
         else
         {
@@ -53,15 +57,15 @@ public class UserService : IUserService
 
     public async Task LoginUserAsync(UserViewModel user, CancellationToken cancellationToken)
     {
-        var response = await _httpClient.PostAsync(_options.LoginAccURL ?? "", user, cancellationToken);
+        var response = await _httpClient.PostAsync(_uri.LoginAccURL, user, cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("User was successfully login");
-            var token = await response.Content.ReadAsStringAsync(cancellationToken);
-
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            var token = JsonSerializer.Deserialize<TokenDto>(content);
             if (Session is not null)
-                Session.SetString("token", token);
+                Session.SetString("token", token?.Token);
         }
         else
         {
@@ -73,7 +77,7 @@ public class UserService : IUserService
 
     public async Task<AccountInfoViewModel> GetAccountInfoAsync(CancellationToken cancellationToken)
     {
-        var response = await _httpClient.GetAsync(_options.UserProfileURL ?? "", cancellationToken);
+        var response = await _httpClient.GetAsync(_uri.UserProfileURL, cancellationToken);
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("Account info are loaded successfully");
@@ -90,7 +94,7 @@ public class UserService : IUserService
 
     public async Task<List<AccountHistoryViewModel>> GetAccountHistoryAsync(CancellationToken cancellationToken)
     {
-        var response = await _httpClient.GetAsync(_options.AccountHistoryURL ?? "", cancellationToken);
+        var response = await _httpClient.GetAsync(_uri.AccountHistoryURL, cancellationToken);
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("Account history are loaded successfully");
@@ -107,18 +111,14 @@ public class UserService : IUserService
 
     public async Task<string> GetUserBalanceAsync(CancellationToken cancellationToken)
     {
-        var balance = string.Empty;
-        var response = await _httpClient.GetAsync(_options.GetBalanceURL ?? "", cancellationToken);
+        var response = await _httpClient.GetAsync(_uri.GetBalanceURL, cancellationToken);
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("User balance are loaded successfully");
-            if (decimal.TryParse(await response.Content.ReadAsStringAsync(cancellationToken),
-                NumberStyles.AllowDecimalPoint,
-                CultureInfo.InvariantCulture,
-                out var bal))
-            {
-                balance = "BALANCE: " + bal.ToString("C", new CultureInfo("uk-UA"));
-            }
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            var money = JsonSerializer.Deserialize<AmountDto>(content);
+            
+            return "BALANCE: " + money?.Amount.ToString("C", new CultureInfo("uk-UA"));
         }
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
@@ -126,24 +126,19 @@ public class UserService : IUserService
             _logger.LogInformation("User balance are not loaded, user is unauthorized");
             throw new GeneralException();
         }
-        return balance;
+        return string.Empty;;
     }
 
     public async Task<decimal> GetUserBalanceDecimalAsync(CancellationToken cancellationToken)
     {
-        var balance = 0M;
-        var response = await _httpClient.GetAsync(_options.GetBalanceURL ?? "", cancellationToken);
+        var response = await _httpClient.GetAsync(_uri.GetBalanceURL, cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("User balance are loaded successfully");
-            if (decimal.TryParse(await response.Content.ReadAsStringAsync(cancellationToken),
-                NumberStyles.AllowDecimalPoint,
-                CultureInfo.InvariantCulture,
-                out var bal))
-            {
-                balance = bal;
-            }
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            var money = JsonSerializer.Deserialize<AmountDto>(content);
+            return money.Amount;
         }
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
@@ -151,7 +146,7 @@ public class UserService : IUserService
             _logger.LogInformation("User balance are not loaded, user is unauthorized");
             throw new GeneralException();
         }
-        return balance;
+        return decimal.Zero;
     }
 
     public void Logout()

@@ -4,71 +4,51 @@ using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
 using CurrencyRateBattleServer.Domain.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace CurrencyRateBattleServer.Dal.Repositories;
 
 public class RoomQueryRepository : IRoomQueryRepository
 {
-    private readonly ILogger<RoomQueryRepository> _logger;
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public RoomQueryRepository(ILogger<RoomQueryRepository> logger, CurrencyRateBattleContext dbContext)
+    public RoomQueryRepository(CurrencyRateBattleContext dbContext)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task<RoomInfo[]> FindAsync(bool isClosed, CancellationToken cancellationToken)
+    public async Task<Room[]> GetActiveRoomsWithFilterAsync(Filter filter, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(FindAsync)} was caused");
-
-        var result = from curr in _dbContext.Currencies
-            join currState in _dbContext.CurrencyStates on curr.CurrencyName equals currState.CurrencyName
-            join room in _dbContext.Rooms on currState.RoomId equals room.Id
-            where room.IsClosed == isClosed
-            select new RoomInfoDal
-            {
-                Id = room.Id,
-                CurrencyName = curr.CurrencyName,
-                Date = room.EndDate,
-                IsClosed = room.IsClosed,
-                CurrencyExchangeRate = currState.CurrencyExchangeRate,
-                UpdateRateTime = currState.UpdateDate,
-                CountRates = _dbContext.Rates.Count(r => r.RoomId == room.Id)
-            };
-        var roomInfos = await result.AsNoTracking().ToArrayAsync(cancellationToken);
-        return roomInfos.Select(x => x.ToDomain()).ToArray();
-    }
-
-    public async Task<RoomInfo[]> GetActiveRoomsWithFilterAsync(Filter filter, CancellationToken cancellationToken)
-    {
-        _logger.LogInformation($"{nameof(GetActiveRoomsWithFilterAsync)} was caused");
-        var filteredRooms =
-            await (from currencyState in _dbContext.CurrencyStates
-            join room in _dbContext.Rooms on currencyState.RoomId equals room.Id
-            join curr in _dbContext.Currencies on currencyState.CurrencyName equals curr.CurrencyName
-            where room.IsClosed == false
-            select new RoomInfoDal
-            {
-                Id = room.Id,
-                Date = room.EndDate,
-                CurrencyExchangeRate = currencyState.CurrencyExchangeRate,
-                IsClosed = room.IsClosed,
-                CurrencyName = curr.CurrencyName,
-                UpdateRateTime = currencyState.UpdateDate,
-                CountRates = _dbContext.Rates.Count(r => r.RoomId == room.Id)
-            }).AsNoTracking().ToArrayAsync(cancellationToken);
+        var rooms = await _dbContext.Rooms
+            .AsNoTracking()
+            .Where(dal => dal.IsClosed == false)
+            .ToArrayAsync(cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(filter.CurrencyName))
-            filteredRooms = filteredRooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant()).ToArray();
-        
-        if (filter.DateTryParse(filter.StartDate, out var startDate))
-            filteredRooms = filteredRooms.Where(room => room.Date >= startDate).ToArray();
-        if (filter.DateTryParse(filter.EndDate, out var endDate))
-            filteredRooms = filteredRooms.Where(room => room.Date <= endDate).ToArray();
-        
+            rooms = rooms.Where(room => room.CurrencyName == filter.CurrencyName.ToUpperInvariant()).ToArray();
 
-        return filteredRooms.Select(x => x.ToDomain()).ToArray();
+        if (filter.DateTryParse(filter.StartDate, out var startDate))
+            rooms = rooms.Where(room => room.EndDate >= startDate).ToArray();
+        if (filter.DateTryParse(filter.EndDate, out var endDate))
+            rooms = rooms.Where(room => room.EndDate <= endDate).ToArray();
+
+
+        return rooms.Select(x => x.ToDomain()).ToArray();
+    }
+    
+    public async Task<Room[]> RoomClosureCheckAsync(CancellationToken cancellationToken)
+    {
+        var closedRooms = await _dbContext.Rooms
+            .AsNoTracking()
+            .Where(dal => (dal.EndDate.Date == DateTime.Today
+                           && dal.EndDate.Hour == DateTime.UtcNow.AddHours(1).Hour)
+                          || ((dal.EndDate.Date == DateTime.Today.AddDays(1))
+                              && dal.EndDate.Hour == 0 && DateTime.UtcNow.Hour == 23)
+                          || DateTime.UtcNow > dal.EndDate)
+            .Select(dal => new RoomDal { EndDate = dal.EndDate, IsClosed = true, Id = dal.Id, CurrencyName = dal.CurrencyName,CountRates = dal.CountRates})
+            .ToArrayAsync(cancellationToken);
+        _dbContext.Rooms.UpdateRange(closedRooms);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return closedRooms.ToDomain();
     }
 }

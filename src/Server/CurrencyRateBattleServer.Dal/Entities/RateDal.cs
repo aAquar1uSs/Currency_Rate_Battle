@@ -29,10 +29,12 @@ public sealed class RateDal
     /// IsWon is true when the rate is winning; false - for losing rate
     /// </summary>
     public bool IsWon { get; set; }
-
-    [ForeignKey("RoomId")]
+    
+    public decimal? RealCurrencyExchange { get; set; }
+    
     public Guid RoomId { get; set; }
 
+    [ForeignKey("RoomId")]
     public RoomDal Room { get; set; }
 
     public string CurrencyName { get; set; }

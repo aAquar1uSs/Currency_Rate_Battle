@@ -3,38 +3,34 @@ using CRBClient.Models;
 using Microsoft.Extensions.Options;
 using CRBClient.Services.Interfaces;
 using System.Net;
-using Newtonsoft.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+using Uri = CRBClient.Helpers.Uri;
 
 namespace CRBClient.Services;
 
 public class RatingService : IRatingService
 {
     private readonly ICRBServerHttpClient _httpClient;
-    private readonly WebServerOptions _options;
     private readonly ILogger<RatingService> _logger;
+    private readonly Uri _uri;
 
-    public RatingService(ICRBServerHttpClient httpClient,
-        IOptions<WebServerOptions> options, ILogger<RatingService> logger)
+    public RatingService(ICRBServerHttpClient httpClient, ILogger<RatingService> logger,  IOptions<Uri> uriOption)
     {
         _httpClient = httpClient;
-        _options = options.Value;
         _logger = logger;
+        _uri = uriOption.Value;
     }
 
     public async Task<RatingViewModel[]> GetUserRatings(CancellationToken cancellationToken)
     {
-        var response = await _httpClient.GetAsync(_options.GetUsersRatingURL ?? "", cancellationToken);
+        var response = await _httpClient.GetAsync(_uri.GetUsersRatingURL, cancellationToken);
         if (response.StatusCode == HttpStatusCode.OK)
         {
             _logger.LogInformation("User rating are loaded successfully");
-          // var ratingsJson =  await response.Content.ReadAsStreamAsync(cancellationToken);
-          // var ratings = await JsonSerializer.DeserializeAsync<RatingViewModel[]>(ratingsJson, cancellationToken: cancellationToken);
-           return await response.Content.ReadAsAsync<RatingViewModel[]>(cancellationToken);
+            return await response.Content.ReadAsAsync<RatingViewModel[]>(cancellationToken);
         }
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            _logger.LogInformation("User rating not loaded, user is unauthorized");
+            _logger.LogWarning("User rating not loaded, user is unauthorized");
             throw new GeneralException();
         }
 
@@ -42,6 +38,7 @@ public class RatingService : IRatingService
 
     }
 
+    //ToDo Move sorting to backend
     public RatingViewModel[] RatingListSorting(RatingViewModel[] ratingInfo, string sortOrder)
     {
         var ratingList = ratingInfo.ToList();

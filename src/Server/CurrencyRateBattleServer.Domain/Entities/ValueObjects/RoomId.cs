@@ -2,7 +2,7 @@
 
 namespace CurrencyRateBattleServer.Domain.Entities.ValueObjects;
 
-public class RoomId : OneId
+public class RoomId : CustomId
 {
     protected RoomId(Guid id) : base(id)
     {
@@ -11,7 +11,7 @@ public class RoomId : OneId
     public static Result<RoomId> TryCreate(Guid? id)
     {
         if (id == Guid.Empty || id is null)
-            Result.Failure<OneId>("Room id can not be empty");
+            Result.Failure<CustomId>("Room id can not be empty");
 
         return new RoomId(id.Value);
     }

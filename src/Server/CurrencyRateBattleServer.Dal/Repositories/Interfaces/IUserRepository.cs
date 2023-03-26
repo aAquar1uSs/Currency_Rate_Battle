@@ -6,17 +6,10 @@ namespace CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 
 public interface IUserRepository
 {
-    /// <summary>
-    /// Verifies the presence of a user , if any, gives his unique token <see cref="Tokens"/>;
-    /// </summary>
-    /// <param name="userData"><see cref="UserDto"/></param>
-    /// <returns>
-    ///the task result contains <see cref="Tokens"/>
-    /// </returns>
-    public Task<User?> GetAsync(User userData, CancellationToken cancellationToken);
+    public Task<User?> Get(Email email, Password password, CancellationToken cancellationToken);
 
-    public Task<User?> FindAsync(UserId id, CancellationToken cancellationToken);
+    public Task<User?> Find(Email email, CancellationToken cancellationToken);
 
-    public Task CreateAsync(User userData, CancellationToken cancellationToken);
+    public Task Create(User userData, CancellationToken cancellationToken);
 
 }

@@ -9,7 +9,6 @@ public static class UserConverter
     {
         return new UserDal
         {
-            Id = user.Id.Id,
             Email = user.Email.Value,
             Password = user.Password.Value
         };
@@ -17,6 +16,6 @@ public static class UserConverter
 
     public static User ToDomain(this UserDal userDal)
     {
-        return User.Create(userDal.Id, userDal.Email, userDal.Password);
+        return User.Create(userDal.Email, userDal.Password);
     }
 }

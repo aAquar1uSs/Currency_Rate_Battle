@@ -9,13 +9,13 @@ public static class GuidHelper
     /// <returns>
     ///the task result contains <see cref="Guid"/> - user id;
     /// </returns>
-    public static Guid? GetGuidFromRequest(HttpContext context)
+    public static string? GetGuidFromRequest(HttpContext context)
     {
         var user = context.User;
 
         if (user.HasClaim(c => c.Type == "UserId"))
         {
-            var id = Guid.Parse(user.Claims.FirstOrDefault(c => c.Type == "UserId")!.Value);
+            var id = user.Claims.FirstOrDefault(c => c.Type == "UserId")!.Value;
             return id;
         }
 

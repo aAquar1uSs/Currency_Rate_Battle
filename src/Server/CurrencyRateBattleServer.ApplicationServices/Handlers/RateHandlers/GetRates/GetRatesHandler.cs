@@ -9,21 +9,17 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RateHandlers.Get
 
 public class GetRatesHandler : IRequestHandler<GetRatesCommand, Result<GetRatesResponse>>
 {
-    private readonly ILogger<GetRatesHandler> _logger;
     private readonly IRateRepository _rateRepository;
 
-    public GetRatesHandler(ILogger<GetRatesHandler> logger, IRateRepository rateRepository)
+    public GetRatesHandler(IRateRepository rateRepository)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _rateRepository = rateRepository ?? throw new ArgumentNullException(nameof(rateRepository));
     }
 
     public async Task<Result<GetRatesResponse>> Handle(GetRatesCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(GetRoomHandler)} was caused. Start processing.");
+        var rates = await _rateRepository.Find(request.IsActive, request.CurrencyName, cancellationToken);
 
-        var rates = await _rateRepository.FindAsync(request.IsActive, request.CurrencyName, cancellationToken);
-
-        return new GetRatesResponse { Rates = rates.ToDto() };
+        return new GetRatesResponse { Rates = rates.Select(x => x.ToDto()).ToArray() };
     }
 }

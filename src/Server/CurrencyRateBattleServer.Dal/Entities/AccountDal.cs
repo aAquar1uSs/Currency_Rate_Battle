@@ -12,8 +12,8 @@ public sealed class AccountDal
 
     public decimal Amount { get; set; }
     
-    public Guid UserId { get; set; }
+    public string Email { get; set; }
 
-    [ForeignKey("UserId")]
+    [ForeignKey("Email")]
     public UserDal User { get; set; }
 }

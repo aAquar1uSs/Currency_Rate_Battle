@@ -1,4 +1,4 @@
-﻿using CurrencyRateBattleServer.Dal.Entities;
+﻿using CurrencyRateBattleServer.Dal.Converters;
 using CurrencyRateBattleServer.Dal.Repositories.Interfaces;
 using CurrencyRateBattleServer.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -8,53 +8,26 @@ namespace CurrencyRateBattleServer.Dal.Repositories;
 
 public class CurrencyRepository : ICurrencyRepository
 {
-    private readonly ILogger<CurrencyRepository> _logger;
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public CurrencyRepository(ILogger<CurrencyRepository> logger, CurrencyRateBattleContext dbContext)
+    public CurrencyRepository(CurrencyRateBattleContext dbContext)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task UpdateAsync(Currency[] currencies, CancellationToken cancellationToken)
+    public async Task Update(Currency currency, CancellationToken cancellationToken)
     {
-        foreach (var currency in currencies)
-        {
-             var entity = await _dbContext.Currencies
-                .Where(x => x.CurrencyName == currency.CurrencyName.Value)
-                .Select(x => new CurrencyDal()
-                {
-                    CurrencyCode = x.CurrencyCode,
-                    CurrencyName = x.CurrencyName,
-                    Description = x.Description,
-                    Rate = currency.Rate.Value,
-                    UpdateDate = x.UpdateDate
-                }).FirstOrDefaultAsync(cancellationToken);
-
-             if (entity is not null)
-             {
-                 _dbContext.Currencies.Update(entity);
-             }
-        }
-
+        var currencyDal = currency.ToDal();
+        _ = _dbContext.Currencies.Update(currencyDal);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<string[]> GetAllIds(CancellationToken cancellationToken)
+    public async Task<Currency[]> Get(CancellationToken cancellationToken)
     {
-        return await _dbContext.Currencies
+        var currency = await _dbContext.Currencies
             .AsNoTracking()
-            .Select(x => x.CurrencyName).ToArrayAsync(cancellationToken);
-    }
+            .ToArrayAsync(cancellationToken);
 
-    public async Task<decimal> GetCurrencyByCurrencyName(string currencyName, CancellationToken cancellationToken)
-    {
-        var value = await _dbContext.Currencies.AsNoTracking()
-            .Where(x => x.CurrencyName == currencyName)
-            .Select(x => x.Rate)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return Math.Round(value, 2);
+        return currency.Select(x => x.ToDomain()).ToArray();
     }
 }

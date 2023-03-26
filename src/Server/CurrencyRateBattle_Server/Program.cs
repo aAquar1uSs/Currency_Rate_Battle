@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyStateHandlers.UpdateCurrencyRateHandlers;
+﻿using CurrencyRateBattleServer.ApplicationServices.Handlers.CurrencyHandlers.UpdateCurrencyRateHandlers;
 using CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.GenerateRoomHandler;
 using CurrencyRateBattleServer.ApplicationServices.HostedServices;
 using CurrencyRateBattleServer.ApplicationServices.Infrastructure;

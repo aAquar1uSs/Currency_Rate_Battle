@@ -13,4 +13,10 @@ public class RoomDal
 
     public bool IsClosed { get; set; }
     
+    public int CountRates { get; set; }
+
+    public string CurrencyName { get; set; }
+
+    [ForeignKey("CurrencyName")]
+    public CurrencyDal Currency { get; set; }
 }

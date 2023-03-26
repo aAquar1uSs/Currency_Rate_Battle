@@ -9,44 +9,36 @@ namespace CurrencyRateBattleServer.Dal.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private readonly ILogger<UserRepository> _logger;
     private readonly CurrencyRateBattleContext _dbContext;
 
-    public UserRepository(ILogger<UserRepository> logger, CurrencyRateBattleContext dbContext)
+    public UserRepository(CurrencyRateBattleContext dbContext)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
     }
 
-    public async Task<User?> GetAsync(User userData, CancellationToken cancellationToken)
+    public async Task<User?> Get(Email email, Password password, CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(GetAsync)} was caused.");
-
         var userDal = await _dbContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(dal => dal.Email == userData.Email.Value && dal.Password == userData.Password.Value,
+            .FirstOrDefaultAsync(dal => dal.Email == email.Value && dal.Password == password.Value,
                 cancellationToken);
 
         return userDal?.ToDomain();
     }
 
-    public async Task<User?> FindAsync(UserId id, CancellationToken cancellationToken)
+    public async Task<User?> Find(Email email, CancellationToken cancellationToken)
     {
-        _logger.LogDebug($"{nameof(FindAsync)} was caused.");
-
         var userDal = await _dbContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(dal => dal.Id == id.Id, cancellationToken);
+            .FirstOrDefaultAsync(dal => dal.Email == email.Value, cancellationToken);
         return userDal?.ToDomain();
     }
 
-    public async Task CreateAsync(User userData, CancellationToken cancellationToken)
+    public async Task Create(User userData, CancellationToken cancellationToken)
     {
         var userDal = userData.ToDal();
 
         _ = await _dbContext.Users.AddAsync(userDal, cancellationToken);
         _ = await _dbContext.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation("New user added to the database");
     }
 }
