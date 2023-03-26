@@ -50,7 +50,6 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
         if (maybeUser is not null)
             return PlayerValidationError.UserAlreadyExist;
         
-
         var amountResult = Amount.TryCreate(_options.RegistrationReward);
         if (amountResult.IsFailure)
             return new MoneyValidationError("amount_not_valid", amountResult.Error);
