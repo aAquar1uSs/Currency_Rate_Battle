@@ -46,9 +46,11 @@ public sealed class Account
         return new Account (accOneId, amountDomain, userOneId);
     }
 
-    public static Account TryCreateNewAccount(AccountId id, Email userEmail)
+    public static Account TryCreateNewAccount(AccountId id, Email userEmail, Amount startBalance)
     {
-        return new Account(id, Amount.Create(0), userEmail);
+        var account = new Account(id, Amount.Create(0), userEmail);
+        account.AddStartBalance(startBalance);
+        return account;
     }
 
     public void AddStartBalance(Amount startBalance)
@@ -77,10 +79,5 @@ public sealed class Account
         Amount.ApportionMoney(money.Value);
 
         return Result.Success();
-    }
-
-    public void AddUser(Email userEmail)
-    {
-        UserEmail = userEmail;
     }
 }

@@ -49,15 +49,15 @@ public class RegistrationHandler : IRequestHandler<RegistrationCommand, Result<R
 
         if (maybeUser is not null)
             return PlayerValidationError.UserAlreadyExist;
-
-        var customAccountId = AccountId.GenerateId();
-        var account = Account.TryCreateNewAccount(customAccountId, emailResult.Value);
+        
 
         var amountResult = Amount.TryCreate(_options.RegistrationReward);
         if (amountResult.IsFailure)
             return new MoneyValidationError("amount_not_valid", amountResult.Error);
 
-        account.AddStartBalance(amountResult.Value);
+        var customAccountId = AccountId.GenerateId();
+        var account = Account.TryCreateNewAccount(customAccountId, emailResult.Value, amountResult.Value);
+        
         var user = User.Create(request.Email, request.Password);
         
         await _userRepository.Create(user, cancellationToken);
