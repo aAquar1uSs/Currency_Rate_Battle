@@ -19,6 +19,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyRateBattleServer.Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NbuClient", "src\Server\NbuClient\NbuClient.csproj", "{FD28FE20-C3C2-4CC0-82D2-AF5990D36521}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AccountManager", "AccountManager", "{C8CDB48A-3A1F-46F5-A0F9-3620C133451A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountManager", "src\AccountManagerService\AccountManager\AccountManager.csproj", "{915AFE0C-7E96-4005-ABA4-5AE0678AFFB0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountManager.Dal", "src\AccountManagerService\AccountManager.Dal\AccountManager.Dal.csproj", "{F5239765-4F86-4F14-85F4-FEDB3A27B711}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountManager.ApplicationServices", "src\AccountManagerService\AccountManager.ApplicationServices\AccountManager.ApplicationServices.csproj", "{654926A5-8180-4E4B-A423-7E850334B444}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountManager.Domain", "src\AccountManagerService\AccountManager.Domain\AccountManager.Domain.csproj", "{698DC73A-C75B-4DE1-B7F7-ED02520EF83E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountManager.Redis", "src\AccountManagerService\AccountManager.Redis\AccountManager.Redis.csproj", "{5A0E4E5C-F5E6-4533-A46B-6FB29B0BD44A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +61,26 @@ Global
 		{FD28FE20-C3C2-4CC0-82D2-AF5990D36521}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD28FE20-C3C2-4CC0-82D2-AF5990D36521}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD28FE20-C3C2-4CC0-82D2-AF5990D36521}.Release|Any CPU.Build.0 = Release|Any CPU
+		{915AFE0C-7E96-4005-ABA4-5AE0678AFFB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{915AFE0C-7E96-4005-ABA4-5AE0678AFFB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{915AFE0C-7E96-4005-ABA4-5AE0678AFFB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{915AFE0C-7E96-4005-ABA4-5AE0678AFFB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5239765-4F86-4F14-85F4-FEDB3A27B711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5239765-4F86-4F14-85F4-FEDB3A27B711}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5239765-4F86-4F14-85F4-FEDB3A27B711}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5239765-4F86-4F14-85F4-FEDB3A27B711}.Release|Any CPU.Build.0 = Release|Any CPU
+		{654926A5-8180-4E4B-A423-7E850334B444}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{654926A5-8180-4E4B-A423-7E850334B444}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{654926A5-8180-4E4B-A423-7E850334B444}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{654926A5-8180-4E4B-A423-7E850334B444}.Release|Any CPU.Build.0 = Release|Any CPU
+		{698DC73A-C75B-4DE1-B7F7-ED02520EF83E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{698DC73A-C75B-4DE1-B7F7-ED02520EF83E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{698DC73A-C75B-4DE1-B7F7-ED02520EF83E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{698DC73A-C75B-4DE1-B7F7-ED02520EF83E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A0E4E5C-F5E6-4533-A46B-6FB29B0BD44A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A0E4E5C-F5E6-4533-A46B-6FB29B0BD44A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A0E4E5C-F5E6-4533-A46B-6FB29B0BD44A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A0E4E5C-F5E6-4533-A46B-6FB29B0BD44A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +92,11 @@ Global
 		{8DF4DDCF-EB02-45CD-BA72-BB8874EB6528} = {C410E5ED-BBE9-49D2-845D-33C898B7BFDA}
 		{9D8A16A5-97A0-4C06-94BB-47D585F3E5AB} = {C410E5ED-BBE9-49D2-845D-33C898B7BFDA}
 		{FD28FE20-C3C2-4CC0-82D2-AF5990D36521} = {C410E5ED-BBE9-49D2-845D-33C898B7BFDA}
+		{915AFE0C-7E96-4005-ABA4-5AE0678AFFB0} = {C8CDB48A-3A1F-46F5-A0F9-3620C133451A}
+		{F5239765-4F86-4F14-85F4-FEDB3A27B711} = {C8CDB48A-3A1F-46F5-A0F9-3620C133451A}
+		{654926A5-8180-4E4B-A423-7E850334B444} = {C8CDB48A-3A1F-46F5-A0F9-3620C133451A}
+		{698DC73A-C75B-4DE1-B7F7-ED02520EF83E} = {C8CDB48A-3A1F-46F5-A0F9-3620C133451A}
+		{5A0E4E5C-F5E6-4533-A46B-6FB29B0BD44A} = {C8CDB48A-3A1F-46F5-A0F9-3620C133451A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A2574B94-42E4-4924-B08C-C53F2F7744FF}

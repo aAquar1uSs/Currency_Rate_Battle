@@ -6,5 +6,6 @@ namespace CurrencyRateBattleServer.ApplicationServices.Handlers.RoomHandlers.Get
 
 public class GetFilteredRoomCommand : IRequest<Result<GetFilteredRoomResponse>>
 {
+    //ToDo
     public FilterDto Filter { get; set; }
 }

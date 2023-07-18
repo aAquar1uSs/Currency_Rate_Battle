@@ -27,7 +27,7 @@ public class AccountHistoryController : ControllerBase
     [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetAccountHistoryAsync(CancellationToken cancellationToken)
     {
-        var userEmail = GuidHelper.GetGuidFromRequest(HttpContext);
+        var userEmail = GuidHelper.GetEmailFromRequest(HttpContext);
         if (userEmail is null)
             return Unauthorized();
 
@@ -46,7 +46,7 @@ public class AccountHistoryController : ControllerBase
     [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateNewAccountHistory([FromBody] AccountHistoryDto historyDto, CancellationToken cancellationToken)
     {
-        var userId = GuidHelper.GetGuidFromRequest(HttpContext);
+        var userId = GuidHelper.GetEmailFromRequest(HttpContext);
         if (userId is null)
             return Unauthorized();
 

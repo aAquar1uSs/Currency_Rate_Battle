@@ -25,8 +25,7 @@ public class Filter
     {
         try
         {
-            dateTime = DateTime.ParseExact(date, DateFormat, CultureInfo.InvariantCulture)
-                       + _timeDifference;
+            dateTime = DateTime.ParseExact(date, DateFormat, CultureInfo.InvariantCulture) + _timeDifference;
             return true;
         }
         catch

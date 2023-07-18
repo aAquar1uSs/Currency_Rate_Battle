@@ -32,10 +32,10 @@ public class RoomController : ControllerBase
         return Ok(response.Value.Rooms);
     }
 
-    [HttpPost("filter")]
+    [HttpGet("filter")]
     [ProducesResponseType(typeof(RoomDto[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromBody] FilterDto filter, CancellationToken cancellationToken)
+    public async Task<ActionResult<List<Room>>> FilterRoomsAsync([FromQuery] FilterDto filter, CancellationToken cancellationToken)
     {
         var command = new GetFilteredRoomCommand { Filter = filter };
 

@@ -1,5 +1,4 @@
-﻿
-namespace CurrencyRateBattleServer.ApplicationServices.Dto;
+namespace AccountManager.Dto;
 
 public class UserDto
 {

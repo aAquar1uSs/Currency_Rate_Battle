@@ -28,7 +28,7 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetUserBalanceAsync(CancellationToken cancellationToken)
     {
-        var userEmal = GuidHelper.GetGuidFromRequest(HttpContext);
+        var userEmal = GuidHelper.GetEmailFromRequest(HttpContext);
         if (userEmal is null)
             return Unauthorized();
 
@@ -46,7 +46,7 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetUserInfoAsync(CancellationToken cancellationToken)
     {
-        var userEmail = GuidHelper.GetGuidFromRequest(HttpContext);
+        var userEmail = GuidHelper.GetEmailFromRequest(HttpContext);
         if (userEmail is null)
             return Unauthorized();
 

@@ -44,6 +44,7 @@ public class RateRepository : IRateRepository
             currencyId = currency?.CurrencyName;
         }
 
+        //ToDo Refactor this
         RateDal[] result;
         if (currencyId is not null || currencyId != string.Empty)
             result = await _dbContext.Rates

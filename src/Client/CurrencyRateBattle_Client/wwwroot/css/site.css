@@ -43,7 +43,8 @@
 
 .container {
     height: 100vh;
-    background-image: url("../css/img/backgound_image.jpg");
+    /*background-image: url("../css/img/backgound_image.jpg");*/
+    background-color: gray;
     background-repeat: no-repeat;
     background-size: cover;
     padding-top: 50px;

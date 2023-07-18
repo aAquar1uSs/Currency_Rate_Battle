@@ -28,7 +28,7 @@ public class RateController : ControllerBase
     [ProducesResponseType(typeof(GetRatesResponse), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<Room>>> GetRatesAsync([FromQuery] bool isActive, [FromQuery] string? currencyCode, CancellationToken cancellationToken)
     {
-        var command = new GetRatesCommand {IsActive = isActive, CurrencyName = currencyCode};
+        var command = new GetRatesCommand { IsActive = isActive, CurrencyName = currencyCode };
 
         var response = await _mediator.Send(command, cancellationToken);
 
@@ -41,7 +41,7 @@ public class RateController : ControllerBase
     [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetUserBetsAsync()
     {
-        var userEmal = GuidHelper.GetGuidFromRequest(HttpContext);
+        var userEmal = GuidHelper.GetEmailFromRequest(HttpContext);
         if (userEmal is null)
             return BadRequest();
 
@@ -60,7 +60,7 @@ public class RateController : ControllerBase
     [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateRateAsync([FromBody] UserRateDto userRateToCreate)
     {
-        var userEmal = GuidHelper.GetGuidFromRequest(HttpContext);
+        var userEmal = GuidHelper.GetEmailFromRequest(HttpContext);
         if (userEmal is null)
             return Unauthorized();
 

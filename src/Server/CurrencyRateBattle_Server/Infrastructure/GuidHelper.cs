@@ -9,7 +9,7 @@ public static class GuidHelper
     /// <returns>
     ///the task result contains <see cref="Guid"/> - user id;
     /// </returns>
-    public static string? GetGuidFromRequest(HttpContext context)
+    public static string? GetEmailFromRequest(HttpContext context)
     {
         var user = context.User;
 
